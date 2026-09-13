@@ -118,7 +118,10 @@ export class HeaderController {
         if (!this.root.isConnected) { this.destroy(); return; }
         if (this.needsMeasure) this.measure();
 
-        const boundaryTop = this.scrollParent === this.window ? 0 : this.scrollParent.getBoundingClientRect().top + this.scrollParent.clientTop;
+        // Sticky children stop at the inner padded edge of a nested scrollport.
+        const boundaryTop = this.scrollParent === this.window ? 0
+            : this.scrollParent.getBoundingClientRect().top + this.scrollParent.clientTop
+                + (parseFloat(this.window.getComputedStyle(this.scrollParent).paddingTop) || 0);
         const bottoms = this.topbars().filter((element) => element.getClientRects().length > 0).map((element) => element.getBoundingClientRect().bottom);
         const offset = resolveOffset(this.options, bottoms, boundaryTop);
         let mode = resolveMode(this.options, this.window.innerWidth);
