@@ -4,12 +4,13 @@ declare(strict_types=1);
 
 use Illuminate\Foundation\Application;
 
-$app = Application::configure(basePath: dirname(__DIR__))
-    ->withRouting(web: __DIR__.'/../routes/web.php')
+// Testbench supplies its own isolated base path when it discovers this file.
+$builder = Application::configure(basePath: $APP_BASE_PATH ?? dirname(__DIR__))
     ->withMiddleware()
-    ->withExceptions()
-    ->create();
+    ->withExceptions();
 
-$app->useVendorPath(dirname(__DIR__, 2).'/vendor');
+if (! isset($APP_BASE_PATH)) {
+    $builder->withRouting(web: __DIR__.'/../routes/web.php');
+}
 
-return $app;
+return $builder->create();

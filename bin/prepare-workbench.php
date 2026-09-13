@@ -21,4 +21,10 @@ if (! file_exists($base.'/database/database.sqlite')) {
     touch($base.'/database/database.sqlite');
 }
 
+if (! is_dir($base.'/vendor') && ! is_link($base.'/vendor')) {
+    if (! symlink('../vendor', $base.'/vendor')) {
+        throw new RuntimeException('Unable to link the workbench to the package vendor directory.');
+    }
+}
+
 fwrite(STDOUT, "Workbench directories and local environment are ready.\n");
