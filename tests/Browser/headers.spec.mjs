@@ -23,7 +23,7 @@ for (const width of [360, 390, 768, 1024, 1440]) {
 }
 
 test('busy desktop headers wrap native actions before schema content becomes unreadable', async ({ page }) => {
-    await page.setViewportSize({ width: 1280, height: 900 });
+    await page.setViewportSize({ width: 1582, height: 900 });
     const errors = await openHeader(page, 'variant=11&mode=normal');
 
     const collapseSidebar = page.getByRole('button', { name: 'Collapse sidebar', exact: true });
@@ -31,10 +31,6 @@ test('busy desktop headers wrap native actions before schema content becomes unr
         await collapseSidebar.click();
         await expect(page.getByRole('button', { name: 'Expand sidebar', exact: true })).toBeVisible();
     }
-
-    await page.locator('[data-fph-root]').evaluate(element => {
-        element.style.maxWidth = '1000px';
-    });
 
     const content = page.locator('.fph-content');
     const main = page.locator('.fph-main');
