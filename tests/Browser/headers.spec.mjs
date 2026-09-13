@@ -56,6 +56,14 @@ test('busy desktop headers wrap native actions before schema content becomes unr
     expect(contentBox.width).toBeGreaterThanOrEqual(680);
     expect(mainBox.width).toBeGreaterThanOrEqual(480);
     expect(actionsBox.y).toBeGreaterThan(contentBox.y + 20);
+
+    const metadataCellWidths = await page.locator('.fph-metadata .fi-in-entry-label').evaluateAll(labels => labels.map(label => {
+        const cell = label.closest('.fi-sc-component');
+        return cell?.getBoundingClientRect().width ?? 0;
+    }));
+    expect(metadataCellWidths).toHaveLength(6);
+    expect(Math.min(...metadataCellWidths)).toBeGreaterThanOrEqual(95);
+
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth + 1)).toBe(true);
     expect(errors).toEqual([]);
 });
