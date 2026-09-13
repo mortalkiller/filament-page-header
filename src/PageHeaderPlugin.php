@@ -93,8 +93,8 @@ final class PageHeaderPlugin implements Plugin
     }
 
     /**
-     * @param class-string<Resource> $resource
-     * @param class-string $schema
+     * @param  class-string<resource>  $resource
+     * @param  class-string  $schema
      */
     public function schemaFor(string $resource, string $schema): self
     {
@@ -112,7 +112,7 @@ final class PageHeaderPlugin implements Plugin
     }
 
     /**
-     * @param class-string $resource
+     * @param  class-string  $resource
      * @return class-string|null
      */
     public function getSchemaFor(string $resource): ?string

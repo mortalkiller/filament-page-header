@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Workbench\App\Providers;
 
+use Filament\FontProviders\LocalFontProvider;
 use Filament\Http\Middleware\DisableBladeIconComponents;
 use Filament\Http\Middleware\DispatchServingFilamentEvent;
 use Filament\Panel;
@@ -24,7 +25,7 @@ final class DemoPanelProvider extends PanelProvider
     public function panel(Panel $panel): Panel
     {
         return $panel->default()->id('demo')->path('demo')->brandName('Page Header')
-            ->spa()->sidebarCollapsibleOnDesktop()->userMenu(false)->font('sans-serif', provider: \Filament\FontProviders\LocalFontProvider::class)
+            ->spa()->sidebarCollapsibleOnDesktop()->userMenu(false)->font('sans-serif', provider: LocalFontProvider::class)
             ->plugin(PageHeaderPlugin::make())
             ->pages([HeaderGallery::class, NativePage::class])
             ->middleware([

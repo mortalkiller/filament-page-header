@@ -1,9 +1,12 @@
 <?php
 
 declare(strict_types=1);
+use MortalKiller\FilamentPageHeader\PageHeaderServiceProvider;
+use Workbench\App\Providers\DemoPanelProvider;
+use Workbench\App\Providers\WorkbenchServiceProvider;
 
 return [
-    MortalKiller\FilamentPageHeader\PageHeaderServiceProvider::class,
-    Workbench\App\Providers\WorkbenchServiceProvider::class,
-    Workbench\App\Providers\DemoPanelProvider::class,
+    PageHeaderServiceProvider::class,
+    WorkbenchServiceProvider::class,
+    DemoPanelProvider::class,
 ];

@@ -7,6 +7,7 @@ use Filament\Panel;
 use Filament\Schemas\Schema;
 use Filament\Support\Facades\FilamentView;
 use Filament\View\PanelsRenderHook;
+use Illuminate\Support\HtmlString;
 use Livewire\Livewire;
 use MortalKiller\FilamentPageHeader\Components\Heading;
 use MortalKiller\FilamentPageHeader\Enums\HeaderMode;
@@ -55,7 +56,7 @@ it('escapes untrusted heading text', function (): void {
 
 it('only renders heading html after explicit opt in', function (): void {
     $page = Livewire::test(ExamplePage::class)->instance();
-    $plain = Schema::make($page)->components([Heading::make('title')->state(new Illuminate\Support\HtmlString('<em>Safe title</em>'))]);
+    $plain = Schema::make($page)->components([Heading::make('title')->state(new HtmlString('<em>Safe title</em>'))]);
     $trusted = Schema::make($page)->components([Heading::make('title')->state('<em>Safe title</em>')->html()]);
     expect($plain->toHtml())->toContain('&lt;em&gt;Safe title&lt;/em&gt;')
         ->and($trusted->toHtml())->toContain('<em>Safe title</em>');
