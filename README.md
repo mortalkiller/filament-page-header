@@ -6,24 +6,23 @@ The package has no dependency on a consuming application's models, theme, databa
 
 ## Status and requirements
 
-This is an **unreleased development branch**. No stable Composer tag or Packagist release is published. See [the verification record](docs/verification.md) for executed checks and remaining manual checks.
+The maintained stable line is **1.x**. Stable versions are published through Packagist from Git tags such as `v1.0.0`. See [the verification record](docs/verification.md) for executed checks and remaining manual checks.
 
 - PHP 8.3 or later within PHP 8.
 - Filament 5.8.1 or later within Filament 5.
 - Laravel 12 or 13, subject to the framework's PHP requirements.
 - A browser supporting CSS sticky positioning, ResizeObserver and MutationObserver.
 
-## Install the development branch
+## Installation
 
-In a consuming Laravel application, register the repository and install the development branch explicitly:
+Install the stable 1.x line from Packagist:
 
 ```bash
-composer config repositories.filament-page-header vcs https://github.com/mortalkiller/filament-page-header
-composer require mortalkiller/filament-page-header:dev-feature/schema-headers
+composer require mortalkiller/filament-page-header:^1.0
 php artisan filament:assets
 ```
 
-Do not change the entire application's `minimum-stability` to `dev`. Keep this dependency in `require`, not `require-dev`, when the application uses its headers at runtime. Review and commit the application's lock file deliberately.
+For unreleased work on the maintained branch, use `1.x-dev` deliberately. Do not change the entire application's `minimum-stability` to `dev`. Keep this dependency in `require`, not `require-dev`, when the application uses its headers at runtime. Review and commit the application's lock file deliberately.
 
 The service provider is auto-discovered. Enable the plugin separately on each panel:
 
