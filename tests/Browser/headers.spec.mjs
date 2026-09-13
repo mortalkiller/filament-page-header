@@ -22,6 +22,52 @@ for (const width of [360, 390, 768, 1024, 1440]) {
     });
 }
 
+test('busy desktop headers wrap native actions before schema content becomes unreadable', async ({ page }) => {
+    await page.setViewportSize({ width: 1582, height: 900 });
+    const errors = await openHeader(page, 'variant=11&mode=normal');
+
+    const collapseSidebar = page.getByRole('button', { name: 'Collapse sidebar', exact: true });
+    if (await collapseSidebar.isVisible()) {
+        await collapseSidebar.click();
+        await expect(page.getByRole('button', { name: 'Expand sidebar', exact: true })).toBeVisible();
+    }
+
+    const content = page.locator('.fph-content');
+    const main = page.locator('.fph-main');
+    const actions = page.locator('.fph-actions');
+
+    for (const label of [
+        'Guardar alterações',
+        'Cancelar',
+        'Criar orçamento',
+        'Criar documento',
+        'Sincronizar cliente com Moloni',
+        'Mais',
+    ]) {
+        await expect(page.getByRole('button', { name: label, exact: true })).toBeVisible();
+    }
+
+    const contentBox = await content.boundingBox();
+    const mainBox = await main.boundingBox();
+    const actionsBox = await actions.boundingBox();
+    expect(contentBox).not.toBeNull();
+    expect(mainBox).not.toBeNull();
+    expect(actionsBox).not.toBeNull();
+    expect(contentBox.width).toBeGreaterThanOrEqual(680);
+    expect(mainBox.width).toBeGreaterThanOrEqual(480);
+    expect(actionsBox.y).toBeGreaterThan(contentBox.y + 20);
+
+    const metadataCellWidths = await page.locator('.fph-metadata .fi-in-entry-label').evaluateAll(labels => labels.map(label => {
+        const cell = label.closest('.fi-sc-component');
+        return cell?.getBoundingClientRect().width ?? 0;
+    }));
+    expect(metadataCellWidths).toHaveLength(6);
+    expect(Math.min(...metadataCellWidths)).toBeGreaterThanOrEqual(95);
+
+    expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth + 1)).toBe(true);
+    expect(errors).toEqual([]);
+});
+
 test('compact scroll preserves content position, inputs and one set of actions without requests', async ({ page }) => {
     const errors = await openHeader(page);
     await page.getByRole('textbox', { name: 'Unsaved note', exact: true }).fill('An unsaved note');
@@ -76,7 +122,6 @@ test('menu and confirmation remain above the sticky header', async ({ page }) =>
     await page.getByRole('button', { name: 'More', exact: true }).click();
     await page.getByRole('button', { name: 'Confirm action', exact: true }).click();
     const dialog = page.getByRole('alertdialog', { name: 'Confirm action', exact: true });
-    // Filament positions the children, leaving the outer dialog with a zero-height box.
     const modalWindow = dialog.locator('.fi-modal-window');
     await expect(modalWindow).toBeVisible();
     await expect(dialog).toHaveAttribute('aria-modal', 'true');
