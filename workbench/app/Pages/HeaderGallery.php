@@ -57,15 +57,15 @@ class HeaderGallery extends Page
                 11 => 'LAURA STRADER',
                 default => 'Invoice · FT 2026/123',
             })
-            ->subheading($this->variant === 11 ? 'Customer since 21/05/2026' : 'A reusable header with native Filament schemas.');
+            ->subheading($this->variant === 11 ? 'Cliente desde 21/05/2026' : 'A reusable header with native Filament schemas.');
 
         if ($this->variant >= 2) {
-            $badges = [TextEntry::make('status')->state(fn (): string => $this->variant === 11 ? 'Active' : $this->status)->badge()->color($this->variant === 11 ? 'success' : 'gray')->hiddenLabel()];
+            $badges = [TextEntry::make('status')->state(fn (): string => $this->variant === 11 ? 'Ativo' : $this->status)->badge()->color($this->variant === 11 ? 'success' : 'gray')->hiddenLabel()];
             if (in_array($this->variant, [3, 10], true)) {
                 $badges[] = TextEntry::make('payment')->state('Awaiting payment')->badge()->color('warning')->hiddenLabel();
             }
             if ($this->variant === 11) {
-                $badges[] = TextEntry::make('provider')->state('Not synchronized')->badge()->color('gray')->hiddenLabel();
+                $badges[] = TextEntry::make('provider')->state('Não sincronizado')->badge()->color('gray')->hiddenLabel();
                 $badges[] = TextEntry::make('locale')->state('PT')->badge()->color('gray')->hiddenLabel();
             }
             $layout->badges($badges);
@@ -89,12 +89,12 @@ class HeaderGallery extends Page
                     'md' => 3,
                     'xl' => 6,
                 ])->schema([
-                    TextEntry::make('customer_number')->label('Customer number')->state('C000007'),
-                    TextEntry::make('reference')->label('Reference')->state('—'),
-                    TextEntry::make('vat_number')->label('VAT number')->state('—'),
+                    TextEntry::make('customer_number')->label('Número de cliente')->state('C000007'),
+                    TextEntry::make('reference')->label('Referência')->state('—'),
+                    TextEntry::make('vat_number')->label('NIF')->state('—'),
                     TextEntry::make('email')->label('Email')->state('—'),
-                    TextEntry::make('phone')->label('Phone')->state('—'),
-                    TextEntry::make('created_at')->label('Customer since')->state('21/05/2026'),
+                    TextEntry::make('phone')->label('Telefone')->state('—'),
+                    TextEntry::make('created_at')->label('Cliente desde')->state('21/05/2026'),
                 ]),
             ]);
         }
@@ -104,9 +104,9 @@ class HeaderGallery extends Page
         if ($this->variant === 11) {
             $layout->trailing([
                 Grid::make(3)->schema([
-                    TextEntry::make('quotes')->label('Quotes')->state(0)->badge()->color('gray'),
-                    TextEntry::make('approved')->label('Approved')->state(0)->badge()->color('success'),
-                    TextEntry::make('conversion')->label('Conversion')->state('0%')->badge()->color('info'),
+                    TextEntry::make('quotes')->label('Orçamentos')->state(0)->badge()->color('gray'),
+                    TextEntry::make('approved')->label('Aprovado')->state(0)->badge()->color('success'),
+                    TextEntry::make('conversion')->label('Conversão')->state('0%')->badge()->color('info'),
                 ]),
             ]);
         }
@@ -131,15 +131,15 @@ class HeaderGallery extends Page
     {
         if ($this->variant === 11) {
             return [
-                Action::make('saveChanges')->label('Save changes')->action(fn (): null => null),
-                Action::make('cancel')->label('Cancel')->action(fn (): null => null),
-                Action::make('createQuote')->label('Create quote')->icon(Heroicon::OutlinedDocumentPlus)->action(fn (): null => null),
-                Action::make('createDocument')->label('Create document')->action(fn (): null => null),
-                Action::make('syncCustomer')->label('Synchronize customer with provider')->action(fn (): null => null),
+                Action::make('saveChanges')->label('Guardar alterações')->action(fn (): null => null),
+                Action::make('cancel')->label('Cancelar')->action(fn (): null => null),
+                Action::make('createQuote')->label('Criar orçamento')->icon(Heroicon::OutlinedDocumentPlus)->action(fn (): null => null),
+                Action::make('createDocument')->label('Criar documento')->action(fn (): null => null),
+                Action::make('syncCustomer')->label('Sincronizar cliente com Moloni')->action(fn (): null => null),
                 ActionGroup::make([
-                    Action::make('merge')->label('Merge customer')->action(fn (): null => null),
-                    Action::make('delete')->label('Delete customer')->action(fn (): null => null),
-                ])->label('More')->button(),
+                    Action::make('merge')->label('Unir cliente')->action(fn (): null => null),
+                    Action::make('delete')->label('Eliminar cliente')->action(fn (): null => null),
+                ])->label('Mais')->button(),
             ];
         }
 
