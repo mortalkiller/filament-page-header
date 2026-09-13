@@ -70,15 +70,18 @@ test('native submit and schema actions execute once and update the header', asyn
 });
 
 test('menu and confirmation remain above the sticky header', async ({ page }) => {
-    await openHeader(page);
+    const errors = await openHeader(page);
     await page.evaluate(() => window.scrollTo(0, 700));
     await expect(page.locator('[data-fph-root]')).toHaveAttribute('data-fph-stuck', 'true');
     await page.getByRole('button', { name: 'More', exact: true }).click();
     await page.getByRole('button', { name: 'Confirm action', exact: true }).click();
-    const dialog = page.getByRole('dialog').filter({ hasText: 'Confirm action' });
+    const dialog = page.getByRole('alertdialog', { name: 'Confirm action', exact: true });
     await expect(dialog).toBeVisible();
+    await expect(dialog).toHaveAttribute('aria-modal', 'true');
     await dialog.getByRole('button', { name: 'Confirm', exact: true }).click();
     await expect(page.locator('.fph-badges')).toContainText('Confirmed');
+    await expect(dialog).not.toBeVisible();
+    expect(errors).toEqual([]);
 });
 
 test('repeated SPA navigation does not leave duplicate controllers or headers', async ({ page }) => {
