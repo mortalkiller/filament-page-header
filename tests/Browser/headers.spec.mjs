@@ -37,12 +37,12 @@ test('busy desktop headers wrap native actions before schema content becomes unr
     const actions = page.locator('.fph-actions');
 
     for (const label of [
-        'Save changes',
-        'Cancel',
-        'Create quote',
-        'Create document',
-        'Synchronize customer with provider',
-        'More',
+        'Guardar alterações',
+        'Cancelar',
+        'Criar orçamento',
+        'Criar documento',
+        'Sincronizar cliente com Moloni',
+        'Mais',
     ]) {
         await expect(page.getByRole('button', { name: label, exact: true })).toBeVisible();
     }
