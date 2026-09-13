@@ -3,9 +3,11 @@
 .fph-root[data-fph-mode="sticky"],.fph-root[data-fph-mode="compact"]{position:sticky;top:var(--fph-offset);z-index:20;pointer-events:none}
 .fph-root .fph-header{display:flex;flex-wrap:wrap;align-items:flex-start;justify-content:space-between;gap:1rem;min-width:0;width:100%;pointer-events:auto;background:var(--fph-background);padding-block:.5rem;box-sizing:border-box;border-bottom:1px solid transparent}
 .fph-root[data-fph-stuck="true"] .fph-header{box-shadow:0 6px 12px -10px rgb(0 0 0 / .35);border-bottom-color:var(--fph-border)}
-.fph-root .fph-content{min-width:0;flex:1 1 26rem}
+/* Wrap native actions against the schema's preferred width, not a fixed small basis. */
+.fph-root .fph-content{min-width:0;flex:1 1 max-content}
 .fph-root .fph-layout{display:flex;flex-wrap:wrap;align-items:flex-start;gap:1rem;min-width:0}
-.fph-root .fph-main{min-width:0;flex:1 1 14rem;display:flex;flex-direction:column;gap:.375rem}
+/* Trailing metrics must also wrap before they crush nested metadata grids. */
+.fph-root .fph-main{min-width:0;flex:1 1 max-content;display:flex;flex-direction:column;gap:.375rem}
 .fph-root .fph-title-row{display:flex;flex-wrap:wrap;align-items:center;gap:.5rem .75rem;min-width:0}
 .fph-root .fph-title-row>.fi-sc{display:contents}
 .fph-root .fph-title-row>.fi-sc>.fi-sc-component{min-width:0}
