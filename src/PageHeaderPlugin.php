@@ -7,6 +7,9 @@ namespace MortalKiller\FilamentPageHeader;
 use Filament\Contracts\Plugin;
 use Filament\Facades\Filament;
 use Filament\Panel;
+use Filament\Resources\Resource;
+use InvalidArgumentException;
+use LogicException;
 use MortalKiller\FilamentPageHeader\Enums\HeaderMode;
 
 final class PageHeaderPlugin implements Plugin
@@ -32,8 +35,17 @@ final class PageHeaderPlugin implements Plugin
 
     public static function get(): self
     {
-        /** @var self $plugin */
-        $plugin = Filament::getCurrentPanel()->getPlugin(self::ID);
+        $panel = Filament::getCurrentPanel();
+
+        if ($panel === null || ! $panel->hasPlugin(self::ID)) {
+            throw new LogicException('The page header plugin is not registered for the current panel.');
+        }
+
+        $plugin = $panel->getPlugin(self::ID);
+
+        if (! $plugin instanceof self) {
+            throw new LogicException('The page header plugin identifier is registered by a different plugin.');
+        }
 
         return $plugin;
     }
@@ -80,15 +92,29 @@ final class PageHeaderPlugin implements Plugin
         return $this->options;
     }
 
-    /** @param class-string $resource @param class-string $schema */
+    /**
+     * @param class-string<Resource> $resource
+     * @param class-string $schema
+     */
     public function schemaFor(string $resource, string $schema): self
     {
+        if (! is_subclass_of($resource, Resource::class)) {
+            throw new InvalidArgumentException('Header schemas must be mapped to a Filament resource class.');
+        }
+
+        if (! is_callable([$schema, 'configure'])) {
+            throw new InvalidArgumentException('A header schema class must expose a public static configure method.');
+        }
+
         $this->resourceSchemas[$resource] = $schema;
 
         return $this;
     }
 
-    /** @param class-string $resource @return class-string|null */
+    /**
+     * @param class-string $resource
+     * @return class-string|null
+     */
     public function getSchemaFor(string $resource): ?string
     {
         return $this->resourceSchemas[$resource] ?? null;
