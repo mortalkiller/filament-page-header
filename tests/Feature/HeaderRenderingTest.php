@@ -81,7 +81,7 @@ it('binds the shared resource schema to the record and native enum', function ()
 it('supports create and list pages without allocating a record', function (string $page): void {
     Livewire::test($page)->assertSeeHtml('data-fph-root');
     expect(Order::count())->toBe(0);
-})->with([CreateOrder::class, ListOrders::class]);
+})->with([[CreateOrder::class], [ListOrders::class]]);
 
 it('keeps edit form state and the native save form target', function (): void {
     $order = Order::create(['reference' => 'BEFORE']);
