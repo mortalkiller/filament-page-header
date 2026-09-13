@@ -139,8 +139,11 @@ export class HeaderController {
 
     revealTarget(target) {
         if (this.destroyed || this.root.dataset.fphStuck !== 'true' || !(target instanceof this.window.Element) || this.root.contains(target)) return;
+        const pageContent = this.root.closest('.fi-page') ?? this.root.parentElement;
+        // Panel chrome and unrelated pages must not move when they receive focus.
+        if (!pageContent?.contains(target)) return;
         if (this.scrollParent !== this.window && !this.scrollParent.contains(target)) return;
-        if (target.closest('[role="dialog"], .fi-modal, [data-fph-root]')) return;
+        if (target.closest('[role="dialog"], [role="alertdialog"], .fi-modal, [data-fph-root]')) return;
         const rect = target.getBoundingClientRect();
         const bottom = this.header.getBoundingClientRect().bottom + 8;
         if (rect.top >= bottom || rect.bottom < 0) return;
