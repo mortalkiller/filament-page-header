@@ -134,7 +134,8 @@ class HeaderGallery extends Page
                 Action::make('saveChanges')->label('Save changes')->action(fn (): null => null),
                 Action::make('cancel')->label('Cancel')->action(fn (): null => null),
                 Action::make('createQuote')->label('Create quote')->icon(Heroicon::OutlinedDocumentPlus)->action(fn (): null => null),
-                Action::make('createDocument')->label('Create document')->action(fn (): null => null),
+                Action::make('createDocument')->label('Create billing document')->action(fn (): null => null),
+                Action::make('resolveProvider')->label('Resolve provider association')->action(fn (): null => null),
                 Action::make('syncCustomer')->label('Synchronize customer with provider')->action(fn (): null => null),
                 ActionGroup::make([
                     Action::make('merge')->label('Merge customer')->action(fn (): null => null),
