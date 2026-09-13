@@ -26,6 +26,7 @@ test('busy desktop headers wrap native actions before schema content becomes unr
     await page.setViewportSize({ width: 1440, height: 900 });
     const errors = await openHeader(page, 'variant=11&mode=normal');
     const content = page.locator('.fph-content');
+    const main = page.locator('.fph-main');
     const actions = page.locator('.fph-actions');
 
     for (const label of [
@@ -41,15 +42,24 @@ test('busy desktop headers wrap native actions before schema content becomes unr
     }
 
     const contentBox = await content.boundingBox();
+    const mainBox = await main.boundingBox();
     const actionsBox = await actions.boundingBox();
     expect(contentBox).not.toBeNull();
+    expect(mainBox).not.toBeNull();
     expect(actionsBox).not.toBeNull();
     expect(contentBox.width).toBeGreaterThanOrEqual(680);
+    expect(mainBox.width).toBeGreaterThanOrEqual(480);
     expect(actionsBox.y).toBeGreaterThan(contentBox.y + 20);
 
-    const metadataWidths = await page.locator('.fph-metadata .fi-sc-component').evaluateAll(elements => elements.map(element => element.getBoundingClientRect().width));
-    expect(metadataWidths.length).toBeGreaterThanOrEqual(6);
-    expect(Math.min(...metadataWidths)).toBeGreaterThanOrEqual(95);
+    const metadataCellWidths = await page.locator('.fph-metadata').evaluate(element => {
+        const labels = [...element.querySelectorAll('.fi-in-entry-wrp-label')];
+        return labels.map(label => {
+            const cell = label.closest('.fi-grid-col') ?? label.closest('.fi-sc-component') ?? label.parentElement;
+            return cell?.getBoundingClientRect().width ?? 0;
+        });
+    });
+    expect(metadataCellWidths.length).toBeGreaterThanOrEqual(6);
+    expect(Math.min(...metadataCellWidths)).toBeGreaterThanOrEqual(95);
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth + 1)).toBe(true);
     expect(errors).toEqual([]);
 });
