@@ -28,7 +28,15 @@ test('busy desktop headers wrap native actions before schema content becomes unr
     const content = page.locator('.fph-content');
     const actions = page.locator('.fph-actions');
 
-    for (const label of ['Save changes', 'Cancel', 'Create quote', 'Create document', 'Synchronize customer with provider', 'More']) {
+    for (const label of [
+        'Save changes',
+        'Cancel',
+        'Create quote',
+        'Create billing document',
+        'Resolve provider association',
+        'Synchronize customer with provider',
+        'More',
+    ]) {
         await expect(page.getByRole('button', { name: label, exact: true })).toBeVisible();
     }
 
@@ -36,12 +44,12 @@ test('busy desktop headers wrap native actions before schema content becomes unr
     const actionsBox = await actions.boundingBox();
     expect(contentBox).not.toBeNull();
     expect(actionsBox).not.toBeNull();
-    expect(contentBox.width).toBeGreaterThanOrEqual(600);
+    expect(contentBox.width).toBeGreaterThanOrEqual(680);
     expect(actionsBox.y).toBeGreaterThan(contentBox.y + 20);
 
     const metadataWidths = await page.locator('.fph-metadata .fi-sc-component').evaluateAll(elements => elements.map(element => element.getBoundingClientRect().width));
     expect(metadataWidths.length).toBeGreaterThanOrEqual(6);
-    expect(Math.min(...metadataWidths)).toBeGreaterThanOrEqual(85);
+    expect(Math.min(...metadataWidths)).toBeGreaterThanOrEqual(95);
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth + 1)).toBe(true);
     expect(errors).toEqual([]);
 });
