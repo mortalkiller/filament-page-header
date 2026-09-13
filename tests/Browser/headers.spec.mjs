@@ -23,7 +23,7 @@ for (const width of [360, 390, 768, 1024, 1440]) {
 }
 
 test('busy desktop headers wrap native actions before schema content becomes unreadable', async ({ page }) => {
-    await page.setViewportSize({ width: 1440, height: 900 });
+    await page.setViewportSize({ width: 1280, height: 900 });
     const errors = await openHeader(page, 'variant=11&mode=normal');
     const content = page.locator('.fph-content');
     const main = page.locator('.fph-main');
@@ -52,7 +52,7 @@ test('busy desktop headers wrap native actions before schema content becomes unr
     expect(actionsBox.y).toBeGreaterThan(contentBox.y + 20);
 
     const metadataCellWidths = await page.locator('.fph-metadata').evaluate(element => {
-        const labels = [...element.querySelectorAll('.fi-in-entry-wrp-label')];
+        const labels = [...element.querySelectorAll('dt')];
         return labels.map(label => {
             const cell = label.closest('.fi-grid-col') ?? label.closest('.fi-sc-component') ?? label.parentElement;
             return cell?.getBoundingClientRect().width ?? 0;
