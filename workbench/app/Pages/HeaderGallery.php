@@ -11,6 +11,7 @@ use Filament\Infolists\Components\TextEntry;
 use Filament\Pages\Page;
 use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Schema;
+use Filament\Support\Enums\Width;
 use Filament\Support\Icons\Heroicon;
 use Livewire\Attributes\Url;
 use MortalKiller\FilamentPageHeader\Components\HeaderLayout;
@@ -46,6 +47,12 @@ class HeaderGallery extends Page
     public function getBreadcrumbs(): array
     {
         return ['/' => 'Workbench', 'Header examples'];
+    }
+
+    public function getMaxContentWidth(): Width|string|null
+    {
+        // A capped page wraps the toolbar early and masks the reported compression.
+        return $this->variant === 11 ? Width::Full : parent::getMaxContentWidth();
     }
 
     public function headerSchema(Schema $schema): Schema
