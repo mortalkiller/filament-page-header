@@ -1,0 +1,107 @@
+# Local package development
+
+The application and the plugin remain separate Git repositories. This workflow does not require committing, pushing or tagging each change.
+
+## Directory layout
+
+```text
+projects/
+  printeemize/
+  filament-page-header/
+```
+
+Work on `feature/schema-headers` in the plugin. Work on a separate integration branch based on `1.x` in Pressiu. This package change does not install the integration automatically.
+
+## Composer path repository
+
+Merge the following into the **consuming application's** composer.json, keeping existing repositories and requirements. Put the path repository before a VCS repository for this same package.
+
+```json
+{
+    "repositories": [
+        {
+            "type": "path",
+            "url": "../filament-page-header",
+            "options": {
+                "symlink": true,
+                "versions": {
+                    "mortalkiller/filament-page-header": "dev-feature/schema-headers"
+                }
+            }
+        }
+    ]
+}
+```
+
+From the application directory:
+
+```bash
+composer require mortalkiller/filament-page-header:dev-feature/schema-headers
+php artisan filament:assets
+```
+
+The explicit development constraint applies only to this package. Keep the project's global stability unchanged. The path version override is a local Composer resolution setting, not a release or Git tag. Composer should report that the package was symlinked; do not edit a copied vendor directory and assume changes will return to the plugin repository.
+
+Register `PageHeaderPlugin::make()` in the intended panel and use `HasPageHeader` on the intended page, as shown in the README.
+
+## Docker
+
+PHP and Composer need to see both directories at paths that make the symlink resolvable. Example container paths:
+
+```text
+/var/www/printee
+/var/www/filament-page-header
+```
+
+Add a development bind mount for the plugin alongside the existing application mount. The following is an illustrative addition, not a replacement Compose configuration:
+
+```yaml
+services:
+  php:
+    volumes:
+      - ../filament-page-header:/var/www/filament-page-header
+```
+
+Use the actual service name in your Compose project. PHP workers and any separate Composer container that resolves the package need compatible mounts. The web server serves published assets from the application's public directory; mount that directory consistently too.
+
+Pressiu's documented local command convention is:
+
+```bash
+docker exec -u ubuntu -w /var/www/printee dockerworker composer require mortalkiller/filament-page-header:dev-feature/schema-headers
+docker exec -u ubuntu -w /var/www/printee dockerworker php artisan filament:assets
+```
+
+This is a consumer-specific example. The plugin itself does not depend on these names or paths. Do not mount a development package folder into production.
+
+## Change and test
+
+| Changed file | Local refresh |
+| --- | --- |
+| Existing PHP or Blade | Reload the page. The symlink points at the working files. |
+| New class or autoload metadata | Run composer dump-autoload if optimized/classmap state needs refreshing. |
+| Package CSS or JavaScript | Run php artisan filament:assets in the consuming app, then reload. |
+| Package dependencies | Run composer update mortalkiller/filament-page-header in the consuming app and review the lock diff. |
+| Cached views/configuration | Clear only the affected development caches. |
+| Long-lived PHP processes or disabled OPcache timestamp validation | Restart the relevant local processes. |
+
+The CSS and JavaScript are plain package assets and require no Vite build. Filament copies them into public; a Composer symlink alone does not update those copies. An optional development watcher can run filament:assets after resource changes. Do not run composer update for every PHP edit.
+
+For independent testing, use the workbench and commands in the README. Do not substitute a successful Pressiu page render for the package's own tests.
+
+## Return to a distributable dependency
+
+A lock file resolved from a path repository records that local source. It must not accidentally be deployed to an environment without the path.
+
+1. Remove the temporary path repository from the application's composer.json.
+2. Restore the authorized VCS or package-distribution repository.
+3. Require an authorized published version when one exists, or deliberately retain a VCS development constraint pinned through the application's lock file during pre-release integration.
+4. Run a targeted update for this package. Confirm its lock entry no longer uses a local path.
+5. Verify composer install in a clean checkout without the sibling package directory and publish the assets there.
+6. Commit the reviewed consumer configuration and lock file together.
+
+Never publish a release merely to test a local edit. Do not commit credentials, generated workbench environment files, vendor or node_modules. Releases and Packagist publication require separate approval.
+
+## Reference
+
+Composer path repositories: https://getcomposer.org/doc/05-repositories.md#path
+Filament assets: https://filamentphp.com/docs/5.x/advanced/assets
