@@ -10,7 +10,7 @@ projects/
   filament-page-header/
 ```
 
-Work on `feature/schema-headers` in the plugin. Work on a separate integration branch based on `1.x` in Pressiu. This package change does not install the integration automatically.
+Work on `1.x` (or on a feature branch created from it) in the plugin. Work on a separate integration branch based on `1.x` in Pressiu. This package change does not install the integration automatically.
 
 ## Composer path repository
 
@@ -25,7 +25,7 @@ Merge the following into the **consuming application's** composer.json, keeping 
             "options": {
                 "symlink": true,
                 "versions": {
-                    "mortalkiller/filament-page-header": "dev-feature/schema-headers"
+                    "mortalkiller/filament-page-header": "1.x-dev"
                 }
             }
         }
@@ -36,7 +36,7 @@ Merge the following into the **consuming application's** composer.json, keeping 
 From the application directory:
 
 ```bash
-composer require mortalkiller/filament-page-header:dev-feature/schema-headers
+composer require mortalkiller/filament-page-header:1.x-dev
 php artisan filament:assets
 ```
 
@@ -67,7 +67,7 @@ Use the actual service name in your Compose project. PHP workers and any separat
 Pressiu's documented local command convention is:
 
 ```bash
-docker exec -u ubuntu -w /var/www/printee dockerworker composer require mortalkiller/filament-page-header:dev-feature/schema-headers
+docker exec -u ubuntu -w /var/www/printee dockerworker composer require mortalkiller/filament-page-header:1.x-dev
 docker exec -u ubuntu -w /var/www/printee dockerworker php artisan filament:assets
 ```
 
@@ -93,13 +93,13 @@ For independent testing, use the workbench and commands in the README. Do not su
 A lock file resolved from a path repository records that local source. It must not accidentally be deployed to an environment without the path.
 
 1. Remove the temporary path repository from the application's composer.json.
-2. Restore the authorized VCS or package-distribution repository.
-3. Require an authorized published version when one exists, or deliberately retain a VCS development constraint pinned through the application's lock file during pre-release integration.
+2. Restore the normal Packagist/VCS distribution source.
+3. Require the published stable constraint, for example `^1.0`, or deliberately retain `1.x-dev` only while testing unreleased changes.
 4. Run a targeted update for this package. Confirm its lock entry no longer uses a local path.
 5. Verify composer install in a clean checkout without the sibling package directory and publish the assets there.
 6. Commit the reviewed consumer configuration and lock file together.
 
-Never publish a release merely to test a local edit. Do not commit credentials, generated workbench environment files, vendor or node_modules. Releases and Packagist publication require separate approval.
+Never publish a release merely to test a local edit. Do not commit credentials, generated workbench environment files, vendor or node_modules.
 
 ## Reference
 
