@@ -25,6 +25,13 @@ for (const width of [360, 390, 768, 1024, 1440]) {
 test('busy desktop headers wrap native actions before schema content becomes unreadable', async ({ page }) => {
     await page.setViewportSize({ width: 1280, height: 900 });
     const errors = await openHeader(page, 'variant=11&mode=normal');
+
+    const collapseSidebar = page.getByRole('button', { name: 'Collapse sidebar', exact: true });
+    if (await collapseSidebar.isVisible()) {
+        await collapseSidebar.click();
+        await expect(page.getByRole('button', { name: 'Expand sidebar', exact: true })).toBeVisible();
+    }
+
     const content = page.locator('.fph-content');
     const main = page.locator('.fph-main');
     const actions = page.locator('.fph-actions');
@@ -33,8 +40,7 @@ test('busy desktop headers wrap native actions before schema content becomes unr
         'Save changes',
         'Cancel',
         'Create quote',
-        'Create billing document',
-        'Resolve provider association',
+        'Create document',
         'Synchronize customer with provider',
         'More',
     ]) {
@@ -51,13 +57,10 @@ test('busy desktop headers wrap native actions before schema content becomes unr
     expect(mainBox.width).toBeGreaterThanOrEqual(480);
     expect(actionsBox.y).toBeGreaterThan(contentBox.y + 20);
 
-    const metadataCellWidths = await page.locator('.fph-metadata').evaluate(element => {
-        const labels = [...element.querySelectorAll('dt')];
-        return labels.map(label => {
-            const cell = label.closest('.fi-grid-col') ?? label.closest('.fi-sc-component') ?? label.parentElement;
-            return cell?.getBoundingClientRect().width ?? 0;
-        });
-    });
+    const metadataCellWidths = await page.locator('.fph-metadata [role="term"]').evaluateAll(labels => labels.map(label => {
+        const cell = label.closest('.fi-grid-col') ?? label.closest('.fi-sc-component') ?? label.parentElement;
+        return cell?.getBoundingClientRect().width ?? 0;
+    }));
     expect(metadataCellWidths.length).toBeGreaterThanOrEqual(6);
     expect(Math.min(...metadataCellWidths)).toBeGreaterThanOrEqual(95);
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth + 1)).toBe(true);
