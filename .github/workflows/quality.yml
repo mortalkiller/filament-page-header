@@ -1,7 +1,7 @@
 name: Code quality
 on:
   push:
-    branches: [main, 'feature/**']
+    branches: ['1.x', 'feature/**']
   pull_request:
 permissions:
   contents: read
