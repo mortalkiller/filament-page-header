@@ -112,19 +112,24 @@ test('nested scroll containers retain one controller and restore layout on dispo
         parent.style.height = '520px';
         parent.style.overflowY = 'auto';
         parent.style.position = 'relative';
+        parent.style.paddingTop = '24px';
+        parent.style.borderTop = '2px solid transparent';
         parent.dataset.nestedScroller = 'true';
         const options = { ...JSON.parse(root.dataset.fphOptions), mode: 'sticky', offset: 0 };
         window.testHeaderController = new module.HeaderController(root, options);
         window.testHeaderController.start();
     });
-    await page.locator('[data-nested-scroller]').evaluate(parent => { parent.scrollTop = 400; });
+    const scroller = page.locator('[data-nested-scroller]');
+    await scroller.evaluate(parent => { parent.scrollTop = 400; });
+    await expect.poll(() => scroller.evaluate(parent => parent.scrollTop)).toBeGreaterThan(0);
     const root = page.locator('[data-fph-root]');
     await expect(root).toHaveAttribute('data-fph-stuck', 'true');
     const geometry = await page.evaluate(() => ({
         root: document.querySelector('[data-fph-root]').getBoundingClientRect().top,
         parent: document.querySelector('[data-nested-scroller]').getBoundingClientRect().top,
     }));
-    expect(geometry.root).toBeCloseTo(geometry.parent, 0);
+    // The fixture has a 2px border and 24px of top padding.
+    expect(geometry.root).toBeCloseTo(geometry.parent + 26, 0);
     await page.evaluate(() => { window.testHeaderController.destroy(); window.testHeaderController.destroy(); });
     await expect(root).not.toHaveAttribute('data-fph-ready', 'true');
     await expect(root).not.toHaveAttribute('data-fph-stuck', 'true');
