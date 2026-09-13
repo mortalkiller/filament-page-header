@@ -5,7 +5,7 @@
     "license": "MIT",
     "require": {
         "php": "^8.3",
-        "filament/filament": "^5.7",
+        "filament/filament": "^5.8.1",
         "illuminate/support": "^12.0 || ^13.0"
     },
     "require-dev": {
@@ -19,6 +19,7 @@
     "extra": {"laravel": {"providers": ["MortalKiller\\FilamentPageHeader\\PageHeaderServiceProvider"]}},
     "config": {"sort-packages": true, "allow-plugins": {"pestphp/pest-plugin": true}},
     "scripts": {
+        "post-autoload-dump": "@php vendor/bin/testbench package:discover --ansi",
         "test": "pest",
         "format": "pint",
         "format:check": "pint --test"
