@@ -76,11 +76,16 @@ test('menu and confirmation remain above the sticky header', async ({ page }) =>
     await page.getByRole('button', { name: 'More', exact: true }).click();
     await page.getByRole('button', { name: 'Confirm action', exact: true }).click();
     const dialog = page.getByRole('alertdialog', { name: 'Confirm action', exact: true });
-    await expect(dialog).toBeVisible();
+    // Filament positions the children, leaving the outer dialog with a zero-height box.
+    const modalWindow = dialog.locator('.fi-modal-window');
+    await expect(modalWindow).toBeVisible();
     await expect(dialog).toHaveAttribute('aria-modal', 'true');
-    await dialog.getByRole('button', { name: 'Confirm', exact: true }).click();
+    await expect(dialog).toHaveClass(/fi-modal-open/);
+    const confirm = dialog.getByRole('button', { name: 'Confirm', exact: true });
+    await expect(confirm).toBeVisible();
+    await confirm.click();
     await expect(page.locator('.fph-badges')).toContainText('Confirmed');
-    await expect(dialog).not.toBeVisible();
+    await expect(modalWindow).not.toBeVisible();
     expect(errors).toEqual([]);
 });
 
