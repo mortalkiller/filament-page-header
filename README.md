@@ -140,7 +140,7 @@ Use native Filament entries for content and keep business logic in your applicat
 
 | Configure | API | Guide |
 | --- | --- | --- |
-| Identity | `heading()`, `description()`, `avatar()`, `image()`, `initials()`, `icon()`, `initialsColor()`, `initialsTextColor()` | [Images and icons](docs/configuration.md#images-and-icons) |
+| Identity | `heading()`, `description()`, `avatar()`, `image()`, `initials()`, `icon()`, `initialsBgColor()`, `initialsTextColor()`, `iconBgColor()`, `iconColor()` | [Images and icons](docs/configuration.md#images-and-icons) |
 | Badges and details | `badges()`, `metadata()`, `summary()` | [Layout slots](docs/configuration.md#layout-slots) |
 | Field icons | `fieldIcon()`, `fieldIconPosition()`, `fieldIconSize()` | [Metadata fields](docs/configuration.md#metadata-separators-and-field-icons) |
 | Product identity | `image()` and `descriptionSchema()` | [Product example](docs/configuration.md#product-header-example) |
@@ -153,18 +153,24 @@ Color an initials fallback with a panel color alias or a native Filament palette
 
 ```php
 use Filament\Support\Colors\Color;
+use Filament\Support\Icons\Heroicon;
 
 Header::make()
     ->initials(fn (Model $record) => $record->name)
-    ->initialsColor('primary');
+    ->initialsBgColor('primary');
 
 Header::make()
     ->initials(fn (Model $record) => $record->name)
-    ->initialsColor(Color::Blue)
-    ->initialsTextColor('white');
+    ->initialsBgColor(Color::Blue)
+    ->initialsTextColor(Color::Blue);
+
+Header::make()
+    ->icon(Heroicon::OutlinedUser)
+    ->iconBgColor('primary')
+    ->iconColor(Color::Blue);
 ```
 
-See [Images and icons](docs/configuration.md#images-and-icons) for closures and fallback behavior.
+See [Images and icons](docs/configuration.md#images-and-icons) for imports, closures and fallback behavior.
 
 For a resilient identity, configure image, initials and an icon together. The header renders one visual in this order: custom `leading()` content, a resolved avatar/image, initials, then `icon()`.
 

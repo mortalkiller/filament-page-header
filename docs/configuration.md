@@ -17,8 +17,10 @@ Configure content with native Filament schema components. Examples below assume 
 | `image($urlOrImageEntry)` | Square image with soft corners and contain fitting, suitable for products without cropping. |
 | `initials($name)` | Full name used to generate initials when no image is rendered. |
 | `icon($icon)` | Native icon fallback when no image or initials can be rendered. |
-| `initialsColor($color)` | Panel color alias, native Filament palette or closure for the initials fallback background. |
-| `initialsTextColor($color)` | Optional CSS color or closure for the initials fallback text. |
+| `initialsBgColor($color)` | Panel color alias, native Filament palette or closure for the initials fallback background. |
+| `initialsTextColor($color)` | Optional panel color alias, native palette, CSS color or closure for the initials fallback text. |
+| `iconBgColor($color)` | Panel color alias, native Filament palette or closure for the icon fallback background. |
+| `iconColor($color)` | Optional panel color alias, native palette, CSS color or closure for the icon fallback. |
 | `leading([...])` | Optional icon, avatar or logo. Use native entries; the package does not manage uploads. |
 | `metadata([...])` | References, dates, links and other secondary information. |
 | `summary([...])` | Optional summary or total, separate from the page's native actions. |
@@ -73,22 +75,22 @@ $header
 
 Pass a URL or closure to `avatar()` for a browser-ready image URL. Use a native `ImageEntry` for stored paths, disk selection, private temporary URLs and image visibility; the package retains Filament's storage handling. `initials()` receives a full name, takes the first two words and supplies the native avatar fallback when image content is empty. The same name supplies alternative text for URL avatars; use native image attributes for custom image descriptions. URL avatars support HTTP(S) and relative URLs, and reject other schemes.
 
-Use `initialsColor()` to give the fallback a semantic panel color or a native palette. A color alias such as `primary`, `success` or a custom color registered on the panel follows that panel's palette. You can also pass `Color::Blue` or a closure returning either value. The package uses shade 600 for the background and chooses the lighter or darker palette extreme with the highest contrast for the initials. This keeps the fallback legible in light and dark panels. `initialsTextColor()` accepts a CSS color string, or a closure returning one, when a deliberate text color is required.
+All four color methods accept a panel color alias, a native palette such as `Color::Blue`, or a closure returning either value. Background colors use shade 600 and choose the lighter or darker palette extreme with the highest contrast for initials or icons. This keeps each fallback legible in light and dark panels. When you explicitly set `initialsTextColor()` or `iconColor()` with a palette or alias, the package uses its shade 600. CSS color strings, such as `white`, remain available for a deliberate foreground color.
 
 ```php
 use Filament\Support\Colors\Color;
 
 Header::make()
     ->initials(fn ($record) => $record->name)
-    ->initialsColor('primary');
+    ->initialsBgColor('primary');
 
 Header::make()
     ->initials(fn ($record) => $record->name)
-    ->initialsColor(fn ($record) => $record->is_vip ? Color::Amber : Color::Blue)
-    ->initialsTextColor('white');
+    ->initialsBgColor(fn ($record) => $record->is_vip ? Color::Amber : Color::Blue)
+    ->initialsTextColor(Color::Blue);
 ```
 
-These methods affect only the initials fallback. A rendered `avatar()`, `image()` or `ImageEntry` keeps its own visual content.
+These initials methods affect only the initials fallback. A rendered `avatar()`, `image()` or `ImageEntry` keeps its own visual content.
 
 `icon()` completes the automatic identity fallback chain. The package renders one visual only: a custom `leading()` slot when present, then an available avatar/image, then generated initials, and finally the icon. Pass a `Heroicon`, another backed icon enum, a string icon name or a closure returning one:
 
@@ -98,7 +100,9 @@ use Filament\Support\Icons\Heroicon;
 Header::make()
     ->avatar(fn ($record) => $record->photo_url)
     ->initials(fn ($record) => $record->name)
-    ->icon(Heroicon::OutlinedUser);
+    ->icon(Heroicon::OutlinedUser)
+    ->iconBgColor('primary')
+    ->iconColor(Color::Blue);
 ```
 
 This shows the image when it resolves, initials when the image is unavailable, and the icon when neither is available. The icon uses the same responsive circular identity frame as initials.

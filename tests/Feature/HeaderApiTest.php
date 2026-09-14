@@ -63,13 +63,15 @@ it('resolves the identity visual from image to initials to icon', function (): v
         ->not->toContain('MC');
 });
 
-it('applies semantic and explicit colors to initials avatars', function (): void {
+it('applies semantic background and foreground colors to initials and icon fallbacks', function (): void {
     $page = Livewire::test(ExamplePage::class)->instance();
     $html = Schema::make($page)->components([
         Header::make()->heading('Mariana Costa')->initials('Mariana Costa')
-            ->initialsColor('primary')->initialsTextColor('white'),
+            ->initialsBgColor('primary')->initialsTextColor(Color::Blue),
         Header::make()->heading('Carlos Silva')->initials('Carlos Silva')
-            ->initialsColor(Color::Blue),
+            ->initialsBgColor(Color::Blue),
+        Header::make()->heading('Icon')->icon(Heroicon::OutlinedUser)
+            ->iconBgColor('primary')->iconColor(Color::Blue),
     ])->toHtml();
 
     $primary = FilamentColor::getColor('primary');
@@ -81,9 +83,10 @@ it('applies semantic and explicit colors to initials avatars', function (): void
         : Color::Blue[50];
 
     expect($html)
-        ->toContain('--fph-avatar-background: '.$primary[600], '--fph-avatar-text: white')
+        ->toContain('--fph-avatar-background: '.$primary[600], '--fph-avatar-text: '.Color::Blue[600])
         ->toContain('--fph-avatar-background: '.Color::Blue[600], '--fph-avatar-text: '.$blueText)
-        ->not->toContain('--fph-avatar-text: '.$primaryText);
+        ->not->toContain('--fph-avatar-text: '.$primaryText)
+        ->and(substr_count($html, '--fph-avatar-background: '.$primary[600]))->toBe(2);
 });
 
 it('hides badge labels by default without changing metadata labels', function (): void {

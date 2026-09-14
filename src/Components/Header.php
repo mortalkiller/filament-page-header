@@ -36,9 +36,16 @@ class Header extends Component
     protected string|BackedEnum|Closure|null $icon = null;
 
     /** @var string|array<int, string>|Closure|null */
-    protected string|array|Closure|null $initialsColor = null;
+    protected string|array|Closure|null $initialsBgColor = null;
 
-    protected string|Closure|null $initialsTextColor = null;
+    /** @var string|array<int, string>|Closure|null */
+    protected string|array|Closure|null $initialsTextColor = null;
+
+    /** @var string|array<int, string>|Closure|null */
+    protected string|array|Closure|null $iconBgColor = null;
+
+    /** @var string|array<int, string>|Closure|null */
+    protected string|array|Closure|null $iconColor = null;
 
     protected ?Page $page = null;
 
@@ -128,16 +135,33 @@ class Header extends Component
     }
 
     /** @param string|array<int, string>|Closure|null $color */
-    public function initialsColor(string|array|Closure|null $color): static
+    public function initialsBgColor(string|array|Closure|null $color): static
     {
-        $this->initialsColor = $color;
+        $this->initialsBgColor = $color;
 
         return $this;
     }
 
-    public function initialsTextColor(string|Closure|null $color): static
+    /** @param string|array<int, string>|Closure|null $color */
+    public function initialsTextColor(string|array|Closure|null $color): static
     {
         $this->initialsTextColor = $color;
+
+        return $this;
+    }
+
+    /** @param string|array<int, string>|Closure|null $color */
+    public function iconBgColor(string|array|Closure|null $color): static
+    {
+        $this->iconBgColor = $color;
+
+        return $this;
+    }
+
+    /** @param string|array<int, string>|Closure|null $color */
+    public function iconColor(string|array|Closure|null $color): static
+    {
+        $this->iconColor = $color;
 
         return $this;
     }
@@ -178,7 +202,19 @@ class Header extends Component
     /** @return array<string, string> */
     public function getInitialsAvatarStyles(): array
     {
-        $palette = $this->getInitialsPalette();
+        return $this->getIdentityStyles($this->initialsBgColor, $this->initialsTextColor);
+    }
+
+    /** @return array<string, string> */
+    public function getIconStyles(): array
+    {
+        return $this->getIdentityStyles($this->iconBgColor, $this->iconColor);
+    }
+
+    /** @return array<string, string> */
+    private function getIdentityStyles(mixed $backgroundColor, mixed $foregroundColor): array
+    {
+        $palette = $this->getPalette($backgroundColor);
 
         if ($palette === null) {
             return [];
@@ -190,18 +226,30 @@ class Header extends Component
             return [];
         }
 
-        $textColor = $this->evaluate($this->initialsTextColor);
+        $textColor = $this->getForegroundColor($foregroundColor);
 
         return [
             '--fph-avatar-background' => $background,
-            '--fph-avatar-text' => is_string($textColor) ? $textColor : $this->getInitialsContrastColor($palette, $background),
+            '--fph-avatar-text' => $textColor ?? $this->getInitialsContrastColor($palette, $background),
         ];
     }
 
-    /** @return array<int, string>|null */
-    private function getInitialsPalette(): ?array
+    private function getForegroundColor(mixed $color): ?string
     {
-        $color = $this->evaluate($this->initialsColor);
+        $color = $this->evaluate($color);
+        $palette = $this->getPalette($color);
+
+        if ($palette !== null) {
+            $color = $palette[600] ?? $palette[500] ?? null;
+        }
+
+        return is_string($color) ? $color : null;
+    }
+
+    /** @return array<int, string>|null */
+    private function getPalette(mixed $color): ?array
+    {
+        $color = $this->evaluate($color);
 
         if (is_string($color)) {
             $color = FilamentColor::getColor($color);

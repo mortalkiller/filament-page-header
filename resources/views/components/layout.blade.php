@@ -12,6 +12,7 @@
     $initials = $getInitials();
     $icon = $getIcon();
     $initialsAvatarStyles = $getInitialsAvatarStyles();
+    $iconStyles = $getIconStyles();
     $hasMetadata = $hasContent($slots['metadata']);
     $hasSummary = $hasContent($slots['summary']);
 @endphp
@@ -29,7 +30,7 @@
                     @endif
                 </div>
             @elseif ($icon)
-                <div class="fph-avatar fph-icon" data-fph-hide-compact="{{ $isSlotHiddenWhenCompact('leading') ? 'true' : 'false' }}">
+                <div class="fph-avatar fph-icon" @if ($iconStyles !== []) style="@foreach ($iconStyles as $property => $value){{ $property }}: {{ $value }}; @endforeach" @endif data-fph-hide-compact="{{ $isSlotHiddenWhenCompact('leading') ? 'true' : 'false' }}">
                     <span aria-hidden="true">{{ \Filament\Support\generate_icon_html($icon) }}</span>
                 </div>
             @endif
