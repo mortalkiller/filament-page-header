@@ -16,6 +16,7 @@ Configure content with native Filament schema components. Examples below assume 
 | `avatar($urlOrImageEntry)` | Image URL or native `ImageEntry`, displayed as an avatar. |
 | `image($urlOrImageEntry)` | Square image with soft corners and contain fitting, suitable for products without cropping. |
 | `initials($name)` | Full name used to generate initials when no image is rendered. |
+| `icon($icon)` | Native icon fallback when no image or initials can be rendered. |
 | `initialsColor($color)` | Panel color alias, native Filament palette or closure for the initials fallback background. |
 | `initialsTextColor($color)` | Optional CSS color or closure for the initials fallback text. |
 | `leading([...])` | Optional icon, avatar or logo. Use native entries; the package does not manage uploads. |
@@ -88,6 +89,19 @@ Header::make()
 ```
 
 These methods affect only the initials fallback. A rendered `avatar()`, `image()` or `ImageEntry` keeps its own visual content.
+
+`icon()` completes the automatic identity fallback chain. The package renders one visual only: a custom `leading()` slot when present, then an available avatar/image, then generated initials, and finally the icon. Pass a `Heroicon`, another backed icon enum, a string icon name or a closure returning one:
+
+```php
+use Filament\Support\Icons\Heroicon;
+
+Header::make()
+    ->avatar(fn ($record) => $record->photo_url)
+    ->initials(fn ($record) => $record->name)
+    ->icon(Heroicon::OutlinedUser);
+```
+
+This shows the image when it resolves, initials when the image is unavailable, and the icon when neither is available. The icon uses the same responsive circular identity frame as initials.
 
 For advanced composition, `headingSchema()` and `leading()` still accept native components. The package does not upload images or depend on a particular icon library.
 

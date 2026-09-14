@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace MortalKiller\FilamentPageHeader\Components;
 
+use BackedEnum;
 use Closure;
 use Filament\Actions\Action;
 use Filament\Infolists\Components\Entry;
@@ -31,6 +32,8 @@ class Header extends Component
     protected bool $isImage = false;
 
     protected mixed $initialsName = null;
+
+    protected string|BackedEnum|Closure|null $icon = null;
 
     /** @var string|array<int, string>|Closure|null */
     protected string|array|Closure|null $initialsColor = null;
@@ -117,6 +120,13 @@ class Header extends Component
         return $this;
     }
 
+    public function icon(string|BackedEnum|Closure|null $icon): static
+    {
+        $this->icon = $icon;
+
+        return $this;
+    }
+
     /** @param string|array<int, string>|Closure|null $color */
     public function initialsColor(string|array|Closure|null $color): static
     {
@@ -158,6 +168,11 @@ class Header extends Component
             static fn (string $word): string => mb_strtoupper(mb_substr($word, 0, 1)),
             array_slice($words, 0, 2),
         ));
+    }
+
+    public function getIcon(): string|BackedEnum|null
+    {
+        return $this->evaluate($this->icon);
     }
 
     /** @return array<string, string> */

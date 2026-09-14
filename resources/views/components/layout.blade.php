@@ -10,6 +10,7 @@
     $avatarUrl = $getAvatarUrl();
     $avatarName = $getAvatarName();
     $initials = $getInitials();
+    $icon = $getIcon();
     $initialsAvatarStyles = $getInitialsAvatarStyles();
     $hasMetadata = $hasContent($slots['metadata']);
     $hasSummary = $hasContent($slots['summary']);
@@ -26,6 +27,10 @@
                     @else
                         <span aria-hidden="true">{{ $initials }}</span>
                     @endif
+                </div>
+            @elseif ($icon)
+                <div class="fph-avatar fph-icon" data-fph-hide-compact="{{ $isSlotHiddenWhenCompact('leading') ? 'true' : 'false' }}">
+                    <span aria-hidden="true">{{ \Filament\Support\generate_icon_html($icon) }}</span>
                 </div>
             @endif
             <div class="fph-main">

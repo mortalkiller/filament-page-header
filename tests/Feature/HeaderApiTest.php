@@ -50,6 +50,19 @@ it('renders a configured photo with an accessible text alternative', function ()
     expect($html)->toContain('src="/avatar.svg"', 'alt="Mariana Costa"');
 });
 
+it('resolves the identity visual from image to initials to icon', function (): void {
+    $page = Livewire::test(ExamplePage::class)->instance();
+    $html = Schema::make($page)->components([
+        Header::make()->heading('Photo')->avatar('/avatar.svg')->initials('Mariana Costa')->icon(Heroicon::OutlinedUser),
+        Header::make()->heading('Initials')->initials('Carlos Silva')->icon(Heroicon::OutlinedUser),
+        Header::make()->heading('Icon')->icon(Heroicon::OutlinedUser),
+    ])->toHtml();
+
+    expect($html)
+        ->toContain('src="/avatar.svg"', 'CS', 'class="fph-avatar fph-icon"')
+        ->not->toContain('MC');
+});
+
 it('applies semantic and explicit colors to initials avatars', function (): void {
     $page = Livewire::test(ExamplePage::class)->instance();
     $html = Schema::make($page)->components([

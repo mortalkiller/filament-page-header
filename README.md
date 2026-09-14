@@ -140,7 +140,7 @@ Use native Filament entries for content and keep business logic in your applicat
 
 | Configure | API | Guide |
 | --- | --- | --- |
-| Identity | `heading()`, `description()`, `avatar()`, `image()`, `initials()`, `initialsColor()`, `initialsTextColor()` | [Images and icons](docs/configuration.md#images-and-icons) |
+| Identity | `heading()`, `description()`, `avatar()`, `image()`, `initials()`, `icon()`, `initialsColor()`, `initialsTextColor()` | [Images and icons](docs/configuration.md#images-and-icons) |
 | Badges and details | `badges()`, `metadata()`, `summary()` | [Layout slots](docs/configuration.md#layout-slots) |
 | Field icons | `fieldIcon()`, `fieldIconPosition()`, `fieldIconSize()` | [Metadata fields](docs/configuration.md#metadata-separators-and-field-icons) |
 | Product identity | `image()` and `descriptionSchema()` | [Product example](docs/configuration.md#product-header-example) |
@@ -165,6 +165,8 @@ Header::make()
 ```
 
 See [Images and icons](docs/configuration.md#images-and-icons) for closures and fallback behavior.
+
+For a resilient identity, configure image, initials and an icon together. The header renders one visual in this order: custom `leading()` content, a resolved avatar/image, initials, then `icon()`.
 
 ## Sticky and compact modes
 
