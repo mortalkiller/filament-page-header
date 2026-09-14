@@ -10,7 +10,7 @@ projects/
   filament-page-header/
 ```
 
-Work on `1.x` (or on a feature branch created from it) in the plugin. Work on a separate integration branch based on `1.x` in Pressiu. This workflow does not install integration automatically. The current Header API redesign is breaking and unreleased; migrate consuming headers before switching to this checkout. A future major release must be chosen explicitly.
+Work on a feature branch based on `2.x` in the plugin. Keep application integration changes on a separate branch in Pressiu. This workflow does not install integration automatically. Version 2 replaces the version 1 header API; migrate consuming headers before switching an existing v1 integration to this code. The package and application do not need matching branch names.
 
 ## Composer path repository
 
@@ -25,7 +25,7 @@ Merge the following into the **consuming application's** composer.json, keeping 
             "options": {
                 "symlink": true,
                 "versions": {
-                    "mortalkiller/filament-page-header": "1.x-dev"
+                    "mortalkiller/filament-page-header": "2.x-dev"
                 }
             }
         }
@@ -36,7 +36,7 @@ Merge the following into the **consuming application's** composer.json, keeping 
 From the application directory:
 
 ```bash
-composer require mortalkiller/filament-page-header:1.x-dev
+composer require mortalkiller/filament-page-header:2.x-dev
 php artisan filament:assets
 ```
 
@@ -67,7 +67,7 @@ Use the actual service name in your Compose project. PHP workers and any separat
 Pressiu's documented local command convention is:
 
 ```bash
-docker exec -u ubuntu -w /var/www/printee dockerworker composer require mortalkiller/filament-page-header:1.x-dev
+docker exec -u ubuntu -w /var/www/printee dockerworker composer require mortalkiller/filament-page-header:2.x-dev
 docker exec -u ubuntu -w /var/www/printee dockerworker php artisan filament:assets
 ```
 
@@ -86,7 +86,7 @@ This is a consumer-specific example. The plugin itself does not depend on these 
 
 The CSS and JavaScript are plain package assets and require no Vite build. Filament copies them into public; a Composer symlink alone does not update those copies. An optional development watcher can run filament:assets after resource changes. Do not run composer update for every PHP edit.
 
-For independent testing, use the workbench and commands in the README. Do not substitute a successful Pressiu page render for the package's own tests.
+For independent testing, use the workbench and commands in [Demo and testing](testing.md). Do not substitute a successful Pressiu page render for the package's own tests.
 
 ## Return to a distributable dependency
 
@@ -94,7 +94,7 @@ A lock file resolved from a path repository records that local source. It must n
 
 1. Remove the temporary path repository from the application's composer.json.
 2. Restore the normal Packagist/VCS distribution source.
-3. Require the published stable constraint, for example `^1.0`, or deliberately retain `1.x-dev` only while testing unreleased changes.
+3. Require the published stable constraint, for example `^2.0`, or deliberately retain `2.x-dev` only while testing unreleased changes.
 4. Run a targeted update for this package. Confirm its lock entry no longer uses a local path.
 5. Verify composer install in a clean checkout without the sibling package directory and publish the assets there.
 6. Commit the reviewed consumer configuration and lock file together.

@@ -4,6 +4,7 @@
             @foreach (range(1, 10) as $example)
                 <a href="{{ '/demo/headers?variant='.$example.'&mode='.$this->mode }}" wire:navigate>Example {{ $example }}</a>
             @endforeach
+            <a href="{{ '/demo/headers?variant=12&mode='.$this->mode }}" wire:navigate>Product example</a>
             <a href="/demo/native" wire:navigate>Native page</a>
         </nav>
         <nav aria-label="Scroll modes" style="display:flex;flex-wrap:wrap;gap:.75rem">

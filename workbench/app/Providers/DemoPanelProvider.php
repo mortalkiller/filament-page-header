@@ -9,6 +9,7 @@ use Filament\Http\Middleware\DisableBladeIconComponents;
 use Filament\Http\Middleware\DispatchServingFilamentEvent;
 use Filament\Panel;
 use Filament\PanelProvider;
+use Filament\Support\Colors\Color;
 use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
 use Illuminate\Cookie\Middleware\EncryptCookies;
 use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
@@ -26,6 +27,7 @@ final class DemoPanelProvider extends PanelProvider
     {
         return $panel->default()->id('demo')->path('demo')->brandName('Page Header')
             ->spa()->sidebarCollapsibleOnDesktop()->userMenu(false)->font('sans-serif', provider: LocalFontProvider::class)
+            ->colors(['primary' => Color::Indigo])
             ->plugin(PageHeaderPlugin::make())
             ->pages([HeaderGallery::class, NativePage::class])
             ->middleware([

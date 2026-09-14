@@ -51,7 +51,9 @@ class HeaderGallery extends Page
 
     public function getBreadcrumbs(): array
     {
-        return ['/' => 'Workbench', 'Header examples'];
+        return $this->variant === 12
+            ? ['/' => 'Products', 'Everyday Runner', 'Edit']
+            : ['/' => 'Workbench', 'Header examples'];
     }
 
     public function getMaxContentWidth(): Width|string|null
@@ -62,6 +64,28 @@ class HeaderGallery extends Page
 
     public function headerSchema(Schema $schema): Schema
     {
+        if ($this->variant === 12) {
+            return $schema->components([
+                Header::make()
+                    ->heading('Everyday Runner')
+                    ->description('RUN-042 · Cloud / Stone')
+                    ->image('/product-runner.png')
+                    ->initials('Everyday Runner')
+                    ->badges([
+                        TextEntry::make('status')->state('Active')->badge()->color('success'),
+                        TextEntry::make('availability')->state('In stock')->badge()->color('gray'),
+                    ])
+                    ->metadata([
+                        MetadataEntry::make('brand')->label('Brand')->state('Aster')->fieldIcon(Heroicon::OutlinedTag),
+                        MetadataEntry::make('category')->label('Category')->state('Footwear')->fieldIcon(Heroicon::OutlinedSquares2x2),
+                        MetadataEntry::make('stock')->label('Available stock')->state('128 units')->fieldIcon(Heroicon::OutlinedCube),
+                    ])
+                    ->mode(HeaderMode::tryFrom($this->mode) ?? HeaderMode::Normal)
+                    ->whenCompact(fn (CompactHeader $compact) => $compact
+                        ->show(HeaderPart::Image, HeaderPart::Badges)),
+            ]);
+        }
+
         $layout = Header::make()
             ->heading(match ($this->variant) {
                 9 => 'Create document',
@@ -140,6 +164,17 @@ class HeaderGallery extends Page
 
     protected function getHeaderActions(): array
     {
+        if ($this->variant === 12) {
+            return [
+                Action::make('preview')->label('Preview')->color('gray')
+                    ->modalHeading('Everyday Runner')
+                    ->modalDescription('Demo product preview. No catalog data is changed.')
+                    ->modalSubmitAction(false)->modalCancelActionLabel('Close'),
+                Action::make('save')->label('Save changes')->color('primary')
+                    ->submit('save')->formId('demo-form'),
+            ];
+        }
+
         if ($this->variant === 11) {
             return [
                 Action::make('saveChanges')->label('Guardar alterações')->action(fn (): null => null),

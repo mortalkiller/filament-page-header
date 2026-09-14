@@ -74,3 +74,23 @@ Existing customer help articles were assessed: action labels, permissions, avail
 - Viewports approximate mobile devices. Physical iOS/Android devices, Safari, Firefox and assistive technologies were not tested.
 - Focused Pressiu integration checks passed; the complete application suite was not run.
 - No PHPStan result, accessibility certification, public release, merge or deployment is claimed.
+
+## Documentation and maintenance configuration — 2026-09-14
+
+The v2 README now links to dedicated configuration, migration and testing guides, includes six reviewed captures from the existing demo test output, and shows dynamic Plumb badges and the maintainer's funding link. The Composer requirements were not changed; documentation distinguishes declared constraints from evidence of incompatibility with earlier Filament 5 releases.
+
+Added contribution and security policies, Dependabot coverage for Composer/GitHub Actions/npm with a seven-day version-update cooldown, and push coverage for 2.x and codex/** in both existing workflows. The approved security maintenance policy is active 2.x development and security fixes only for 1.x.
+
+Executed static validation inside Docker using installed Symfony YAML and CommonMark libraries: four YAML files parsed; workflow branch triggers, read-only content permissions and full action SHA pins checked; three Dependabot ecosystems and cooldowns checked; 52 local Markdown links/anchors resolved; 12 PHP examples passed syntax parsing; all five Plumb badges and six screenshot references were present. The six selected screenshots were visually inspected and copied without image edits. The final whitespace diff check passed.
+
+GitHub API readback confirmed private vulnerability reporting enabled and Dependabot security updates enabled and not paused. Repository files still need to be published before GitHub can apply the new Dependabot configuration and Plumb can assess it. No new Plumb score or CI result is claimed.
+
+The package's runtime code and consuming application's UI were unchanged. PHP/JavaScript/browser regression suites were not rerun for this documentation and CI-trigger change, and no end-user help translations were needed.
+
+## Simplified product showcase — 2026-09-14
+
+Replaced the six README screenshots with fresh captures of a simple product header: illustrative product image, English labels, two native actions, three metadata entries, and an indigo/gray demo palette. Variant 12 in the standalone gallery reproduces this composition; existing customer variants remain available. The public package renderer and consuming application were not changed.
+
+Executed scoped Pint on the two changed demo PHP files and the complete Chromium browser suite: 49 tests passed. Four new product cases cover light/dark at 390 and 1440 pixels, image loading, mobile button stacking, expanded/compact content, overflow, preview modal, native save and preservation of the entered note. The first product run caught an ambiguous test selector for the two native Close buttons; using Escape and asserting that the modal closed resolved the test issue. All 49 tests passed on the final run.
+
+The six resulting screenshots were visually inspected and copied into docs/screenshots without image edits. The product illustration was generated separately and is stored in workbench/public/product-runner.png; its provenance and generation prompt are recorded in testing.md. Tests reused the installed Chromium revision through PLAYWRIGHT_CHROMIUM_EXECUTABLE. PHP unit tests and the consuming application's suite were not rerun for this demo-only change. No end-user application help changes were needed.

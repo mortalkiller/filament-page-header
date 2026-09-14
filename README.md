@@ -2,323 +2,235 @@
 
 # Filament Page Header
 
-Opt-in, schema-based page headers for **Filament 5**. Combine headings, badges, avatars, metadata, links, native actions and a summary. Optionally keep the header visible while scrolling, either at full size or in a compact layout.
+[![Latest version](https://img.shields.io/packagist/v/mortalkiller/filament-page-header.svg)](https://packagist.org/packages/mortalkiller/filament-page-header)
+[![Total downloads](https://img.shields.io/packagist/dt/mortalkiller/filament-page-header.svg)](https://packagist.org/packages/mortalkiller/filament-page-header)
+[![Package tests](https://github.com/mortalkiller/filament-page-header/actions/workflows/tests.yml/badge.svg?branch=2.x)](https://github.com/mortalkiller/filament-page-header/actions/workflows/tests.yml)
+[![License](https://img.shields.io/packagist/l/mortalkiller/filament-page-header.svg)](LICENSE.md)
 
-The package has no dependency on a consuming application's models, theme, database, billing rules or icon package. Installing it does not replace every page header.
+[![Scanned by Plumb](https://plumbphp.dev/badges/mortalkiller/filament-page-header/scanned.svg)](https://plumbphp.dev/mortalkiller/filament-page-header)
+[![Plumb ecosystem score](https://plumbphp.dev/badges/mortalkiller/filament-page-header/ecosystem.svg)](https://plumbphp.dev/mortalkiller/filament-page-header)
+[![Plumb maintenance score](https://plumbphp.dev/badges/mortalkiller/filament-page-header/maintenance.svg)](https://plumbphp.dev/mortalkiller/filament-page-header)
+[![Plumb security score](https://plumbphp.dev/badges/mortalkiller/filament-page-header/security.svg)](https://plumbphp.dev/mortalkiller/filament-page-header)
+[![Plumb score](https://plumbphp.dev/badges/mortalkiller/filament-page-header/composite.svg)](https://plumbphp.dev/mortalkiller/filament-page-header)
 
-## Status and requirements
+Build informative, responsive page headers with native **Filament 5** schemas. Combine identity, status, metadata and page actions, then choose what stays visible while scrolling.
 
-**This checkout contains an unreleased, breaking API redesign.** The examples below require this checkout; published 1.x releases use the former API. A major release is required before distributing these changes as a stable version. No release is made by this change. See [the verification record](docs/verification.md) for executed checks and remaining manual checks.
+Enable headers only on the panels and pages you choose. No custom theme build, application-specific models or required icon library.
 
-- PHP 8.3 or later within PHP 8.
-- Filament 5.8.1 or later within Filament 5.
-- Laravel 12 or 13, subject to the framework's PHP requirements.
-- A browser supporting CSS sticky positioning, ResizeObserver and MutationObserver.
+## Contents
+
+- [Features](#features)
+- [Screenshots](#screenshots)
+- [Version compatibility](#version-compatibility)
+- [Installation](#installation)
+- [Your first header](#your-first-header)
+- [Configuration](#configuration)
+- [Sticky and compact modes](#sticky-and-compact-modes)
+- [Migration from v1](#migration-from-v1)
+- [Troubleshooting](#troubleshooting)
+- [Testing and contributing](#testing-and-contributing)
+- [Changelog](#changelog)
+- [Security](#security)
+- [Support this project](#support-this-project)
+- [Credits and license](#credits-and-license)
+
+## Features
+
+- Headings, descriptions, badges, avatars, initials and product images.
+- Native schema fields for metadata and summary metrics, with responsive separators.
+- Field icons before or after the complete label/value, with configurable size.
+- Native page actions aligned right on desktop and stacked at full width on mobile.
+- Normal, sticky and compact layouts, with configurable responsive thresholds.
+- Typed compact configuration: keep entire blocks or select individual fields.
+- Native light/dark colors, keyboard focus handling and reduced-motion support.
+- Shared resource schemas, with individual page overrides.
+
+## Screenshots
+
+Real captures of the package's product demo: a product image, two actions and three information fields. The example uses fictional product data, English labels and a native indigo/gray palette. The product image and banner are illustrative assets; the header itself is rendered by Filament. Native action colors follow your panel configuration.
+
+| Layout | Light | Dark |
+| --- | --- | --- |
+| Desktop | ![Expanded desktop product header in light mode](docs/screenshots/desktop-light.png) | ![Expanded desktop product header in dark mode](docs/screenshots/desktop-dark.png) |
+| Compact after scrolling | ![Compact desktop product header in light mode](docs/screenshots/compact-light.png) | ![Compact desktop product header in dark mode](docs/screenshots/compact-dark.png) |
+| Mobile | ![Mobile product header in light mode](docs/screenshots/mobile-light.png) | ![Mobile product header in dark mode](docs/screenshots/mobile-dark.png) |
+
+[Run the demo locally](docs/testing.md) to explore the layouts and native actions.
+
+## Version compatibility
+
+This README documents **2.x**. Package major versions identify this package's API; they do not correspond to Filament major versions.
+
+| Package version | Filament requirement | PHP requirement | Laravel | API |
+| --- | --- | --- | --- | --- |
+| `^2.0` | `^5.8.1` | `^8.3` | 12 or 13 | `Header`, `MetadataEntry`, typed compact configuration |
+| `^1.0` | `^5.8.1` | `^8.3` | 12 or 13 | Previous `HeaderLayout` API |
+
+These are the declared Composer requirements. Filament `>=5.0 <5.8.1` is excluded by the current constraint and has not been validated; this is not evidence of incompatibility with every earlier 5.x release. Other Filament major versions are outside these releases' declared requirements. PHP must also satisfy your selected Laravel version's requirements.
+
+See the [1.x README](https://github.com/mortalkiller/filament-page-header/blob/1.x/README.md) for the previous API and the [verification record](docs/verification.md) for executed checks. Security maintenance is documented separately in the [security policy](SECURITY.md).
 
 ## Installation
 
-The published stable line can be installed with the command below, but does not yet provide the redesigned API shown here. For this implementation use the local path workflow in [Local development](docs/local-development.md):
+### 1. Install the package
 
 ```bash
-composer require mortalkiller/filament-page-header:^1.0
+composer require mortalkiller/filament-page-header:^2.0
+```
+
+### 2. Publish Filament assets
+
+```bash
 php artisan filament:assets
 ```
 
-For unreleased work on the maintained branch, use `1.x-dev` deliberately. Do not change the entire application's `minimum-stability` to `dev`. Keep this dependency in `require`, not `require-dev`, when the application uses its headers at runtime. Review and commit the application's lock file deliberately.
+The service provider is discovered automatically. There are no package migrations to run and no custom theme build is required.
 
-The service provider is auto-discovered. Enable the plugin separately on each panel:
+### 3. Register the plugin
+
+Add the plugin to the intended panel's existing configuration:
 
 ```php
-use Filament\Panel;
 use MortalKiller\FilamentPageHeader\PageHeaderPlugin;
 
-public function panel(Panel $panel): Panel
-{
-    return $panel->plugin(PageHeaderPlugin::make());
-}
+$panel->plugin(PageHeaderPlugin::make());
 ```
 
-## Configure a page
+Register it separately for each panel that needs custom headers, then add the page trait as shown below. Installation alone does not replace existing headers.
 
-Use the trait on a resource Create, Edit, View or List page, or a custom Filament page. All content remains a normal Filament schema:
+## Your first header
+
+For an existing `CustomerResource`, add `HasPageHeader` and `headerSchema()` to its Edit page. This example assumes the model has `name` and `email` attributes; retain your page's existing methods and actions.
 
 ```php
-use Filament\Infolists\Components\TextEntry;
+<?php
+
+namespace App\Filament\Resources\Customers\Pages;
+
+use App\Filament\Resources\Customers\CustomerResource;
+use Filament\Resources\Pages\EditRecord;
 use Filament\Schemas\Schema;
 use Illuminate\Database\Eloquent\Model;
 use MortalKiller\FilamentPageHeader\Components\Header;
 use MortalKiller\FilamentPageHeader\Concerns\HasPageHeader;
 
-use HasPageHeader;
-
-public function headerSchema(Schema $schema): Schema
+class EditCustomer extends EditRecord
 {
-    return $schema->components([
-        Header::make()
-            ->heading(fn (?Model $record) => $record?->getAttribute('name') ?? __('New customer'))
-            ->description(fn (?Model $record) => $record?->getAttribute('email'))
-            ->initials(fn (?Model $record) => $record?->getAttribute('name'))
-            ->badges([
-                TextEntry::make('status')
-                    ->state(fn (?Model $record) => $record?->getAttribute('status') ?? __('New'))
-                    ->badge()
-                    ->hiddenLabel(),
-            ])
-            ->metadata([
-                TextEntry::make('reference')->hiddenLabel(),
-            ]),
-    ]);
+    use HasPageHeader;
+
+    protected static string $resource = CustomerResource::class;
+
+    public function headerSchema(Schema $schema): Schema
+    {
+        return $schema->components([
+            Header::make()
+                ->heading(fn (Model $record) => $record->getAttribute('name'))
+                ->description(fn (Model $record) => $record->getAttribute('email'))
+                ->initials(fn (Model $record) => $record->getAttribute('name')),
+        ]);
+    }
 }
 ```
 
-Place the trait declaration and method inside your page class. `Header::make()` inherits the page's heading and subheading. It does not change the browser tab title. Create and List pages do not require a persisted record.
+The trait also works with Create, View, List and custom pages. Use nullable record closures where no record exists. `Header::make()` inherits the page heading and subheading by default and does not change the browser tab title.
 
-### Layout slots
+## Configuration
 
-| Method | Purpose |
-| --- | --- |
-| `heading($state, html: false)` | Page heading; accepts a literal value or closure. |
-| `headingSchema([...])` | Custom heading composition, including the package's `Heading` component. |
-| `description($state, html: false)` | Supporting text. |
-| `descriptionSchema([...])` | Native supporting content, such as a copyable product code. |
-| `badges([...])` | Ordered native entries, including `TextEntry::badge()` and enums. |
-| `avatar($urlOrImageEntry)` | Image URL or native `ImageEntry`, displayed as an avatar. |
-| `image($urlOrImageEntry)` | Square image with soft corners and contain fitting, suitable for products without cropping. |
-| `initials($name)` | Full name used to generate initials when no image is rendered. |
-| `leading([...])` | Optional icon, avatar or logo. Use native entries; the package does not manage uploads. |
-| `metadata([...])` | References, dates, links and other secondary information. |
-| `summary([...])` | Optional summary or total, separate from the page's native actions. |
-| `schema([...])` | Additional components or native actions below the title. |
-| `whenCompact(fn (CompactHeader $compact) => ...)` | Select compact blocks and fields using HeaderPart enums. |
+Use native Filament entries for content and keep business logic in your application. The package handles layout, images, spacing and light/dark appearance.
 
-Slot methods accept arrays or closures. Badge entry labels are hidden automatically. Metadata and summary arrange native components without requiring a Grid; use explicit native layouts only for custom compositions. Use normal Filament visibility, colors, icons and authorization APIs. Do not put persistence, API requests or expensive calculations inside rendering closures.
+| Configure | API | Guide |
+| --- | --- | --- |
+| Identity | `heading()`, `description()`, `avatar()`, `image()`, `initials()` | [Images and icons](docs/configuration.md#images-and-icons) |
+| Badges and details | `badges()`, `metadata()`, `summary()` | [Layout slots](docs/configuration.md#layout-slots) |
+| Field icons | `fieldIcon()`, `fieldIconPosition()`, `fieldIconSize()` | [Metadata fields](docs/configuration.md#metadata-separators-and-field-icons) |
+| Product identity | `image()` and `descriptionSchema()` | [Product example](docs/configuration.md#product-header-example) |
+| Reusable resource headers | Convention discovery or `schemaFor()` | [Shared configuration](docs/configuration.md#share-configuration-across-a-resource) |
+| Custom composition | `headingSchema()`, `leading()`, `schema()` | [Layout slots](docs/configuration.md#layout-slots) |
 
-A page should render one principal `h1`. `Header` supplies one by default; preserve that rule when supplying `headingSchema()`. Optional empty slots are omitted. Badges wrap instead of forcing page-wide horizontal scrolling.
-
-Native `getHeaderActions()` remains independent. Its actions render once beside the identity, right-aligned, and wrap to right-aligned rows when space runs out. On mobile, metadata and summary precede a single column of full-width actions. Native button groups keep their segments on one row, and standalone icon-only menu triggers are centered below the main actions. The first top-level Header hosts the native actions; arbitrary schemas without a Header keep an independent native action group. Existing `formId`, ActionGroup, modal, confirmation and authorization behavior is retained. An action in the schema is additional content, not a replacement for native header actions.
-
-### Metadata separators and field icons
-
-Direct metadata fields are separated by subtle vertical lines in both themes. A 32 px gap reserves 16 px on each side of the separator, whether the field has an icon or only text. Separators follow the actual wrapped rows: the first visible field on each row has no leading line. Hidden fields do not leave a separator. Native nested layouts remain in control of their own internal composition.
-
-Use the package's `MetadataEntry` when an icon should sit beside the **whole label and value**, rather than just the value:
-
-```php
-use Filament\Support\Enums\IconPosition;
-use Filament\Support\Icons\Heroicon;
-use MortalKiller\FilamentPageHeader\Components\MetadataEntry;
-
-Header::make()->metadata([
-    MetadataEntry::make('customer_number')
-        ->label(__('Customer number'))
-        ->fieldIcon(Heroicon::OutlinedHashtag)
-        ->copyable(),
-    MetadataEntry::make('email')
-        ->fieldIcon(Heroicon::OutlinedEnvelope)
-        ->fieldIconPosition(IconPosition::After)
-        ->fieldIconSize(32),
-]);
-```
-
-`fieldIconSize()` accepts a positive integer in CSS pixels or a closure returning one; the default is 24. Zero, negative and invalid dynamic values are rejected. The package leaves 16 pixels between the icon and its native field content, with enough room for the text when fields wrap.
-
-`fieldIconPosition()` defaults to `IconPosition::Before` (left in left-to-right layouts); `After` places the icon on the right. Both methods accept closures with native Filament utility injection. Return `null` from `fieldIcon()` to omit the icon and its space. Icons are decorative; the visible label/value retain their accessible meaning.
-
-`MetadataEntry` extends native `TextEntry`, preserving formatting, placeholders, copyable values, links, visibility and child actions. Native `icon()` / `iconPosition()` remain available for an icon inside the value; the package's `fieldIcon()` / `fieldIconPosition()` control the entire field. Plain `TextEntry` and other native components can still be used without field icons. The consuming application only declares this API; it needs no layout CSS or Blade overrides.
-
-### Images and icons
-
-```php
-use Filament\Infolists\Components\ImageEntry;
-use MortalKiller\FilamentPageHeader\Components\Heading;
-
-$header
-    ->avatar(ImageEntry::make('photo'))
-    ->initials(fn (?Model $record) => $record?->getAttribute('name'));
-```
-
-Pass a URL or closure to `avatar()` for a browser-ready image URL. Use a native `ImageEntry` for stored paths, disk selection, private temporary URLs and image visibility; the package retains Filament's storage handling. `initials()` receives a full name, takes the first two words and supplies the native avatar fallback when image content is empty. The same name supplies alternative text for URL avatars; use native image attributes for custom image descriptions. URL avatars support HTTP(S) and relative URLs, and reject other schemes.
-
-For advanced composition, `headingSchema()` and `leading()` still accept native components. The package does not upload images or depend on a particular icon library.
-
-### Product header example
-
-```php
-use Filament\Infolists\Components\TextEntry;
-use Filament\Support\Icons\Heroicon;
-use MortalKiller\FilamentPageHeader\CompactHeader;
-use MortalKiller\FilamentPageHeader\Enums\HeaderPart;
-use MortalKiller\FilamentPageHeader\Components\Header;
-use MortalKiller\FilamentPageHeader\Components\MetadataEntry;
-
-Header::make()
-    ->heading(fn ($record) => $record->name)
-    ->image(fn ($record) => $record->image_url)
-    ->initials(fn ($record) => $record->name)
-    ->descriptionSchema([
-        TextEntry::make('supplier_code')->hiddenLabel()->copyable(),
-    ])
-    ->badges([
-        TextEntry::make('status')->badge(),
-    ])
-    ->metadata([
-        MetadataEntry::make('supplier.name')->label(__('Supplier'))
-            ->fieldIcon(Heroicon::OutlinedTruck)->fieldIconSize(24),
-        MetadataEntry::make('brand.name')->label(__('Brand'))
-            ->fieldIcon(Heroicon::OutlinedTag),
-    ])
-    ->whenCompact(fn (CompactHeader $compact) => $compact
-        ->show(HeaderPart::Image, HeaderPart::Description, HeaderPart::Badges));
-```
-
-The example assumes the consuming model provides these fields; image selection and business state belong to that application. `image()` shows the entire image in a square frame with soft corners: 96 px on desktop, 80 px below 768 px and 32 px when compact. Images and avatars are vertically centered with the full identity block (heading, description and badges). It accepts the same URL/closure/native ImageEntry inputs as `avatar()`. Calling `avatar()` again restores circular presentation. Both shrink in compact mode. The compact configuration above keeps the copyable supplier code visible while the metadata collapses. Create pages can continue to use their existing native header.
-
-### Share configuration across a resource
-
-Define a class such as `App\Filament\Resources\Orders\Schemas\OrderHeader` with `public static function configure(Schema $schema): Schema`. The trait discovers `{Model}Header` beside the resource by convention, including parent resource namespaces.
-
-Alternatively, map the class explicitly on the panel plugin:
-
-```php
-PageHeaderPlugin::make()->schemaFor(OrderResource::class, OrderHeader::class);
-```
-
-An inline `headerSchema()` method overrides discovery. Add the trait only to pages that should use the shared schema. A page without a schema, or with an empty schema, uses the native header. A `getHeader()` method defined on the page itself keeps precedence. Without panel activation, the trait falls back to the native header.
-
-### Native Filament surfaces
-
-The header uses Filament's native `fi-section` surface, including its background, ring and shadow in light/dark mode. Text and avatar colors read the panel's `--gray-*` palette. Internal dividers match native sections: gray-200 in light mode and white at 10% opacity in dark mode. No consumer CSS or theme rebuild is required.
+Native `getHeaderActions()` continues to define the page actions. They render once, right-aligned on desktop and after the details on mobile. Native button groups, modals, form targets and authorization remain in place. Breadcrumbs sit outside the card and scroll with the page.
 
 ## Sticky and compact modes
 
+Set a default on the panel plugin:
+
 ```php
-PageHeaderPlugin::make(); // Normal scrolling.
-PageHeaderPlugin::make()->sticky(); // Pin the full header.
-PageHeaderPlugin::make()->compact(); // Compact after reaching the sticky edge.
+PageHeaderPlugin::make(); // Scroll normally.
+PageHeaderPlugin::make()->sticky(); // Keep the full header pinned.
+PageHeaderPlugin::make()->compact(); // Compact when the header reaches the sticky edge.
 PageHeaderPlugin::make()->sticky()->compactBelow(1024);
 ```
 
-`compactBelow(1024)` applies strictly below 1024 CSS pixels; at 1024 and above the configured base mode applies. It is a viewport threshold, not a device detector. At the top of the page the full layout remains visible. Compact mode retains the heading, badges, a smaller avatar and all native actions. It hides description, metadata, summary and additional schema content by default.
+You can also call `normal()`, `sticky()` or `compact()` on an individual `Header`. Call `compactBelow()` after selecting the base mode; its threshold is exclusive.
 
-A Header inherits the current panel settings. Override its mode directly:
-
-```php
-Header::make()->heading(__('Customers'))->compact();
-Header::make()->heading(__('Customers'))->normal();
-Header::make()->heading(__('Customers'))->sticky()->compactBelow(768);
-```
-
-`normal()`, `sticky()` and `compact()` replace the inherited mode, responsive rules and compact threshold; the last selected mode wins. Call `compactBelow()` after selecting the mode. A header override never mutates another header or the panel defaults. The first top-level Header controls the page header's scroll behavior.
-
-Advanced configurations can still use `mode(HeaderMode::...)`, `responsive([minimumWidth => HeaderMode::...])` on the plugin, or immutable `HeaderOptions` through `options()` / `pageHeaderOptions()`. The highest matching minimum width wins; `compactBelow()` takes precedence below its threshold.
-
-### Offset and compact content
-
-The default offset is derived from visible native topbars. Set an explicit pixel offset, or customize the selector for a different layout:
-
-```php
-PageHeaderPlugin::make()->offset(80);
-PageHeaderPlugin::make()->topbarSelector('.my-topbar, .my-announcement-bar');
-```
-
-Passing `offset(null)` restores automatic detection; `topbarSelector(null)` disables topbar detection. Sticky positioning is bounded by the real scroll container and its ancestors. Avoid short wrappers or unintended `overflow: hidden` ancestors that prevent CSS sticky from reaching the page content.
-
-Without `whenCompact()`, the existing defaults remain: image/avatar, heading, badges and native page actions stay visible; description, metadata, summary and extra content collapse.
-
-Configure compact content with a typed callback:
+By default, compact mode keeps the heading, image/avatar, badges and native page actions. Choose optional content explicitly with enums:
 
 ```php
 use MortalKiller\FilamentPageHeader\CompactHeader;
+use MortalKiller\FilamentPageHeader\Components\Header;
 use MortalKiller\FilamentPageHeader\Enums\HeaderPart;
 
 Header::make()
+    ->compact()
     ->whenCompact(fn (CompactHeader $compact) => $compact
-        ->show(HeaderPart::Image, HeaderPart::Description, HeaderPart::Badges)
-        ->only(HeaderPart::Metadata, ['supplier.name', 'header_variants']));
+        ->show(HeaderPart::Image, HeaderPart::Badges)
+        ->only(HeaderPart::Metadata, ['reference']));
 ```
 
-`whenCompact()` configures content only: select `compact()` on the header or plugin to activate scroll compaction. Each callback starts with no optional blocks selected. An empty callback retains only the heading and native page actions, which cannot be hidden through this API. Each header has its own configuration; calling `whenCompact()` again replaces it.
+Use this on a header whose metadata includes `reference`. Each `whenCompact()` callback starts with no optional blocks selected. The heading and native page actions always remain; field visibility and authorization still apply. Scrolling does not duplicate actions or send Livewire requests.
 
-| HeaderPart | Content |
+[Full compact configuration, offsets and responsive rules](docs/configuration.md#sticky-and-compact-modes).
+
+## Migration from v1
+
+Version 2 replaces `HeaderLayout` with `Header` and introduces a new composition API. Update consuming schemas and publish the assets again when upgrading.
+
+Follow the [migration guide](docs/migration.md), including the deprecated compact methods. For unreleased development on `2.x`, deliberately use `2.x-dev` with the [local path and symlink workflow](docs/local-development.md); keep your application's global stability unchanged.
+
+## Troubleshooting
+
+| Symptom | Check |
 | --- | --- |
-| `Image` | Image, avatar, initials or custom leading content. |
-| `Description` | Description text or native description schema. |
-| `Badges` | Status badges. |
-| `Metadata` | Information fields. |
-| `Summary` | Summary metrics. |
-| `Content` | Extra components declared through `schema()`. |
+| The native header still appears | Register the plugin on the active panel, add `HasPageHeader` to the page and return a non-empty schema. A page's own `getHeader()` method takes precedence. |
+| Styling or scrolling behavior is outdated | Run `php artisan filament:assets` in the consuming application after updating the package, then reload. A Composer symlink does not refresh published assets. |
+| The header does not stick | Enable `sticky()` or `compact()`. Check the real scroll container, short parent wrappers and ancestor overflow. Pinning is temporarily disabled when the header cannot fit the viewport. |
+| `whenCompact()` has no visible effect | Enable `compact()` on the header or plugin, then scroll to the sticky edge. The callback selects content; it does not activate compaction. |
+| A selected compact field disappears | Match its entry name or layout key, and check native visibility conditions. Selection covers direct fields, not nested descendants. |
 
-- `show(HeaderPart ...$parts)` adds complete blocks to the compact selection.
-- `only(HeaderPart $part, array $fields)` enables that block with only the listed direct fields. It takes precedence over `show()` for that block regardless of call order. Repeating `only()` replaces that block's field list; `only(..., [])` hides it.
-- Field identifiers are the names passed to native entries' `make()`, including relationship names such as `supplier.name`. Other schema components use their local `key()` / state path. For a nested layout, select its explicit key to retain the whole layout; this API does not search its descendants. Named schema actions can also be selected. Image/leading content supports `show()` only.
-- Missing or currently unavailable fields do not become visible. If none of the selected fields are available, the block collapses without leaving an empty details strip. Empty/invalid field identifiers are rejected.
-- Native `visible()` / `hidden()` conditions and permissions remain authoritative. Compaction only changes presentation of already-rendered content; it is not an authorization boundary. Components and actions are not duplicated, and scrolling sends no Livewire requests.
-- Separators follow the visible rows in both expanded and compact layouts. Focused content stays accessible until focus leaves it. Images continue to shrink when compact.
+[Advanced layout and offset configuration](docs/configuration.md#offset-and-compact-content).
 
-`hideWhenCompact()` and `retainSummaryWhenCompact()` remain deprecated compatibility methods. New configuration should use `whenCompact()`; do not mix the APIs. If mixed, the last configuration method selects the active API. Existing per-component `data-fph-hide-compact` attributes remain supported for legacy views.
-
-Breadcrumbs render above and outside the header card, and scroll with the page. They never occupy the pinned header. The former `HeaderOptions::hideBreadcrumbsWhenCompact()` option remains readable for compatibility with custom views, but has no effect on the package view.
-
-The browser handles scrolling and compaction without Livewire requests or duplicated action instances. A stable expanded footprint prevents layout jumps. On very short viewports or unusually tall headers, pinning is temporarily disabled so the page remains usable. Reduced-motion preferences are respected.
-
-External job/provider changes are not polled by this package. The application must refresh its data through its existing Livewire events or refresh mechanisms.
-
-## Light and dark appearance
-
-The package owns the card surface, spacing, dividers, avatars and responsive composition. When pinned, the card has square top corners and retains rounded bottom corners; scrolling back to the top restores all four rounded corners. Colors follow Filament's gray tokens and its `.dark` theme class. Native badges and actions keep their configured semantic colors. No consumer CSS, Blade overrides or Tailwind build is needed.
-
-## Migration from the former API
-
-- Replace `HeaderLayout` with `Header`.
-- Replace `subheading()` with `description()` and `trailing()` with `summary()`.
-- Pass metadata and metrics directly; remove Grids used only to arrange these standard regions.
-- Replace manual photo/initials composition with `avatar()` and `initials()` where appropriate.
-- Prefer `sticky()->compactBelow(1024)` over the equivalent panel breakpoint map.
-- Update compact slot names and explicitly opt in if a summary must stay visible.
-- Publish assets again; PHP/Blade symlinks do not update published CSS/JS.
-
-This is intentionally a breaking change. Migrate consuming schemas before using this checkout and select a major release separately before publication.
-
-## HTML and security
-
-Headings and subheadings are escaped by default, including `HtmlString` values. Use `html: true` or `Heading::html()` only for trusted markup that your application has prepared. Escape untrusted values before including them in that markup. Native entries and actions retain their own security behavior; hiding an action is not authorization.
-
-The package does not load arbitrary URLs on the server, persist settings or register demo routes in a consuming application. Assets are namespaced and loaded when the header needs them. No custom Tailwind theme or build step is required; publish assets using Filament's standard command.
-
-## Independent demo and tests
-
-From this repository:
-
-```bash
-composer install
-php bin/prepare-workbench.php
-php workbench/artisan package:discover
-php workbench/artisan filament:assets
-php workbench/artisan serve --host=127.0.0.1 --port=8000
-```
-
-Open `http://127.0.0.1:8000/demo/headers`. The workbench demonstrates ten compositions and all three scroll modes. It is a **local testing application**, not a production application; do not expose it publicly. It does not need Pressiu's database or theme.
-
-Run checks from the repository root:
+## Testing and contributing
 
 ```bash
 composer test
 node --test tests/JavaScript/*.test.mjs
-npm install
-npx playwright install chromium
 npm run test:browser
 ```
 
-Playwright starts the local workbench automatically. Browser reports and screenshots are also retained as CI artifacts. PHP tests use an isolated in-memory database; browser tests use the separate workbench.
+See [demo and testing setup](docs/testing.md) before running browser tests, and [CONTRIBUTING](CONTRIBUTING.md) for branch conventions, checks and pull requests. The package has an independent workbench and does not require a consuming application's database.
 
-## Develop locally inside Pressiu or another application
+## Changelog
 
-See [Local development](docs/local-development.md) for Composer `path` + symlink configuration, Docker mounts, asset refresh and safe transition back to a distributed version. PHP/Blade changes can be tested without a commit, push, tag or release. Asset publishing is a local operation, not a release.
+See [GitHub Releases](https://github.com/mortalkiller/filament-page-header/releases) for published versions and release notes.
 
-## Scope and credits
+## Security
 
-This version intentionally excludes visual editors, uploads, database-stored configuration, automatic polling and Filament 4 compatibility. Pressiu integration is a separate change; the package does not import Pressiu classes.
+Please report vulnerabilities privately using the process in [SECURITY.md](SECURITY.md). Use GitHub Issues for ordinary bugs and feature requests.
 
-Inspired by [Vitis Studio's Filament Header Schema](https://github.com/VitisStudio/filament-header-schema), and built on native [Filament plugin and schema APIs](https://filamentphp.com/docs/5.x/plugins/panel-plugins). See [third-party notices](THIRD_PARTY_NOTICES.md).
+Heading and description text are escaped by default. Enable `html: true` only for trusted markup prepared by your application. Native visibility is not an authorization boundary; keep permission checks on the server.
+
+The Plumb badges display the latest external assessment, which may lag behind repository changes. They are not a security audit or a guarantee that the package has no vulnerabilities.
+
+## Support this project
+
+If this package saves you time, consider supporting its development. Your support helps maintain the package and improve its documentation.
+
+[![Buy Me a Coffee](https://img.shields.io/badge/Buy_Me_a_Coffee-Support-FFDD00?logo=buymeacoffee&logoColor=000)](https://buymeacoffee.com/mortalkiller)
+
+## Credits and license
+
+- [Pedro Monteiro (MortalKiller)](https://github.com/mortalkiller)
+- [All contributors](https://github.com/mortalkiller/filament-page-header/graphs/contributors)
+- Inspired by [Vitis Studio's Filament Header Schema](https://github.com/VitisStudio/filament-header-schema).
+- Built on [Filament](https://filamentphp.com). See [third-party notices](THIRD_PARTY_NOTICES.md).
 
 Licensed under the [MIT license](LICENSE.md).
