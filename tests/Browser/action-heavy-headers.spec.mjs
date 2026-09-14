@@ -269,13 +269,29 @@ for (const width of [390, 1440]) {
         await page.setViewportSize({ width, height: 1400 });
         await page.goto('/demo/headers?variant=11&mode=compact&selective=1');
         await expect(page.locator('[data-fph-root]')).toHaveAttribute('data-fph-ready', 'true');
+        const root = page.locator('[data-fph-root]');
+        const header = page.locator('[data-fph-header]');
+        const restingShadow = await header.evaluate(element => getComputedStyle(element).boxShadow);
+        await expect.poll(() => header.evaluate(element => getComputedStyle(element).transitionDuration)).toContain('0.15s');
         const fields = page.locator('.fph-metadata > .fi-sc > .fi-grid-col');
         await expect(fields).toHaveCount(6);
         await expect(fields.nth(0)).toBeVisible();
         await page.getByLabel('Unsaved note').fill('Keep this unsaved value');
         page.on('request', request => { if (request.method() !== 'GET') requests.push(request.url()); });
         await page.evaluate(() => window.scrollTo(0, 850));
-        await expect(page.locator('[data-fph-root]')).toHaveAttribute('data-fph-compact', 'true');
+        await expect(root).toHaveAttribute('data-fph-compact', 'true');
+        await expect(page.locator('.fph-description')).toBeVisible();
+        await expect.poll(async () => {
+            const [heading, description] = await Promise.all([
+                page.locator('.fph-heading').boundingBox(),
+                page.locator('.fph-description').boundingBox(),
+            ]);
+
+            return heading !== null && description !== null
+                && description.y >= heading.y + heading.height
+                && Math.abs(description.x - heading.x) <= 1;
+        }).toBe(true);
+        await expect.poll(() => header.evaluate(element => getComputedStyle(element).boxShadow)).not.toBe(restingShadow);
         await expect(fields.nth(0)).toBeHidden();
         await expect(fields.nth(1)).toBeVisible();
         await expect(fields.nth(2)).toBeHidden();
@@ -293,6 +309,9 @@ for (const width of [390, 1440]) {
         await expect(fields.nth(2)).toBeVisible();
         await expect(fields).toHaveCount(6);
         await expect(page.getByLabel('Unsaved note')).toHaveValue('Keep this unsaved value');
+        await page.evaluate(() => window.scrollTo(0, 0));
+        await expect(root).toHaveAttribute('data-fph-stuck', 'false');
+        await expect.poll(() => header.evaluate(element => getComputedStyle(element).boxShadow)).toBe(restingShadow);
         expect(requests).toEqual([]);
         expect(errors).toEqual([]);
     });

@@ -42,6 +42,12 @@ it('renders a schema without a record and preserves one heading', function (): v
         ->and($component->instance()->getTitle())->toBe('Native title');
 });
 
+it('preserves browser-managed header state during Livewire morphs', function (): void {
+    Livewire::test(ExamplePage::class)
+        ->assertSeeHtml('data-fph-root')
+        ->assertSeeHtml('wire:ignore.self');
+});
+
 it('overrides panel modes per page without mutating defaults', function (): void {
     $component = Livewire::test(ExamplePage::class);
     expect($component->instance()->getPageHeaderOptions()->toArray()['mode'])->toBe('compact')

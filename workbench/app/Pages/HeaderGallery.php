@@ -153,7 +153,7 @@ class HeaderGallery extends Page
 
         if ($this->selective) {
             $layout->whenCompact(fn (CompactHeader $compact) => $compact
-                ->show(HeaderPart::Image)
+                ->show(HeaderPart::Image, HeaderPart::Description)
                 ->only(HeaderPart::Badges, ['status'])
                 ->only(HeaderPart::Metadata, ['reference', 'email'])
                 ->only(HeaderPart::Summary, ['approved']));

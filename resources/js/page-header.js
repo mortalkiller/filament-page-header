@@ -36,6 +36,7 @@ export class HeaderController {
         this.options = options;
         this.frame = null;
         this.needsMeasure = true;
+        this.measurementPending = false;
         this.destroyed = false;
         this.cleanups = [];
         this.expandedHeight = 0;
@@ -105,6 +106,22 @@ export class HeaderController {
         });
     }
 
+    measureWhenIdle() {
+        const transitions = this.header.getAnimations().filter(animation =>
+            animation instanceof this.window.CSSTransition && animation.playState === 'running');
+        if (transitions.length === 0) {
+            this.measure();
+            return;
+        }
+        if (this.measurementPending) return;
+        this.measurementPending = true;
+        Promise.allSettled(transitions.map(transition => transition.finished)).then(() => {
+            if (this.destroyed) return;
+            this.measurementPending = false;
+            this.schedule(true);
+        });
+    }
+
     measure() {
         const compact = this.root.dataset.fphCompact;
         this.root.dataset.fphMeasuring = 'true';
@@ -115,6 +132,8 @@ export class HeaderController {
         this.updateMetadataDividers(true);
         this.compactHeight = Math.ceil(this.header.getBoundingClientRect().height);
         this.root.dataset.fphCompact = compact ?? 'false';
+        // Commit the restored layout while transitions are still disabled.
+        this.header.getBoundingClientRect();
         delete this.root.dataset.fphMeasuring;
         this.needsMeasure = false;
     }
@@ -136,7 +155,7 @@ export class HeaderController {
     update() {
         if (this.destroyed) return;
         if (!this.root.isConnected) { this.destroy(); return; }
-        if (this.needsMeasure) this.measure();
+        if (this.needsMeasure) this.measureWhenIdle();
 
         // Sticky children stop at the inner padded edge of a nested scrollport.
         const boundaryTop = this.scrollParent === this.window ? 0

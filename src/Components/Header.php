@@ -11,6 +11,8 @@ use Filament\Infolists\Components\ImageEntry;
 use Filament\Pages\Page;
 use Filament\Schemas\Components\Component;
 use Filament\Schemas\Schema;
+use Filament\Support\Colors\Color;
+use Filament\Support\Facades\FilamentColor;
 use InvalidArgumentException;
 use MortalKiller\FilamentPageHeader\CompactHeader;
 use MortalKiller\FilamentPageHeader\Enums\HeaderMode;
@@ -29,6 +31,11 @@ class Header extends Component
     protected bool $isImage = false;
 
     protected mixed $initialsName = null;
+
+    /** @var string|array<int, string>|Closure|null */
+    protected string|array|Closure|null $initialsColor = null;
+
+    protected string|Closure|null $initialsTextColor = null;
 
     protected ?Page $page = null;
 
@@ -110,6 +117,21 @@ class Header extends Component
         return $this;
     }
 
+    /** @param string|array<int, string>|Closure|null $color */
+    public function initialsColor(string|array|Closure|null $color): static
+    {
+        $this->initialsColor = $color;
+
+        return $this;
+    }
+
+    public function initialsTextColor(string|Closure|null $color): static
+    {
+        $this->initialsTextColor = $color;
+
+        return $this;
+    }
+
     public function getAvatarUrl(): ?string
     {
         $url = trim((string) $this->evaluate($this->avatar));
@@ -136,6 +158,56 @@ class Header extends Component
             static fn (string $word): string => mb_strtoupper(mb_substr($word, 0, 1)),
             array_slice($words, 0, 2),
         ));
+    }
+
+    /** @return array<string, string> */
+    public function getInitialsAvatarStyles(): array
+    {
+        $palette = $this->getInitialsPalette();
+
+        if ($palette === null) {
+            return [];
+        }
+
+        $background = $palette[600] ?? $palette[500] ?? null;
+
+        if (! is_string($background)) {
+            return [];
+        }
+
+        $textColor = $this->evaluate($this->initialsTextColor);
+
+        return [
+            '--fph-avatar-background' => $background,
+            '--fph-avatar-text' => is_string($textColor) ? $textColor : $this->getInitialsContrastColor($palette, $background),
+        ];
+    }
+
+    /** @return array<int, string>|null */
+    private function getInitialsPalette(): ?array
+    {
+        $color = $this->evaluate($this->initialsColor);
+
+        if (is_string($color)) {
+            $color = FilamentColor::getColor($color);
+        }
+
+        if (! is_array($color)) {
+            return null;
+        }
+
+        return $color;
+    }
+
+    /** @param array<int, string> $palette */
+    private function getInitialsContrastColor(array $palette, string $background): string
+    {
+        $light = $palette[50] ?? 'oklch(1 0 0)';
+        $dark = $palette[950] ?? 'oklch(0 0 0)';
+
+        return Color::calculateContrastRatio($background, $dark) >= Color::calculateContrastRatio($background, $light)
+            ? $dark
+            : $light;
     }
 
     public function normal(): static

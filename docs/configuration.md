@@ -16,6 +16,8 @@ Configure content with native Filament schema components. Examples below assume 
 | `avatar($urlOrImageEntry)` | Image URL or native `ImageEntry`, displayed as an avatar. |
 | `image($urlOrImageEntry)` | Square image with soft corners and contain fitting, suitable for products without cropping. |
 | `initials($name)` | Full name used to generate initials when no image is rendered. |
+| `initialsColor($color)` | Panel color alias, native Filament palette or closure for the initials fallback background. |
+| `initialsTextColor($color)` | Optional CSS color or closure for the initials fallback text. |
 | `leading([...])` | Optional icon, avatar or logo. Use native entries; the package does not manage uploads. |
 | `metadata([...])` | References, dates, links and other secondary information. |
 | `summary([...])` | Optional summary or total, separate from the page's native actions. |
@@ -69,6 +71,23 @@ $header
 ```
 
 Pass a URL or closure to `avatar()` for a browser-ready image URL. Use a native `ImageEntry` for stored paths, disk selection, private temporary URLs and image visibility; the package retains Filament's storage handling. `initials()` receives a full name, takes the first two words and supplies the native avatar fallback when image content is empty. The same name supplies alternative text for URL avatars; use native image attributes for custom image descriptions. URL avatars support HTTP(S) and relative URLs, and reject other schemes.
+
+Use `initialsColor()` to give the fallback a semantic panel color or a native palette. A color alias such as `primary`, `success` or a custom color registered on the panel follows that panel's palette. You can also pass `Color::Blue` or a closure returning either value. The package uses shade 600 for the background and chooses the lighter or darker palette extreme with the highest contrast for the initials. This keeps the fallback legible in light and dark panels. `initialsTextColor()` accepts a CSS color string, or a closure returning one, when a deliberate text color is required.
+
+```php
+use Filament\Support\Colors\Color;
+
+Header::make()
+    ->initials(fn ($record) => $record->name)
+    ->initialsColor('primary');
+
+Header::make()
+    ->initials(fn ($record) => $record->name)
+    ->initialsColor(fn ($record) => $record->is_vip ? Color::Amber : Color::Blue)
+    ->initialsTextColor('white');
+```
+
+These methods affect only the initials fallback. A rendered `avatar()`, `image()` or `ImageEntry` keeps its own visual content.
 
 For advanced composition, `headingSchema()` and `leading()` still accept native components. The package does not upload images or depend on a particular icon library.
 
@@ -166,7 +185,7 @@ Header::make()
         ->only(HeaderPart::Metadata, ['supplier.name', 'header_variants']));
 ```
 
-`whenCompact()` configures content only: select `compact()` on the header or plugin to activate scroll compaction. Each callback starts with no optional blocks selected. An empty callback retains only the heading and native page actions, which cannot be hidden through this API. Each header has its own configuration; calling `whenCompact()` again replaces it.
+`whenCompact()` configures content only: select `compact()` on the header or plugin to activate scroll compaction. Each callback starts with no optional blocks selected. An empty callback retains only the heading and native page actions, which cannot be hidden through this API. Each header has its own configuration; calling `whenCompact()` again replaces it. When selected, description content remains directly below the compact heading in a smaller supporting line; it never shares the heading's row.
 
 | HeaderPart | Content |
 | --- | --- |
@@ -182,11 +201,13 @@ Header::make()
 - Field identifiers are the names passed to native entries' `make()`, including relationship names such as `supplier.name`. Other schema components use their local `key()` / state path. For a nested layout, select its explicit key to retain the whole layout; this API does not search its descendants. Named schema actions can also be selected. Image/leading content supports `show()` only.
 - Missing or currently unavailable fields do not become visible. If none of the selected fields are available, the block collapses without leaving an empty details strip. Empty/invalid field identifiers are rejected.
 - Native `visible()` / `hidden()` conditions and permissions remain authoritative. Compaction only changes presentation of already-rendered content; it is not an authorization boundary. Components and actions are not duplicated, and scrolling sends no Livewire requests.
-- Separators follow the visible rows in both expanded and compact layouts. Focused content stays accessible until focus leaves it. Images continue to shrink when compact.
+- Separators follow the visible rows in both expanded and compact layouts. Focused content stays accessible until focus leaves it. Images and initials remain centered with the compact identity block and continue to shrink responsively. A compact header gains a subtle lower shadow only after it reaches the sticky edge; that shadow and the reduced spacing animate over 150ms.
 
 Breadcrumbs render above and outside the header card and scroll with the page. For deprecated compact methods, see [Migration from v1](migration.md).
 
-The browser handles scrolling and compaction without Livewire requests or duplicated action instances. A stable expanded footprint prevents layout jumps. On very short viewports or unusually tall headers, pinning is temporarily disabled so the page remains usable. Reduced-motion preferences are respected.
+The browser handles scrolling and compaction without Livewire requests or duplicated action instances. Its sticky state remains browser-owned across unrelated Livewire updates, so changing a relation-manager tab does not reset an already compact header. A stable expanded footprint prevents layout jumps. On very short viewports or unusually tall headers, pinning is temporarily disabled so the page remains usable. Reduced-motion preferences are respected.
+
+Internal height measurements restore the displayed layout before re-enabling transitions. Loading the page, resizing its content or refreshing Livewire does not animate a temporary measurement state. While the header itself is transitioning, new measurements wait until its transitions finish or are cancelled; scroll state continues updating. This lets the compact/expanded animation complete without being interrupted by its own height changes. Reduced-motion users do not incur an animation delay.
 
 External job/provider changes are not polled by this package. The application must refresh its data through its existing Livewire events or refresh mechanisms.
 

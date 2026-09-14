@@ -140,7 +140,7 @@ Use native Filament entries for content and keep business logic in your applicat
 
 | Configure | API | Guide |
 | --- | --- | --- |
-| Identity | `heading()`, `description()`, `avatar()`, `image()`, `initials()` | [Images and icons](docs/configuration.md#images-and-icons) |
+| Identity | `heading()`, `description()`, `avatar()`, `image()`, `initials()`, `initialsColor()`, `initialsTextColor()` | [Images and icons](docs/configuration.md#images-and-icons) |
 | Badges and details | `badges()`, `metadata()`, `summary()` | [Layout slots](docs/configuration.md#layout-slots) |
 | Field icons | `fieldIcon()`, `fieldIconPosition()`, `fieldIconSize()` | [Metadata fields](docs/configuration.md#metadata-separators-and-field-icons) |
 | Product identity | `image()` and `descriptionSchema()` | [Product example](docs/configuration.md#product-header-example) |
@@ -148,6 +148,23 @@ Use native Filament entries for content and keep business logic in your applicat
 | Custom composition | `headingSchema()`, `leading()`, `schema()` | [Layout slots](docs/configuration.md#layout-slots) |
 
 Native `getHeaderActions()` continues to define the page actions. They render once, right-aligned on desktop and after the details on mobile. Native button groups, modals, form targets and authorization remain in place. Breadcrumbs sit outside the card and scroll with the page.
+
+Color an initials fallback with a panel color alias or a native Filament palette. The text color is chosen for contrast unless you override it:
+
+```php
+use Filament\Support\Colors\Color;
+
+Header::make()
+    ->initials(fn (Model $record) => $record->name)
+    ->initialsColor('primary');
+
+Header::make()
+    ->initials(fn (Model $record) => $record->name)
+    ->initialsColor(Color::Blue)
+    ->initialsTextColor('white');
+```
+
+See [Images and icons](docs/configuration.md#images-and-icons) for closures and fallback behavior.
 
 ## Sticky and compact modes
 

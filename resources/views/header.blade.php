@@ -12,6 +12,7 @@
 <div
     class="fph-root"
     data-fph-root
+    wire:ignore.self
     data-fph-options="{{ json_encode($options, JSON_THROW_ON_ERROR) }}"
     x-load
     x-load-src="{{ FilamentAsset::getAlpineComponentSrc('page-header', package: PageHeaderPlugin::PACKAGE) }}"

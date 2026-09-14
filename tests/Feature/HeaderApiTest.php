@@ -5,7 +5,9 @@ declare(strict_types=1);
 use Filament\Actions\Action;
 use Filament\Infolists\Components\TextEntry;
 use Filament\Schemas\Schema;
+use Filament\Support\Colors\Color;
 use Filament\Support\Enums\IconPosition;
+use Filament\Support\Facades\FilamentColor;
 use Filament\Support\Icons\Heroicon;
 use Livewire\Livewire;
 use MortalKiller\FilamentPageHeader\Components\Header;
@@ -46,6 +48,29 @@ it('renders a configured photo with an accessible text alternative', function ()
     ])->toHtml();
 
     expect($html)->toContain('src="/avatar.svg"', 'alt="Mariana Costa"');
+});
+
+it('applies semantic and explicit colors to initials avatars', function (): void {
+    $page = Livewire::test(ExamplePage::class)->instance();
+    $html = Schema::make($page)->components([
+        Header::make()->heading('Mariana Costa')->initials('Mariana Costa')
+            ->initialsColor('primary')->initialsTextColor('white'),
+        Header::make()->heading('Carlos Silva')->initials('Carlos Silva')
+            ->initialsColor(Color::Blue),
+    ])->toHtml();
+
+    $primary = FilamentColor::getColor('primary');
+    $primaryText = Color::calculateContrastRatio($primary[600], $primary[950]) >= Color::calculateContrastRatio($primary[600], $primary[50])
+        ? $primary[950]
+        : $primary[50];
+    $blueText = Color::calculateContrastRatio(Color::Blue[600], Color::Blue[950]) >= Color::calculateContrastRatio(Color::Blue[600], Color::Blue[50])
+        ? Color::Blue[950]
+        : Color::Blue[50];
+
+    expect($html)
+        ->toContain('--fph-avatar-background: '.$primary[600], '--fph-avatar-text: white')
+        ->toContain('--fph-avatar-background: '.Color::Blue[600], '--fph-avatar-text: '.$blueText)
+        ->not->toContain('--fph-avatar-text: '.$primaryText);
 });
 
 it('hides badge labels by default without changing metadata labels', function (): void {
