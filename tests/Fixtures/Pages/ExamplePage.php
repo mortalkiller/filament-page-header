@@ -7,10 +7,8 @@ namespace MortalKiller\FilamentPageHeader\Tests\Fixtures\Pages;
 use Filament\Actions\Action;
 use Filament\Infolists\Components\TextEntry;
 use Filament\Schemas\Schema;
-use MortalKiller\FilamentPageHeader\Components\HeaderLayout;
+use MortalKiller\FilamentPageHeader\Components\Header;
 use MortalKiller\FilamentPageHeader\Concerns\HasPageHeader;
-use MortalKiller\FilamentPageHeader\Enums\HeaderMode;
-use MortalKiller\FilamentPageHeader\HeaderOptions;
 
 class ExamplePage extends NativePage
 {
@@ -27,16 +25,16 @@ class ExamplePage extends NativePage
     public function headerSchema(Schema $schema): Schema
     {
         return $schema->components([
-            HeaderLayout::make()
+            Header::make()->compact()
                 ->heading(fn (self $livewire): string => $livewire->headerText)
-                ->subheading('Supporting text')
+                ->description('Supporting text')
                 ->badges([
                     TextEntry::make('status')->state(fn (self $livewire): string => $livewire->status)->badge()->hiddenLabel(),
                 ])
                 ->metadata([
                     TextEntry::make('reference')->state('REF-100')->hiddenLabel(),
                 ])
-                ->trailing([
+                ->summary([
                     TextEntry::make('total')->state(120)->money('EUR')->hiddenLabel(),
                 ])
                 ->schema([
@@ -49,11 +47,6 @@ class ExamplePage extends NativePage
                     }),
                 ]),
         ]);
-    }
-
-    public function pageHeaderOptions(HeaderOptions $defaults): HeaderOptions
-    {
-        return $defaults->mode(HeaderMode::Compact);
     }
 
     public function getBreadcrumbs(): array

@@ -1,16 +1,40 @@
-# Schema headers implementation plan
+# Header API and presentation implementation plan
 
-**Goal:** Implement the approved reusable header package and prove it independently of Pressiu.
-**Architecture:** Filament panel plugin + immutable options; opt-in schema trait; thin layout/heading components; namespaced Blade/CSS; a lazy Alpine controller with one sticky DOM instance.
-**Tech stack:** PHP 8.3+, Filament 5.8.1+, Laravel 12/13, Pest/Testbench, Node and Playwright.
-**Spec:** specification.md.
+## Approved design
+
+Replace HeaderLayout with Header. Identity uses heading(), description(), avatar() and initials(); badges, metadata and summary accept native components. The package owns the entire card, responsive layout, external breadcrumbs, square pinned top corners, right-aligned desktop actions, full-width mobile action columns, light/dark styling and compact behavior. Pressiu only declares content and plugin options. Existing labels, permissions, business closures, forms and action ordering remain authoritative. The changes are prepared as a local package commit; no release is part of this work.
 
 ## Execution
-1. Configuration: write tests/Unit/HeaderOptionsTest.php first. Run Pest and observe failure without HeaderOptions. Implement Enums/HeaderMode.php and HeaderOptions.php until immutable defaults, validation and responsive ordering pass.
-2. Rendering: add Testbench fixtures and tests/Feature/HeaderRenderingTest.php. Assert native fallback, null record, shared schema, text escaping, correct h1 and four render hooks before adding PageHeaderPlugin, PageHeaderServiceProvider, Concerns/HasPageHeader and Components/HeaderLayout/Heading. Run focused tests then all PHP tests.
-3. Interaction: write native schema/header action tests and the browser acceptance tests before implementing controller. Test one invocation, confirmation modal, preserved form state and visibility. Use actual Filament pages, not HTML mocks.
-4. Scroll: write Node tests for viewport mode/geometry and Playwright tests for normal/sticky/compact. Implement resources/js/page-header.js and namespaced CSS. Keep expanded layout footprint stable; do not duplicate DOM. Test return to top, responsive modes, focus, SPA and listener cleanup.
-5. Delivery: finish independent workbench, installation/local symlink documentation, license, style checks and CI matrix. Run PHP/JS/browser checks; inspect screenshots and changed files. Record actual results and remaining risks in docs/verification.md. Open a pull request; no merge, release or Pressiu changes.
 
-## Evidence
-The recorded automated checks and the outstanding manual/style verification are documented separately in verification.md. A planned check is not a passing result. The Composer requirement and exact-version CI job use Filament 5.8.1 as the tested floor; compatibility with earlier 5.x versions is not claimed.
+- [x] Add behavioral regression coverage for the new identity API, escaping, hidden labels, responsive options and per-header overrides. Run the new tests before implementation.
+- [x] Implement Header and migrate package fixtures. Integrate native actions once in the upper row; metadata and summary share the lower strip. Retain advanced native schema composition and native/custom fallback.
+- [x] Add sticky(), compact(), normal() and compactBelow(int) defaults and per-header overrides. Compact hides description, metadata, summary and extra content by default; retainSummaryWhenCompact() opts metrics back in. Preserve focus safety, cleanup and short-viewport fallback.
+- [x] Implement responsive card CSS using Filament gray tokens in both themes. Verify right-aligned wrapping, long text, images, empty slots and one principal heading.
+- [x] Migrate only CustomerHeader and TenantPanelProvider API use in Pressiu. Publish package assets locally.
+- [x] Run isolated package PHP/JS/browser checks and focused customer integration checks. Inspect real light/dark desktop/mobile screenshots and final diff.
+- [x] Update README, current specification, local workflow and verification record. Assess existing end-user articles without adding implementation details.
+
+## Metadata follow-up
+
+- [x] Add optional MetadataEntry field icons with per-field Before/After positions while preserving native TextEntry rendering and behavior.
+- [x] Separate visible metadata fields on the same wrapped row without drawing leading lines or clipping native content.
+- [x] Configure customer icons through the package API and document both positions.
+
+## Product and icon-size follow-up
+
+- [x] Add fieldIconSize(int|Closure), validate positive pixel sizes, default to 24 px and increase icon-to-field spacing to 16 px.
+- [x] Add square image() presentation without cropping and descriptionSchema() for native copyable product codes.
+- [x] Add the shared ProductHeader to Pressiu View/Edit pages, using the main image, supplier code, status/stock badges and approved catalogue fields; preserve native actions and keep the code visible while compact.
+- [x] Update README examples, current specification and product help in all four locales.
+- [x] Verify PHP behavior, browser layout in both themes, focused product/support regressions and final screenshots.
+
+## Typed compact content
+
+- [x] Add HeaderPart and CompactHeader with whenCompact(), show() and only().
+- [x] Preserve native field visibility, action instances and focus safety; calculate dividers for expanded and compact selections.
+- [x] Migrate ProductHeader and the workbench to the typed API; document direct-field selection, defaults and legacy compatibility.
+- [x] Cover selection, hidden fields, invalid identifiers and browser expansion/compaction with unsaved input.
+
+## Verification contract
+
+PHP tests cover photo/initials selection, escaped names, native child component defaults, panel/header configuration isolation, recordless pages and native action behavior. JavaScript tests cover breakpoint boundaries. Browser tests exercise 360/390/768/1024/1440 widths, light/dark, expanded/compact, native actions, no horizontal overflow, no scroll-triggered requests and unchanged unsaved form state. Install only already-declared development dependencies.

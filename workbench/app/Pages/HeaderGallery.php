@@ -9,16 +9,18 @@ use Filament\Actions\ActionGroup;
 use Filament\Infolists\Components\ImageEntry;
 use Filament\Infolists\Components\TextEntry;
 use Filament\Pages\Page;
-use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Schema;
+use Filament\Support\Enums\IconPosition;
 use Filament\Support\Enums\Width;
 use Filament\Support\Icons\Heroicon;
 use Livewire\Attributes\Url;
-use MortalKiller\FilamentPageHeader\Components\HeaderLayout;
+use MortalKiller\FilamentPageHeader\CompactHeader;
+use MortalKiller\FilamentPageHeader\Components\Header;
 use MortalKiller\FilamentPageHeader\Components\Heading;
+use MortalKiller\FilamentPageHeader\Components\MetadataEntry;
 use MortalKiller\FilamentPageHeader\Concerns\HasPageHeader;
 use MortalKiller\FilamentPageHeader\Enums\HeaderMode;
-use MortalKiller\FilamentPageHeader\HeaderOptions;
+use MortalKiller\FilamentPageHeader\Enums\HeaderPart;
 
 class HeaderGallery extends Page
 {
@@ -35,6 +37,9 @@ class HeaderGallery extends Page
 
     #[Url]
     public string $mode = 'compact';
+
+    #[Url]
+    public bool $selective = false;
 
     public string $note = '';
 
@@ -57,14 +62,15 @@ class HeaderGallery extends Page
 
     public function headerSchema(Schema $schema): Schema
     {
-        $layout = HeaderLayout::make()
+        $layout = Header::make()
             ->heading(match ($this->variant) {
                 9 => 'Create document',
                 1 => 'Customers',
-                11 => 'LAURA STRADER',
+                11 => 'Mariana Costa',
                 default => 'Invoice · FT 2026/123',
             })
-            ->subheading($this->variant === 11 ? 'Cliente desde 21/05/2026' : 'A reusable header with native Filament schemas.');
+            ->description($this->variant === 11 ? 'mariana@example.com' : 'A reusable header with native Filament schemas.')
+            ->mode(HeaderMode::tryFrom($this->mode) ?? HeaderMode::Normal);
 
         if ($this->variant >= 2) {
             $badges = [TextEntry::make('status')->state(fn (): string => $this->variant === 11 ? 'Ativo' : $this->status)->badge()->color($this->variant === 11 ? 'success' : 'gray')->hiddenLabel()];
@@ -80,8 +86,11 @@ class HeaderGallery extends Page
         if ($this->variant === 4) {
             $layout->headingSchema([Heading::make('title')->state('Invoices')->icon(Heroicon::OutlinedDocumentText)]);
         }
-        if (in_array($this->variant, [5, 10, 11], true)) {
+        if (in_array($this->variant, [5, 10], true)) {
             $layout->leading([ImageEntry::make('avatar')->state('/avatar.svg')->defaultImageUrl('/avatar.svg')->circular()->imageHeight(56)->hiddenLabel()->extraImgAttributes(['alt' => 'Example company logo'])]);
+        }
+        if ($this->variant === 11) {
+            $layout->initials('Mariana Costa');
         }
         if (in_array($this->variant, [6, 10], true)) {
             $layout->metadata([
@@ -91,30 +100,22 @@ class HeaderGallery extends Page
         }
         if ($this->variant === 11) {
             $layout->metadata([
-                Grid::make([
-                    'default' => 1,
-                    'md' => 3,
-                    'xl' => 6,
-                ])->schema([
-                    TextEntry::make('customer_number')->label('Número de cliente')->state('C000007'),
-                    TextEntry::make('reference')->label('Referência')->state('—'),
-                    TextEntry::make('vat_number')->label('NIF')->state('—'),
-                    TextEntry::make('email')->label('Email')->state('—'),
-                    TextEntry::make('phone')->label('Telefone')->state('—'),
-                    TextEntry::make('created_at')->label('Cliente desde')->state('21/05/2026'),
-                ]),
+                MetadataEntry::make('customer_number')->fieldIcon(Heroicon::OutlinedHashtag)->label('Número de cliente')->state('C000042'),
+                MetadataEntry::make('reference')->fieldIcon(Heroicon::OutlinedTag)->fieldIconPosition(IconPosition::After)->fieldIconSize(32)->label('Referência')->state('CLI-042'),
+                MetadataEntry::make('vat_number')->fieldIcon(Heroicon::OutlinedIdentification)->label('NIF')->state('—'),
+                MetadataEntry::make('email')->fieldIcon(Heroicon::OutlinedEnvelope)->label('Email')->state('mariana@example.com')->belowContent([Action::make('emailCustomer')->label('Enviar email')->link()->url('mailto:mariana@example.com')]),
+                MetadataEntry::make('phone')->fieldIcon(Heroicon::OutlinedPhone)->label('Telefone')->state('—'),
+                MetadataEntry::make('created_at')->fieldIcon(Heroicon::OutlinedCalendar)->label('Cliente desde')->state('21/05/2026'),
             ]);
         }
         if (in_array($this->variant, [7, 10], true)) {
-            $layout->trailing([TextEntry::make('total')->label('Total')->state(1250)->money('EUR')]);
+            $layout->summary([TextEntry::make('total')->label('Total')->state(1250)->money('EUR')]);
         }
         if ($this->variant === 11) {
-            $layout->trailing([
-                Grid::make(3)->schema([
-                    TextEntry::make('quotes')->label('Orçamentos')->state(0)->badge()->color('gray'),
-                    TextEntry::make('approved')->label('Aprovado')->state(0)->badge()->color('success'),
-                    TextEntry::make('conversion')->label('Conversão')->state('0%')->badge()->color('info'),
-                ]),
+            $layout->summary([
+                TextEntry::make('quotes')->label('Orçamentos')->state(12)->color('gray'),
+                TextEntry::make('approved')->label('Aprovado')->state(8)->color('success'),
+                TextEntry::make('conversion')->label('Conversão')->state('67%')->color('info'),
             ]);
         }
         if (in_array($this->variant, [8, 10], true)) {
@@ -123,15 +124,18 @@ class HeaderGallery extends Page
                     $this->status = $this->status === 'Draft' ? 'Approved' : 'Draft';
                     $this->inlineCount++;
                 }),
-            ])->hideWhenCompact(['metadata', 'subheading']);
+            ])->whenCompact(fn (CompactHeader $compact) => $compact->show(HeaderPart::Image, HeaderPart::Badges, HeaderPart::Summary, HeaderPart::Content));
+        }
+
+        if ($this->selective) {
+            $layout->whenCompact(fn (CompactHeader $compact) => $compact
+                ->show(HeaderPart::Image)
+                ->only(HeaderPart::Badges, ['status'])
+                ->only(HeaderPart::Metadata, ['reference', 'email'])
+                ->only(HeaderPart::Summary, ['approved']));
         }
 
         return $schema->components([$layout]);
-    }
-
-    public function pageHeaderOptions(HeaderOptions $defaults): HeaderOptions
-    {
-        return $defaults->mode(HeaderMode::tryFrom($this->mode) ?? HeaderMode::Normal);
     }
 
     protected function getHeaderActions(): array
@@ -141,12 +145,17 @@ class HeaderGallery extends Page
                 Action::make('saveChanges')->label('Guardar alterações')->action(fn (): null => null),
                 Action::make('cancel')->label('Cancelar')->action(fn (): null => null),
                 Action::make('createQuote')->label('Criar orçamento')->icon(Heroicon::OutlinedDocumentPlus)->action(fn (): null => null),
-                Action::make('createDocument')->label('Criar documento')->action(fn (): null => null),
+                ActionGroup::make([
+                    Action::make('createDocument')->label('Criar documento')->action(fn (): null => null),
+                    ActionGroup::make([
+                        Action::make('createInvoice')->label('Criar fatura')->action(fn (): null => null),
+                    ])->label('Outros documentos')->icon(Heroicon::ChevronDown)->button()->hiddenLabel(),
+                ])->buttonGroup(),
                 Action::make('syncCustomer')->label('Sincronizar cliente com Moloni')->action(fn (): null => null),
                 ActionGroup::make([
                     Action::make('merge')->label('Unir cliente')->action(fn (): null => null),
                     Action::make('delete')->label('Eliminar cliente')->action(fn (): null => null),
-                ])->label('Mais')->button(),
+                ])->label('Mais')->iconButton(),
             ];
         }
 

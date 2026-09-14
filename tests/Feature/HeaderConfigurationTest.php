@@ -6,7 +6,7 @@ use Filament\Facades\Filament;
 use Filament\Panel;
 use Filament\Schemas\Schema;
 use Livewire\Livewire;
-use MortalKiller\FilamentPageHeader\Components\HeaderLayout;
+use MortalKiller\FilamentPageHeader\Components\Header;
 use MortalKiller\FilamentPageHeader\PageHeaderPlugin;
 use MortalKiller\FilamentPageHeader\Tests\Fixtures\Pages\ExamplePage;
 use MortalKiller\FilamentPageHeader\Tests\Fixtures\Resources\OrderResource;
@@ -41,12 +41,12 @@ it('allows explicit schema mappings without leaking into another plugin instance
 it('omits empty optional content while preserving the main heading', function (): void {
     $page = Livewire::test(ExamplePage::class)->instance();
     $schema = Schema::make($page)->components([
-        HeaderLayout::make()->heading('Only a title')->subheading(null)->badges([])->metadata([])->trailing([]),
+        Header::make()->heading('Only a title')->description(null)->badges([])->metadata([])->summary([]),
     ]);
     expect($schema->toHtml())->toContain('Only a title')
         ->not->toContain('class="fph-subheading"')
         ->not->toContain('class="fph-inline fph-badges"')
-        ->not->toContain('class="fph-trailing"');
+        ->not->toContain('class="fph-summary"');
 });
 
 it('keeps unsaved input when dynamic header content changes', function (): void {
@@ -66,6 +66,6 @@ class AlternateHeaderConfiguration
 {
     public static function configure(Schema $schema): Schema
     {
-        return $schema->components([HeaderLayout::make()->heading('Alternate header')]);
+        return $schema->components([Header::make()->heading('Alternate header')]);
     }
 }

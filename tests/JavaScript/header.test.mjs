@@ -23,3 +23,11 @@ test('sticky does not activate before scrolling', () => {
   assert.equal(shouldStick(70, 64, 100, 'sticky'), false);
   assert.equal(shouldStick(64, 64, 100, 'normal'), false);
 });
+
+
+test('compact below uses an exclusive threshold and preserves the desktop mode', () => {
+    const options = { mode: 'sticky', compactBelow: 1024 };
+    assert.equal(resolveMode(options, 1023), 'compact');
+    assert.equal(resolveMode(options, 1024), 'sticky');
+    assert.equal(resolveMode(options, 1440), 'sticky');
+});

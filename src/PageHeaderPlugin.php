@@ -66,6 +66,26 @@ final class PageHeaderPlugin implements Plugin
         return $this;
     }
 
+    public function normal(): self
+    {
+        return $this->mode(HeaderMode::Normal);
+    }
+
+    public function sticky(): self
+    {
+        return $this->mode(HeaderMode::Sticky);
+    }
+
+    public function compact(): self
+    {
+        return $this->mode(HeaderMode::Compact);
+    }
+
+    public function compactBelow(int $width): self
+    {
+        return $this->options($this->options->compactBelow($width));
+    }
+
     public function mode(HeaderMode $mode): self
     {
         return $this->options($this->options->mode($mode));

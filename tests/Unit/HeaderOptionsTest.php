@@ -13,6 +13,7 @@ it('defaults to normal mode and automatic topbar offset', function (): void {
         'offset' => null,
         'topbarSelector' => '.fi-topbar-ctn, .fi-topbar',
         'hideBreadcrumbsWhenCompact' => true,
+        'compactBelow' => null,
     ]);
 });
 

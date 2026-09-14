@@ -22,7 +22,7 @@ for (const width of [360, 390, 768, 1024, 1440]) {
     });
 }
 
-test('busy desktop headers wrap native actions before schema content becomes unreadable', async ({ page }) => {
+test('busy desktop headers share the identity row while metadata remains readable', async ({ page }) => {
     await page.setViewportSize({ width: 1582, height: 900 });
     const errors = await openHeader(page, 'variant=11&mode=normal');
 
@@ -53,9 +53,10 @@ test('busy desktop headers wrap native actions before schema content becomes unr
     expect(contentBox).not.toBeNull();
     expect(mainBox).not.toBeNull();
     expect(actionsBox).not.toBeNull();
-    expect(contentBox.width).toBeGreaterThanOrEqual(680);
-    expect(mainBox.width).toBeGreaterThanOrEqual(480);
-    expect(actionsBox.y).toBeGreaterThan(contentBox.y + 20);
+    expect(contentBox.width).toBeGreaterThanOrEqual(256);
+    expect(mainBox.width).toBeGreaterThanOrEqual(180);
+    expect(Math.abs(actionsBox.y - contentBox.y)).toBeLessThanOrEqual(1);
+    expect(actionsBox.x).toBeGreaterThanOrEqual(contentBox.x + contentBox.width);
 
     const metadataCellWidths = await page.locator('.fph-metadata .fi-in-entry-label').evaluateAll(labels => labels.map(label => {
         const cell = label.closest('.fi-sc-component');

@@ -10,7 +10,7 @@ projects/
   filament-page-header/
 ```
 
-Work on `1.x` (or on a feature branch created from it) in the plugin. Work on a separate integration branch based on `1.x` in Pressiu. This package change does not install the integration automatically.
+Work on `1.x` (or on a feature branch created from it) in the plugin. Work on a separate integration branch based on `1.x` in Pressiu. This workflow does not install integration automatically. The current Header API redesign is breaking and unreleased; migrate consuming headers before switching to this checkout. A future major release must be chosen explicitly.
 
 ## Composer path repository
 
@@ -105,3 +105,7 @@ Never publish a release merely to test a local edit. Do not commit credentials, 
 
 Composer path repositories: https://getcomposer.org/doc/05-repositories.md#path
 Filament assets: https://filamentphp.com/docs/5.x/advanced/assets
+
+## Reuse an installed Chromium for local tests
+
+When the environment already provides a suitable Chromium executable, set `PLAYWRIGHT_CHROMIUM_EXECUTABLE` to its actual executable path before running `npm run test:browser`. The override is optional and affects tests only; CI continues to use the browser installed by Playwright. A different Chromium revision is useful for local checks but does not replace the CI browser matrix.

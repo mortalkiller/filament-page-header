@@ -11,6 +11,7 @@ use Filament\Resources\Pages\ViewRecord;
 use Filament\Schemas\Schema;
 use Illuminate\Contracts\View\View;
 use Illuminate\Database\Eloquent\Model;
+use MortalKiller\FilamentPageHeader\Components\Header;
 use MortalKiller\FilamentPageHeader\HeaderOptions;
 use MortalKiller\FilamentPageHeader\PageHeaderPlugin;
 
@@ -81,9 +82,22 @@ trait HasPageHeader
 
     public function getPageHeaderOptions(): HeaderOptions
     {
-        return $this->pageHeaderOptions(
+        $defaults = $this->pageHeaderOptions(
             $this->pageHeaderIsEnabled() ? PageHeaderPlugin::get()->getOptions() : new HeaderOptions,
         );
+
+        return $this->getPageHeaderComponent()?->resolveOptions($defaults) ?? $defaults;
+    }
+
+    public function getPageHeaderComponent(): ?Header
+    {
+        foreach ($this->getSchema('headerSchema')?->getComponents() ?? [] as $component) {
+            if ($component instanceof Header) {
+                return $component;
+            }
+        }
+
+        return null;
     }
 
     public function pageHeaderIsEnabled(): bool
@@ -103,7 +117,10 @@ trait HasPageHeader
             return parent::getHeader();
         }
 
+        $headerComponent = $this->getPageHeaderComponent()?->page($this);
+
         return view('filament-page-header::header', [
+            'headerComponent' => $headerComponent,
             'page' => $this,
             'schema' => $schema,
             'options' => $this->getPageHeaderOptions()->toArray(),

@@ -7,7 +7,7 @@ use Filament\Infolists\Components\TextEntry;
 use Filament\Panel;
 use Filament\Schemas\Schema;
 use Livewire\Livewire;
-use MortalKiller\FilamentPageHeader\Components\HeaderLayout;
+use MortalKiller\FilamentPageHeader\Components\Header;
 use MortalKiller\FilamentPageHeader\HeaderOptions;
 use MortalKiller\FilamentPageHeader\PageHeaderPlugin;
 use MortalKiller\FilamentPageHeader\Tests\Fixtures\Pages\ExamplePage;
@@ -18,31 +18,31 @@ use MortalKiller\FilamentPageHeader\Tests\Fixtures\Resources\Schemas\OrderHeader
 it('omits empty optional slots instead of leaving empty rows', function (): void {
     $page = Livewire::test(ExamplePage::class)->instance();
     $html = Schema::make($page)->components([
-        HeaderLayout::make()->heading('Only a title')->subheading(null)
+        Header::make()->heading('Only a title')->description(null)
             ->metadata([TextEntry::make('secret')->state('Hidden')->hidden()])
-            ->badges([])->leading([])->trailing([]),
+            ->badges([])->leading([])->summary([]),
     ])->toHtml();
 
     expect($html)->toContain('Only a title')
         ->not->toContain('class="fph-subheading"')
         ->not->toContain('class="fph-metadata')
-        ->not->toContain('class="fph-trailing"')
+        ->not->toContain('class="fph-summary"')
         ->not->toContain('class="fph-leading"')
         ->not->toContain('class="fph-inline fph-badges"');
 });
 
 it('retains essential slots and allows explicitly choosing compact content', function (): void {
-    $layout = HeaderLayout::make()->hideWhenCompact(['metadata', 'subheading']);
+    $layout = Header::make()->hideWhenCompact(['metadata', 'description']);
 
     expect($layout->isSlotHiddenWhenCompact('metadata'))->toBeTrue()
-        ->and($layout->isSlotHiddenWhenCompact('subheading'))->toBeTrue()
+        ->and($layout->isSlotHiddenWhenCompact('description'))->toBeTrue()
         ->and($layout->isSlotHiddenWhenCompact('heading'))->toBeFalse()
         ->and($layout->isSlotHiddenWhenCompact('badges'))->toBeFalse()
         ->and($layout->isSlotHiddenWhenCompact('default'))->toBeFalse();
 });
 
 it('rejects attempts to hide the page title in compact mode', function (): void {
-    expect(fn () => HeaderLayout::make()->hideWhenCompact(['heading']))
+    expect(fn () => Header::make()->hideWhenCompact(['heading']))
         ->toThrow(InvalidArgumentException::class);
 });
 
@@ -96,6 +96,6 @@ final class AlternativeHeaderForTest
 {
     public static function configure(Schema $schema): Schema
     {
-        return $schema->components([HeaderLayout::make()->heading('Mapped resource header')]);
+        return $schema->components([Header::make()->heading('Mapped resource header')]);
     }
 }
