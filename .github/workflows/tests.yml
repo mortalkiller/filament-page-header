@@ -17,13 +17,16 @@ jobs:
         include:
           - php: '8.3'
             testbench: '^10.0'
-            filament: '^5.8.1'
+            filament: '4.12.6'
           - php: '8.4'
             testbench: '^11.0'
-            filament: '^5.8.1'
+            filament: '^4.12.6'
           - php: '8.3'
             testbench: '^10.0'
             filament: '5.8.1'
+          - php: '8.4'
+            testbench: '^11.0'
+            filament: '^5.8.1'
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
         with:
@@ -50,6 +53,10 @@ jobs:
   browser:
     runs-on: ubuntu-latest
     timeout-minutes: 15
+    strategy:
+      fail-fast: false
+      matrix:
+        filament: ['4.12.6', '^5.8.1']
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
         with:
@@ -60,7 +67,9 @@ jobs:
           extensions: intl, mbstring, pdo_sqlite, dom, fileinfo, curl, zip
           coverage: none
           tools: composer:v2
-      - run: composer update --prefer-dist --no-interaction --no-progress > /tmp/composer.log 2>&1 || { cat /tmp/composer.log; exit 1; }
+      - run: |
+          composer require "filament/filament:${{ matrix.filament }}" --no-update --no-interaction
+          composer update --prefer-dist --no-interaction --no-progress > /tmp/composer.log 2>&1 || { cat /tmp/composer.log; exit 1; }
       - run: |
           php bin/prepare-workbench.php
           php workbench/artisan package:discover
@@ -71,7 +80,7 @@ jobs:
       - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
         if: always()
         with:
-          name: browser-report
+          name: browser-report-filament-${{ matrix.filament }}
           path: |
             playwright-report/
             test-results/

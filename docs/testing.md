@@ -1,5 +1,20 @@
 # Demo and testing
 
+## Compatibility matrix
+
+The PHP suite is run in CI against both supported Filament lines and Laravel combinations:
+
+| Filament | Laravel / Testbench | Purpose |
+| --- | --- | --- |
+| `4.12.6` | 12 / Testbench 10 | Minimum supported Filament 4 release |
+| `^4.12.6` | 13 / Testbench 11 | Latest Filament 4 release Composer resolves |
+| `5.8.1` | 12 / Testbench 10 | Minimum supported Filament 5 release |
+| `^5.8.1` | 13 / Testbench 11 | Latest Filament 5 release Composer resolves |
+
+The Chromium suite also runs against the minimum supported release of each major. It covers the rendered header, sticky/compact behavior, native actions, themes and responsive layouts. The matrix is part of [GitHub Actions](../.github/workflows/tests.yml), so every pull request tests the package without changing a consuming application.
+
+Do not alter the package's root requirement to test another combination locally. Use a temporary clean copy, constrain Filament and Testbench there, then run the normal suite. This keeps your working tree and lockfile untouched.
+
 From this repository:
 
 ```bash

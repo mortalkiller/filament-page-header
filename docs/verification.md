@@ -94,3 +94,20 @@ Replaced the six README screenshots with fresh captures of a simple product head
 Executed scoped Pint on the two changed demo PHP files and the complete Chromium browser suite: 49 tests passed. Four new product cases cover light/dark at 390 and 1440 pixels, image loading, mobile button stacking, expanded/compact content, overflow, preview modal, native save and preservation of the entered note. The first product run caught an ambiguous test selector for the two native Close buttons; using Escape and asserting that the modal closed resolved the test issue. All 49 tests passed on the final run.
 
 The six resulting screenshots were visually inspected and copied into docs/screenshots without image edits. The product illustration was generated separately and is stored in workbench/public/product-runner.png; its provenance and generation prompt are recorded in testing.md. Tests reused the installed Chromium revision through PLAYWRIGHT_CHROMIUM_EXECUTABLE. PHP unit tests and the consuming application's suite were not rerun for this demo-only change. No end-user application help changes were needed.
+
+## Filament 4 and 5 compatibility — 2026-09-14
+
+Version 2 now declares Filament `^4.12.6 || ^5.8.1`. No package source change was required: the same PHP suite passed against the supported framework combinations listed below.
+
+| Filament | Laravel / Testbench | Result |
+| --- | --- | --- |
+| `4.12.6` | 12 / Testbench 10 | Passed: 58 tests, 175 assertions. |
+| `^4.12.6` (resolved as `4.13.1`) | 13 / Testbench 11 | Passed: 58 tests, 175 assertions. |
+| `5.8.1` | 12 / Testbench 10 | Passed: 58 tests, 175 assertions. |
+| `^5.8.1` (resolved as `5.8.1`) | 13 / Testbench 11 | Passed: 58 tests, 175 assertions. |
+
+Composer refused the exact dependency sets for Filament `4.0.0`, `4.12.0`, `4.12.4` and `4.12.5` because of known security advisories. This is why version 2 starts at the earliest exact Filament 4 version that installed and passed cleanly, `4.12.6`; it does not prove that every excluded release is functionally incompatible.
+
+The complete Chromium suite also passed with Filament `4.12.6`: 49 tests in 52 seconds. An earlier concurrent invocation reported two `ENOENT` trace-artifact failures after all browser assertions had run; a single isolated rerun passed, so the failures were caused by concurrent writes to the same temporary Playwright output directory rather than header behavior.
+
+The GitHub Actions workflow now keeps this PHP matrix permanent and runs the complete Chromium suite on the minimum secure release of Filament 4 and 5. Pressiu was not changed: it remains only a consumer of the public package API.

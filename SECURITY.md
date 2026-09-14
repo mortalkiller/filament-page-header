@@ -7,7 +7,7 @@
 | `2.x` | Active development, bug fixes and security fixes |
 | `1.x` | Security fixes only |
 
-Use the latest patch release in your supported line. Framework compatibility is documented separately in the [README](README.md#version-compatibility).
+Use the latest patch release in your supported line. Version 2 supports Filament `^4.12.6 || ^5.8.1`; framework compatibility is documented separately in the [README](README.md#version-compatibility).
 
 ## Reporting a vulnerability
 

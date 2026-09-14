@@ -27,7 +27,7 @@ node --test tests/JavaScript/*.test.mjs
 npm run test:browser
 ```
 
-Run `composer format` to format PHP changes. Browser tests require the setup described in the testing guide. CI runs PHP, JavaScript and Chromium checks on pull requests; push checks include the `1.x`, `2.x`, `feature/**` and `codex/**` branches.
+Run `composer format` to format PHP changes. Browser tests require the setup described in the testing guide. CI runs PHP, JavaScript and Chromium checks on pull requests; the PHP matrix covers the supported Filament 4 and 5/Laravel 12 and 13 combinations, while Chromium runs on the minimum secure release of both Filament majors. Push checks include the `1.x`, `2.x`, `feature/**` and `codex/**` branches.
 
 Do not commit dependencies, generated environment files, test reports or lockfiles produced by local library development. Selected, reviewed documentation screenshots belong in `docs/screenshots/`.
 

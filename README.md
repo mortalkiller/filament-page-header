@@ -13,7 +13,7 @@
 [![Plumb security score](https://plumbphp.dev/badges/mortalkiller/filament-page-header/security.svg)](https://plumbphp.dev/mortalkiller/filament-page-header)
 [![Plumb score](https://plumbphp.dev/badges/mortalkiller/filament-page-header/composite.svg)](https://plumbphp.dev/mortalkiller/filament-page-header)
 
-Build informative, responsive page headers with native **Filament 5** schemas. Combine identity, status, metadata and page actions, then choose what stays visible while scrolling.
+Build informative, responsive page headers with native **Filament 4 and 5** schemas. Combine identity, status, metadata and page actions, then choose what stays visible while scrolling.
 
 Enable headers only on the panels and pages you choose. No custom theme build, application-specific models or required icon library.
 
@@ -63,10 +63,10 @@ This README documents **2.x**. Package major versions identify this package's AP
 
 | Package version | Filament requirement | PHP requirement | Laravel | API |
 | --- | --- | --- | --- | --- |
-| `^2.0` | `^5.8.1` | `^8.3` | 12 or 13 | `Header`, `MetadataEntry`, typed compact configuration |
+| `^2.0` | `^4.12.6 \|\| ^5.8.1` | `^8.3` | 12 or 13 | `Header`, `MetadataEntry`, typed compact configuration |
 | `^1.0` | `^5.8.1` | `^8.3` | 12 or 13 | Previous `HeaderLayout` API |
 
-These are the declared Composer requirements. Filament `>=5.0 <5.8.1` is excluded by the current constraint and has not been validated; this is not evidence of incompatibility with every earlier 5.x release. Other Filament major versions are outside these releases' declared requirements. PHP must also satisfy your selected Laravel version's requirements.
+Version 2 runs its PHP suite against the minimum secure Filament 4 release (`4.12.6`), the latest release resolved by `^4.12.6`, the minimum Filament 5 release (`5.8.1`) and the latest release resolved by `^5.8.1`, across Laravel 12 and 13. The Chromium suite runs on the minimum supported release of each Filament major. Versions before `4.12.6` are outside the declared requirement; Composer specifically blocks `4.0.0` and `4.12.0`–`4.12.5` because of known security advisories. Filament `5.0`–`5.8.0` is also outside the declared requirement and has not been validated. Other Filament majors are outside these releases' requirements. PHP must also satisfy your selected Laravel version's requirements.
 
 See the [1.x README](https://github.com/mortalkiller/filament-page-header/blob/1.x/README.md) for the previous API and the [verification record](docs/verification.md) for executed checks. Security maintenance is documented separately in the [security policy](SECURITY.md).
 

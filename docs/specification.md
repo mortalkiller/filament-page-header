@@ -2,7 +2,7 @@
 
 ## Boundary
 
-Independent package for Filament 5.8.1+, Laravel 12/13 and PHP 8.3+ (subject to framework constraints). No consumer models, tenant identifiers, queries, provider calls, fiscal logic or required icon package. All rendering, CSS, JavaScript and behavior belong here. A consuming application only configures the plugin and native schemas. Version 2 replaces HeaderLayout with Header. See migration.md for upgrading consumers from the 1.x API.
+Independent package for Filament `^4.12.6 || ^5.8.1`, Laravel 12/13 and PHP 8.3+ (subject to framework constraints). No consumer models, tenant identifiers, queries, provider calls, fiscal logic or required icon package. All rendering, CSS, JavaScript and behavior belong here. A consuming application only configures the plugin and native schemas. Version 2 replaces HeaderLayout with Header. See migration.md for upgrading consumers from the 1.x API.
 
 ## Approved composition
 
