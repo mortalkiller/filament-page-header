@@ -7,7 +7,7 @@ export default defineConfig({
     fullyParallel: false,
     workers: 1,
     reporter: [['list'], ['html', { open: 'never' }]],
-    use: { baseURL: 'http://127.0.0.1:8000', screenshot: 'only-on-failure', trace: 'retain-on-failure' },
+    use: { launchOptions: process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE ? { executablePath: process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE } : {}, baseURL: 'http://127.0.0.1:8000', screenshot: 'only-on-failure', trace: 'retain-on-failure' },
     projects: [{ name: 'chromium', use: { browserName: 'chromium' } }],
     webServer: {
         command: 'php workbench/artisan serve --host=127.0.0.1 --port=8000',

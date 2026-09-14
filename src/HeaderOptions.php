@@ -16,9 +16,14 @@ final readonly class HeaderOptions
         private ?int $offset = null,
         private ?string $topbarSelector = '.fi-topbar-ctn, .fi-topbar',
         private bool $hideBreadcrumbsWhenCompact = true,
+        private ?int $compactBelow = null,
     ) {
         if ($offset !== null && $offset < 0) {
             throw new InvalidArgumentException('The header offset must be zero or positive.');
+        }
+
+        if ($compactBelow !== null && $compactBelow < 1) {
+            throw new InvalidArgumentException('The compact breakpoint must be positive.');
         }
 
         foreach ($breakpoints as $width => $mode) {
@@ -30,7 +35,12 @@ final readonly class HeaderOptions
 
     public function mode(HeaderMode $mode): self
     {
-        return $this->with(['mode' => $mode]);
+        return $this->with(['mode' => $mode, 'breakpoints' => [], 'compactBelow' => null]);
+    }
+
+    public function compactBelow(int $width): self
+    {
+        return $this->with(['compactBelow' => $width]);
     }
 
     /** @param array<int, HeaderMode> $breakpoints */
@@ -54,7 +64,7 @@ final readonly class HeaderOptions
         return $this->with(['hideBreadcrumbsWhenCompact' => $condition]);
     }
 
-    /** @return array{mode: string, breakpoints: list<array{minWidth: int, mode: string}>, offset: int|null, topbarSelector: string|null, hideBreadcrumbsWhenCompact: bool} */
+    /** @return array{mode: string, breakpoints: list<array{minWidth: int, mode: string}>, offset: int|null, topbarSelector: string|null, hideBreadcrumbsWhenCompact: bool, compactBelow: int|null} */
     public function toArray(): array
     {
         $breakpoints = $this->breakpoints;
@@ -71,6 +81,7 @@ final readonly class HeaderOptions
             'offset' => $this->offset,
             'topbarSelector' => $this->topbarSelector,
             'hideBreadcrumbsWhenCompact' => $this->hideBreadcrumbsWhenCompact,
+            'compactBelow' => $this->compactBelow,
         ];
     }
 

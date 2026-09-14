@@ -1,12 +1,13 @@
 /vendor/
 /node_modules/
+/package-lock.json
 /composer.lock
 /.phpunit.cache/
 /.phpunit.result.cache
 /.pest/
 /test-results/
 /playwright-report/
-/workbench/vendor/
+/workbench/vendor
 /workbench/.env
 /workbench/database/*.sqlite*
 /workbench/bootstrap/cache/*.php

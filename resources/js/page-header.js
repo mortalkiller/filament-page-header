@@ -6,6 +6,7 @@ export function resolveMode(options, width) {
     for (const breakpoint of [...(options.breakpoints ?? [])].sort((a, b) => a.minWidth - b.minWidth)) {
         if (width >= breakpoint.minWidth && modes.has(breakpoint.mode)) mode = breakpoint.mode;
     }
+    if (Number.isFinite(options.compactBelow) && width < options.compactBelow) return 'compact';
     return mode;
 }
 
@@ -70,7 +71,10 @@ export class HeaderController {
             for (const topbar of this.topbars()) this.resizeObserver.observe(topbar);
         }
         this.mutationObserver = new this.window.MutationObserver(() => this.schedule(true));
-        this.mutationObserver.observe(this.header, { childList: true, characterData: true, subtree: true });
+        this.mutationObserver.observe(this.header, {
+            childList: true, characterData: true, subtree: true, attributes: true,
+            attributeFilter: ['data-fph-exclude-compact', 'data-fph-hide-compact'],
+        });
         this.optionsObserver = new this.window.MutationObserver(() => {
             try { this.options = JSON.parse(this.root.dataset.fphOptions ?? '{}'); } catch { return; }
             this.schedule(true);
@@ -105,12 +109,28 @@ export class HeaderController {
         const compact = this.root.dataset.fphCompact;
         this.root.dataset.fphMeasuring = 'true';
         this.root.dataset.fphCompact = 'false';
+        this.updateMetadataDividers();
         this.expandedHeight = Math.ceil(this.header.getBoundingClientRect().height);
         this.root.dataset.fphCompact = 'true';
+        this.updateMetadataDividers(true);
         this.compactHeight = Math.ceil(this.header.getBoundingClientRect().height);
         this.root.dataset.fphCompact = compact ?? 'false';
         delete this.root.dataset.fphMeasuring;
         this.needsMeasure = false;
+    }
+
+    updateMetadataDividers(compact = false) {
+        for (const schema of this.header.querySelectorAll('.fph-metadata > .fi-sc, .fph-summary > .fi-sc')) {
+            let previousTop = null;
+            for (const field of schema.children) {
+                if (!field.classList.contains('fi-grid-col')) continue;
+                const rect = field.getBoundingClientRect();
+                const visible = rect.width > 0 && rect.height > 0;
+                const divider = visible && previousTop !== null && Math.abs(rect.top - previousTop) <= 1;
+                field.dataset[compact ? 'fphDividerCompact' : 'fphDivider'] = String(divider);
+                if (visible) previousTop = rect.top;
+            }
+        }
     }
 
     update() {
@@ -162,6 +182,10 @@ export class HeaderController {
         this.optionsObserver?.disconnect();
         this.cleanups.forEach((cleanup) => cleanup());
         this.cleanups = [];
+        this.header?.querySelectorAll('[data-fph-divider], [data-fph-divider-compact]').forEach(field => {
+            delete field.dataset.fphDivider;
+            delete field.dataset.fphDividerCompact;
+        });
         this.root.style.height = this.originalHeight;
         if (this.originalOffset) this.root.style.setProperty('--fph-offset', this.originalOffset);
         else this.root.style.removeProperty('--fph-offset');
