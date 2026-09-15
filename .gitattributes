@@ -1,0 +1,11 @@
+/.gitattributes export-ignore
+/.github export-ignore
+/.gitignore export-ignore
+/tests export-ignore
+/workbench export-ignore
+/bin export-ignore
+/phpunit.xml.dist export-ignore
+/playwright.config.mjs export-ignore
+/testbench.yaml export-ignore
+/package.json export-ignore
+/CONTRIBUTING.md export-ignore
