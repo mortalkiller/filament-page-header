@@ -1,4 +1,4 @@
-![Filament Page Header showcase](docs/Filament%20Page%20Header%20Showcase.png)
+![Filament Page Header showcase](docs/filament-page-header-dark-2560x1440.jpg)
 
 # Filament Page Header
 
