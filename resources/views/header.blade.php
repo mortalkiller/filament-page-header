@@ -17,7 +17,6 @@
     x-load
     x-load-src="{{ FilamentAsset::getAlpineComponentSrc('page-header', package: PageHeaderPlugin::PACKAGE) }}"
     x-data="pageHeader(@js($options))"
-    x-load-css="[@js(FilamentAsset::getStyleHref('page-header', package: PageHeaderPlugin::PACKAGE))]"
 >
     <header class="fph-header fi-section" data-fph-header>
         <div class="fph-schema">

@@ -118,6 +118,30 @@ test('simple headers retain side-by-side actions when there is enough room', asy
     await expectNoOverflow(page);
 });
 
+test('native action alignment cannot override the expanded and compact header layouts', async ({ page }) => {
+    await page.setViewportSize({ width: 1440, height: 1000 });
+    await page.goto('/demo/headers?variant=10&mode=compact');
+    const root = page.locator('[data-fph-root]');
+    await expect(root).toHaveAttribute('data-fph-ready', 'true');
+    // Filament 5.8.2 introduced this rule for its own header. Exercise it on older versions too.
+    await page.addStyleTag({ content: '@media (min-width: 40rem) { .fi-header-actions-ctn { align-self: flex-end; } }' });
+
+    const alignment = () => page.evaluate(() => {
+        const content = document.querySelector('.fph-content').getBoundingClientRect();
+        const actions = document.querySelector('.fph-actions').getBoundingClientRect();
+        return {
+            topDifference: Math.abs(actions.top - content.top),
+            centerDifference: Math.abs(actions.top + actions.height / 2 - content.top - content.height / 2),
+        };
+    });
+
+    await expect.poll(async () => (await alignment()).topDifference).toBeLessThanOrEqual(1);
+    await page.evaluate(() => window.scrollTo(0, 700));
+    await expect(root).toHaveAttribute('data-fph-compact', 'true');
+    await expect.poll(async () => (await alignment()).centerDifference).toBeLessThanOrEqual(1);
+    await expectNoOverflow(page);
+});
+
 
 for (const theme of ['light', 'dark']) {
     for (const width of [390, 1440]) {

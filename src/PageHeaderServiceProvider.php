@@ -16,6 +16,7 @@ final class PageHeaderServiceProvider extends ServiceProvider
         $this->loadViewsFrom(__DIR__.'/../resources/views', 'filament-page-header');
 
         FilamentAsset::register([
+            // The plugin emits this stylesheet in the initial head, after the panel theme.
             Css::make('page-header', __DIR__.'/../resources/css/page-header.css')->loadedOnRequest(),
             AlpineComponent::make('page-header', __DIR__.'/../resources/js/page-header.js'),
         ], package: PageHeaderPlugin::PACKAGE);

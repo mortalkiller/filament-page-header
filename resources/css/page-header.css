@@ -99,6 +99,8 @@
 .fph-root .fph-leading { flex: 0 0 auto; max-width: 4rem; }
 .fph-root .fph-leading img { max-width: 100%; object-fit: contain; }
 .fph-root .fph-actions {
+    /* Follow the header row alignment, not Filament's native header self-alignment. */
+    align-self: auto;
     flex: 0 1 auto;
     min-width: 0;
     max-width: 100%;

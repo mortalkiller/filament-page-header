@@ -52,15 +52,24 @@ it('renders a configured photo with an accessible text alternative', function ()
 
 it('resolves the identity visual from image to initials to icon', function (): void {
     $page = Livewire::test(ExamplePage::class)->instance();
+    // Initials can also occur in Livewire's randomly generated identifiers.
+    $page->setId('MC-avatar-fallback-test');
     $html = Schema::make($page)->components([
         Header::make()->heading('Photo')->avatar('/avatar.svg')->initials('Mariana Costa')->icon(Heroicon::OutlinedUser),
         Header::make()->heading('Initials')->initials('Carlos Silva')->icon(Heroicon::OutlinedUser),
         Header::make()->heading('Icon')->icon(Heroicon::OutlinedUser),
     ])->toHtml();
 
-    expect($html)
-        ->toContain('src="/avatar.svg"', 'CS', 'class="fph-avatar fph-icon"')
-        ->not->toContain('MC');
+    expect($html)->toContain('src="/avatar.svg"', 'class="fph-avatar fph-icon"');
+
+    $document = new DOMDocument;
+    @$document->loadHTML($html);
+    $avatars = (new DOMXPath($document))->query('//div[contains(concat(" ", normalize-space(@class), " "), " fph-avatar ")]');
+
+    expect(array_map(
+        fn (DOMNode $avatar): string => trim($avatar->textContent),
+        iterator_to_array($avatars),
+    ))->toBe(['', 'CS', '']);
 });
 
 it('applies semantic background and foreground colors to initials and icon fallbacks', function (): void {

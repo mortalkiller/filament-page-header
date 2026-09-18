@@ -111,3 +111,31 @@ Composer refused the exact dependency sets for Filament `4.0.0`, `4.12.0`, `4.12
 The complete Chromium suite also passed with Filament `4.12.6`: 49 tests in 52 seconds. An earlier concurrent invocation reported two `ENOENT` trace-artifact failures after all browser assertions had run; a single isolated rerun passed, so the failures were caused by concurrent writes to the same temporary Playwright output directory rather than header behavior.
 
 The GitHub Actions workflow now keeps this PHP matrix permanent and runs the complete Chromium suite on the minimum secure release of Filament 4 and 5. Pressiu was not changed: it remains only a consumer of the public package API.
+
+## Initial stylesheet loading — 2026-09-19
+
+The plugin now emits a stylesheet link in the initial head through `STYLES_AFTER`, after the panel theme. Only enabled panels emit it, including their native pages, so entering a header page through SPA does not need to discover the stylesheet. The asset remains registered with `loadedOnRequest()` to prevent a second automatic link; the header no longer uses `x-load-css`. CSS and JavaScript contents were unchanged.
+
+Before the fix, the new PHP tests detected the missing initial link and the deferred Alpine markup. All seven new Chromium cases failed against the original implementation: no JavaScript meant no header stylesheet, delayed header JavaScript left theme-only styling visible, a held CSS response allowed the first content paint, and native pages did not preload the stylesheet. The cases pass with the fix. The JavaScript-delay cases compare header height and the following content position before and after initialization in all three modes, allowing at most one pixel for rounding. An equal-specificity theme rule checks stylesheet precedence.
+
+| Local check | Result |
+| --- | --- |
+| PHP suite: Filament 4.12.6 / Laravel 12.69.2 | 65 passed, 199 assertions |
+| PHP suite: Filament 4.13.2 / Laravel 13.32.0 | 65 passed, 199 assertions |
+| PHP suite: Filament 5.8.1 / Laravel 12.69.2 | 65 passed, 199 assertions |
+| PHP suite: Filament 5.8.1 / Laravel 13.31.0 | 65 passed, 199 assertions |
+| Complete Chromium suite: Filament 4.12.6 and 5.8.1 | 62 passed on each |
+| JavaScript unit tests | 6 passed |
+| Pint on changed PHP files and whitespace check | Passed |
+
+Compatibility installs used separate temporary copies; the working package's dependency files were unchanged. These runs used local PHP 8.5.4 and the installed Chromium executable, not the CI PHP 8.3/8.4 matrix or a fresh browser download. Desktop and mobile captures were also visually inspected. An independent static review found no concrete issues. Safari, Firefox, production consumer themes and production network conditions were not tested; this verifies the stylesheet loading regression, not a promise of zero layout shift from every possible source. No commit, release or deployment was made.
+
+## Filament 5.8.2 action alignment — 2026-09-19
+
+[PR #7's browser job](https://github.com/mortalkiller/filament-page-header/actions/runs/35405753386/job/105795058321) resolved `^5.8.1` to Filament 5.8.2. The captured stylesheet adds `sm:self-end` to `.fi-header-actions-ctn`; local validation above used 5.8.1, which did not have that rule. The two failed desktop alignment tests reproduced with 5.8.2 in a temporary copy, with the same 28.59375 px and 57.578125 px differences as CI. All seven stylesheet-loading regressions had passed in the failed CI job.
+
+The package now sets `align-self: auto` on its action container, so the parent row controls expanded and compact alignment. The existing mobile `stretch` rule is retained. A new browser regression applies the conflicting native rule even on older Filament versions, then checks both top alignment when expanded and center alignment when compact. It failed before the CSS fix and passes afterward; the existing one-pixel assertions were not relaxed.
+
+A separate intermittent PHP test failure was also diagnosed: the avatar fallback test searched all HTML for `MC`, including random Livewire IDs. Setting a deterministic ID containing `MC` reproduced it. The assertion now inspects avatar text nodes and retains that ID fixture, checking that only the initials fallback contains text.
+
+After these fixes, the complete Chromium suite passed with 63 tests on each of Filament 4.12.6, 5.8.1 and 5.8.2. The PHP suite passed with 65 tests and 198 assertions on all three versions; all six JavaScript tests and scoped Pint passed. One local Filament 4 browser run lost its HTTP server after 56 passing tests, resulting in connection errors; a complete rerun on a dedicated port with server reuse disabled passed all 63 tests. An independent static review found no concrete issues. The runs used local PHP 8.5.4 and the installed Chromium; the remote CI job has not been rerun with this follow-up fix.
