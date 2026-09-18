@@ -129,3 +129,13 @@ Before the fix, the new PHP tests detected the missing initial link and the defe
 | Pint on changed PHP files and whitespace check | Passed |
 
 Compatibility installs used separate temporary copies; the working package's dependency files were unchanged. These runs used local PHP 8.5.4 and the installed Chromium executable, not the CI PHP 8.3/8.4 matrix or a fresh browser download. Desktop and mobile captures were also visually inspected. An independent static review found no concrete issues. Safari, Firefox, production consumer themes and production network conditions were not tested; this verifies the stylesheet loading regression, not a promise of zero layout shift from every possible source. No commit, release or deployment was made.
+
+## Filament 5.8.2 action alignment — 2026-09-19
+
+[PR #7's browser job](https://github.com/mortalkiller/filament-page-header/actions/runs/35405753386/job/105795058321) resolved `^5.8.1` to Filament 5.8.2. The captured stylesheet adds `sm:self-end` to `.fi-header-actions-ctn`; local validation above used 5.8.1, which did not have that rule. The two failed desktop alignment tests reproduced with 5.8.2 in a temporary copy, with the same 28.59375 px and 57.578125 px differences as CI. All seven stylesheet-loading regressions had passed in the failed CI job.
+
+The package now sets `align-self: auto` on its action container, so the parent row controls expanded and compact alignment. The existing mobile `stretch` rule is retained. A new browser regression applies the conflicting native rule even on older Filament versions, then checks both top alignment when expanded and center alignment when compact. It failed before the CSS fix and passes afterward; the existing one-pixel assertions were not relaxed.
+
+A separate intermittent PHP test failure was also diagnosed: the avatar fallback test searched all HTML for `MC`, including random Livewire IDs. Setting a deterministic ID containing `MC` reproduced it. The assertion now inspects avatar text nodes and retains that ID fixture, checking that only the initials fallback contains text.
+
+After these fixes, the complete Chromium suite passed with 63 tests on each of Filament 4.12.6, 5.8.1 and 5.8.2. The PHP suite passed with 65 tests and 198 assertions on all three versions; all six JavaScript tests and scoped Pint passed. One local Filament 4 browser run lost its HTTP server after 56 passing tests, resulting in connection errors; a complete rerun on a dedicated port with server reuse disabled passed all 63 tests. An independent static review found no concrete issues. The runs used local PHP 8.5.4 and the installed Chromium; the remote CI job has not been rerun with this follow-up fix.
