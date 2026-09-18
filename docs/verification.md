@@ -111,3 +111,21 @@ Composer refused the exact dependency sets for Filament `4.0.0`, `4.12.0`, `4.12
 The complete Chromium suite also passed with Filament `4.12.6`: 49 tests in 52 seconds. An earlier concurrent invocation reported two `ENOENT` trace-artifact failures after all browser assertions had run; a single isolated rerun passed, so the failures were caused by concurrent writes to the same temporary Playwright output directory rather than header behavior.
 
 The GitHub Actions workflow now keeps this PHP matrix permanent and runs the complete Chromium suite on the minimum secure release of Filament 4 and 5. Pressiu was not changed: it remains only a consumer of the public package API.
+
+## Initial stylesheet loading — 2026-09-19
+
+The plugin now emits a stylesheet link in the initial head through `STYLES_AFTER`, after the panel theme. Only enabled panels emit it, including their native pages, so entering a header page through SPA does not need to discover the stylesheet. The asset remains registered with `loadedOnRequest()` to prevent a second automatic link; the header no longer uses `x-load-css`. CSS and JavaScript contents were unchanged.
+
+Before the fix, the new PHP tests detected the missing initial link and the deferred Alpine markup. All seven new Chromium cases failed against the original implementation: no JavaScript meant no header stylesheet, delayed header JavaScript left theme-only styling visible, a held CSS response allowed the first content paint, and native pages did not preload the stylesheet. The cases pass with the fix. The JavaScript-delay cases compare header height and the following content position before and after initialization in all three modes, allowing at most one pixel for rounding. An equal-specificity theme rule checks stylesheet precedence.
+
+| Local check | Result |
+| --- | --- |
+| PHP suite: Filament 4.12.6 / Laravel 12.69.2 | 65 passed, 199 assertions |
+| PHP suite: Filament 4.13.2 / Laravel 13.32.0 | 65 passed, 199 assertions |
+| PHP suite: Filament 5.8.1 / Laravel 12.69.2 | 65 passed, 199 assertions |
+| PHP suite: Filament 5.8.1 / Laravel 13.31.0 | 65 passed, 199 assertions |
+| Complete Chromium suite: Filament 4.12.6 and 5.8.1 | 62 passed on each |
+| JavaScript unit tests | 6 passed |
+| Pint on changed PHP files and whitespace check | Passed |
+
+Compatibility installs used separate temporary copies; the working package's dependency files were unchanged. These runs used local PHP 8.5.4 and the installed Chromium executable, not the CI PHP 8.3/8.4 matrix or a fresh browser download. Desktop and mobile captures were also visually inspected. An independent static review found no concrete issues. Safari, Firefox, production consumer themes and production network conditions were not tested; this verifies the stylesheet loading regression, not a promise of zero layout shift from every possible source. No commit, release or deployment was made.

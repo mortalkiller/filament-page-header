@@ -8,6 +8,8 @@ use Filament\Contracts\Plugin;
 use Filament\Facades\Filament;
 use Filament\Panel;
 use Filament\Resources\Resource;
+use Filament\View\PanelsRenderHook;
+use Illuminate\Contracts\View\View;
 use InvalidArgumentException;
 use LogicException;
 use MortalKiller\FilamentPageHeader\Enums\HeaderMode;
@@ -55,7 +57,15 @@ final class PageHeaderPlugin implements Plugin
         return self::ID;
     }
 
-    public function register(Panel $panel): void {}
+    public function register(Panel $panel): void
+    {
+        $panel->renderHook(
+            PanelsRenderHook::STYLES_AFTER,
+            fn (): View|string => Filament::getCurrentPanel() === $panel
+                ? view('filament-page-header::styles')
+                : '',
+        );
+    }
 
     public function boot(Panel $panel): void {}
 

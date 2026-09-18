@@ -39,6 +39,8 @@ npm run test:browser
 
 Playwright starts the local workbench automatically. Browser reports and screenshots are also retained as CI artifacts. PHP tests use an isolated in-memory database; browser tests use the separate workbench.
 
+`HeaderAssetsTest` checks initial stylesheet placement after the panel theme, panel isolation and the Alpine markup. `asset-loading.spec.mjs` covers styling without JavaScript, delayed CSS and header JavaScript, theme precedence, layout stability during initialization, and entering from a native page through SPA navigation. These cases inspect the initial load before `data-fph-ready`, which the existing scrolling and action tests wait for.
+
 The README uses the product fixture at `/demo/headers?variant=12&mode=compact`: Everyday Runner, a fictional reference, two badges, three metadata fields and two native actions. The demo panel uses `Color::Indigo` for its primary color and the Preview action uses gray. The existing customer fixture remains available for more complex compositions. These palettes belong to the demo and do not change consuming applications.
 
 To regenerate the matching desktop/mobile and light/dark captures:

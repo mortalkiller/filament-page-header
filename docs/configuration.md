@@ -4,6 +4,12 @@
 
 Configure content with native Filament schema components. Examples below assume the imports shown in each example and an existing page using `HasPageHeader`.
 
+## Stylesheet loading
+
+The plugin includes its stylesheet in the initial document head, after the panel theme, using Filament's `STYLES_AFTER` hook. It loads on every page of a panel that enables the plugin, including native pages, so SPA navigation into a custom header already has the required styles. Panels without the plugin do not include this stylesheet. The Alpine component remains loaded on demand.
+
+Keep publishing assets with `php artisan filament:assets` after package updates. No custom theme import is required. Theme overrides still follow normal CSS cascade rules; for equally specific rules in the same cascade layer, the package stylesheet comes after the panel theme.
+
 ## Layout slots
 
 | Method | Purpose |
