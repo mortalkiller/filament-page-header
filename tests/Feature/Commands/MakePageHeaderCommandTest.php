@@ -168,7 +168,7 @@ it('generates a conventional header schema and enables selected resource pages',
 
     $schemaPath = $fixture['resourceDirectory'].'/Schemas/OrderHeader.php';
 
-    expect($schemaPath)->toBeFile();
+    expect(is_file($schemaPath))->toBeTrue();
 
     $schema = file_get_contents($schemaPath);
 
@@ -262,7 +262,7 @@ it('rejects unavailable and conflicting page options before writing files', func
         '--page' => ['view'],
     ])->assertFailed();
 
-    expect($fixture['resourceDirectory'].'/Schemas/OrderHeader.php')->not->toBeFile();
+    expect(is_file($fixture['resourceDirectory'].'/Schemas/OrderHeader.php'))->toBeFalse();
 
     $this->artisan('make:filament-page-header', [
         'resource' => 'OrderResource',
