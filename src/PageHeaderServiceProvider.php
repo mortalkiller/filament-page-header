@@ -8,6 +8,7 @@ use Filament\Support\Assets\AlpineComponent;
 use Filament\Support\Assets\Css;
 use Filament\Support\Facades\FilamentAsset;
 use Illuminate\Support\ServiceProvider;
+use MortalKiller\FilamentPageHeader\Commands\MakePageHeaderCommand;
 
 final class PageHeaderServiceProvider extends ServiceProvider
 {
