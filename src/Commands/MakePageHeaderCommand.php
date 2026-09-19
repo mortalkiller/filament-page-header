@@ -122,7 +122,7 @@ final class MakePageHeaderCommand extends Command
 
             return search(
                 label: 'Which resource should use a page header?',
-                options: function (string $search) use ($resources): array {
+                options: function (?string $search) use ($resources): array {
                     $search = (string) str($search)->trim()->replace(['\\', '/'], '');
 
                     return collect($resources)
