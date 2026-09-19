@@ -69,11 +69,11 @@ final class MakePageHeaderCommand extends Command
                 $this->components->info('No resource pages were modified.');
             }
 
-            return static::SUCCESS;
+            return self::SUCCESS;
         } catch (RuntimeException $exception) {
             $this->components->error($exception->getMessage());
 
-            return static::FAILURE;
+            return self::FAILURE;
         }
     }
 
@@ -103,7 +103,7 @@ final class MakePageHeaderCommand extends Command
     }
 
     /**
-     * @return class-string<Resource>
+     * @return class-string<resource>
      */
     protected function resolveResource(): string
     {
@@ -169,7 +169,7 @@ final class MakePageHeaderCommand extends Command
     }
 
     /**
-     * @param  class-string<Resource>  $resource
+     * @param  class-string<resource>  $resource
      */
     protected function resourceMatchesInput(string $resource, string $input): bool
     {
@@ -187,7 +187,7 @@ final class MakePageHeaderCommand extends Command
     }
 
     /**
-     * @param  class-string<Resource>  $resource
+     * @param  class-string<resource>  $resource
      */
     protected function getResourceLabel(string $resource): string
     {
@@ -199,7 +199,7 @@ final class MakePageHeaderCommand extends Command
     }
 
     /**
-     * @param  class-string<Resource>  $resource
+     * @param  class-string<resource>  $resource
      * @return array<string, class-string>
      */
     protected function getStandardPages(string $resource): array
@@ -300,7 +300,7 @@ final class MakePageHeaderCommand extends Command
     }
 
     /**
-     * @param  class-string<Resource>  $resource
+     * @param  class-string<resource>  $resource
      * @return array{0: class-string, 1: string, 2: string}
      */
     protected function getSchemaDefinition(string $resource): array
