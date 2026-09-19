@@ -14,7 +14,6 @@ use Filament\Resources\Resource;
 use Filament\Support\Commands\Concerns\HasPanel;
 use Illuminate\Console\Command;
 use Illuminate\Filesystem\Filesystem;
-use MortalKiller\FilamentPageHeader\Components\Header;
 use MortalKiller\FilamentPageHeader\Support\PageHeaderPageUpdater;
 use ReflectionClass;
 use RuntimeException;
