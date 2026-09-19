@@ -149,6 +149,192 @@ Header::make()
 
 The example assumes the consuming model provides these fields; image selection and business state belong to that application. `image()` shows the entire image in a square frame with soft corners: 96 px on desktop, 80 px below 768 px and 32 px when compact. Images and avatars are vertically centered with the full identity block (heading, description and badges). It accepts the same URL/closure/native ImageEntry inputs as `avatar()`. Calling `avatar()` again restores circular presentation. Both shrink in compact mode. The compact configuration above keeps the copyable supplier code visible while the metadata collapses. Create pages can continue to use their existing native header.
 
+## Record and context resolution
+
+The header schema uses the current page record by default. On Resource pages with a record, `getPageHeaderRecord()` returns that record; pages without a record receive `null`. The trait applies this value to the native Filament `Schema` before your `headerSchema()` or shared `*Header::configure()` method runs.
+
+Override `getPageHeaderRecord()` when the header should describe something other than the page's primary record:
+
+```php
+use Illuminate\Database\Eloquent\Model;
+
+public function getPageHeaderRecord(): Model|array|null
+{
+    // Return the model or array that should back the header schema.
+}
+```
+
+Native Filament schema utilities keep working with this context. A closure parameter named `$record` receives the configured model, array or `null`; model type injection also works when the context is an Eloquent model. Entries resolve their state from the same schema record.
+
+Changing the header record does **not** replace the page's own Resource record, change form persistence, or grant access to anything. Policies, page authorization, action authorization and data loading remain the consuming application's responsibility.
+
+### Tenant-backed pages
+
+A tenant can be used as the header record without coupling this package to a tenancy implementation. For a Filament tenant-aware panel:
+
+```php
+use Filament\Facades\Filament;
+use Illuminate\Database\Eloquent\Model;
+
+public function getPageHeaderRecord(): ?Model
+{
+    return Filament::getTenant();
+}
+```
+
+The existing header schema can then use normal record injection:
+
+```php
+Header::make()
+    ->heading(fn (?Model $record): string => $record?->getAttribute('name') ?? __('Workspace'))
+    ->initials(fn (?Model $record): ?string => $record?->getAttribute('name'));
+```
+
+If the page can also render outside a tenant context, keep the closure nullable or provide an application-specific fallback.
+
+### Parent records
+
+Nested Resource pages can make their parent record the header context:
+
+```php
+use Illuminate\Database\Eloquent\Model;
+
+public function getPageHeaderRecord(): ?Model
+{
+    return $this->getParentRecord();
+}
+```
+
+This is useful when a nested list or create page is conceptually about the parent entity even though the page does not have its own persisted record yet.
+
+For example, an order-items page can keep the header focused on the parent order while the table or form continues to manage item records independently.
+
+### Settings and singleton models
+
+A settings page can resolve an application-owned singleton model and expose it to the header:
+
+```php
+use App\Models\CompanySettings;
+use Illuminate\Database\Eloquent\Model;
+
+public function getPageHeaderRecord(): ?Model
+{
+    return CompanySettings::query()->first();
+}
+```
+
+The header may then read that model using normal Filament schema components:
+
+```php
+Header::make()
+    ->heading(fn (?CompanySettings $record): string => $record?->company_name ?? __('Company settings'))
+    ->description(fn (?CompanySettings $record): ?string => $record?->billing_email);
+```
+
+The package does not require a particular settings library. Resolve the model or context using the same application service or repository you would use elsewhere.
+
+### Custom pages backed by a model
+
+Custom Filament pages can return any application model they already resolved:
+
+```php
+use App\Models\Customer;
+use Filament\Schemas\Schema;
+use Illuminate\Database\Eloquent\Model;
+use MortalKiller\FilamentPageHeader\Components\Header;
+use MortalKiller\FilamentPageHeader\Concerns\HasPageHeader;
+
+class CustomerOverview extends \Filament\Pages\Page
+{
+    use HasPageHeader;
+
+    public Customer $customer;
+
+    public function mount(Customer $customer): void
+    {
+        $this->customer = $customer;
+    }
+
+    public function getPageHeaderRecord(): Model
+    {
+        return $this->customer;
+    }
+
+    public function headerSchema(Schema $schema): Schema
+    {
+        return $schema->components([
+            Header::make()
+                ->heading(fn (Customer $record): string => $record->name)
+                ->description(fn (Customer $record): string => $record->email),
+        ]);
+    }
+}
+```
+
+The routing and model resolution shown here belong to the application; the package only uses the returned record as the schema context.
+
+### Array-backed custom pages
+
+A header does not require an Eloquent model. Return an associative array when the page context is derived or does not belong to one model:
+
+```php
+/** @return array<string, mixed> */
+public function getPageHeaderRecord(): array
+{
+    return [
+        'name' => __('System status'),
+        'environment' => app()->environment(),
+        'region' => config('app.region'),
+    ];
+}
+```
+
+Use a parameter named `$record` for array context closures:
+
+```php
+use Filament\Infolists\Components\TextEntry;
+
+Header::make()
+    ->heading(fn (array $record): string => $record['name'])
+    ->metadata([
+        TextEntry::make('environment')->label(__('Environment')),
+        TextEntry::make('region')->label(__('Region')),
+    ]);
+```
+
+Native entries resolve keys such as `environment` and `region` from the array record. Do not type the closure as an Eloquent model when the page returns an array.
+
+### Create pages and null records
+
+Create pages normally have no persisted record yet, so the default header record is `null`. Header closures that depend on the future record should therefore accept `null`:
+
+```php
+use Illuminate\Database\Eloquent\Model;
+
+Header::make()
+    ->heading(fn (?Model $record): string => $record?->getAttribute('name') ?? __('Create customer'));
+```
+
+If the create page should instead describe a tenant, parent record or another stable context, override `getPageHeaderRecord()` with that value. This changes only the header schema context; it does not change the record being created.
+
+### Multiple panels
+
+Register the plugin separately on every panel that should use custom page headers:
+
+```php
+// AdminPanelProvider
+return $panel
+    ->id('admin')
+    ->plugin(PageHeaderPlugin::make());
+
+// OperationsPanelProvider
+return $panel
+    ->id('operations')
+    ->plugin(PageHeaderPlugin::make());
+```
+
+Panels that do not register the plugin keep their native Filament headers. Plugin options and explicit `schemaFor()` mappings are configured per plugin instance, so each panel can choose its own defaults and mappings.
+
 ## Share configuration across a resource
 
 Define a class such as `App\Filament\Resources\Orders\Schemas\OrderHeader` with `public static function configure(Schema $schema): Schema`. The trait discovers `{Model}Header` beside the resource by convention, including parent resource namespaces.
