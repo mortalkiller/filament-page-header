@@ -23,6 +23,7 @@ Enable headers only on the panels and pages you choose. No custom theme build, a
 - [Screenshots](#screenshots)
 - [Version compatibility](#version-compatibility)
 - [Installation](#installation)
+- [Generator](#generator)
 - [Your first header](#your-first-header)
 - [Configuration](#configuration)
 - [Sticky and compact modes](#sticky-and-compact-modes)
@@ -45,6 +46,7 @@ Enable headers only on the panels and pages you choose. No custom theme build, a
 - Typed compact configuration: keep entire blocks or select individual fields.
 - Native light/dark colors, keyboard focus handling and reduced-motion support.
 - Shared resource schemas, with individual page overrides.
+- Artisan generator for conventional header schemas and Resource page setup.
 
 ## Screenshots
 
@@ -98,6 +100,28 @@ $panel->plugin(PageHeaderPlugin::make());
 ```
 
 Register it separately for each panel that needs custom headers, then add the page trait as shown below. Installation alone does not replace existing headers.
+
+## Generator
+
+For an existing Filament Resource, generate the conventional header schema and choose which standard Resource pages should use it:
+
+```bash
+php artisan make:filament-page-header OrderResource
+```
+
+For explicit or non-interactive usage:
+
+```bash
+php artisan make:filament-page-header OrderResource \\
+    --panel=admin \\
+    --page=list \\
+    --page=view \\
+    --page=edit
+```
+
+Use `--no-pages` to generate only the schema and `--force` to deliberately replace an existing generated schema. Repeated runs do not duplicate `HasPageHeader` imports or trait declarations.
+
+See the [generator guide](docs/generator.md) for page selection, multi-panel applications, existing schemas and supported page types.
 
 ## Your first header
 
