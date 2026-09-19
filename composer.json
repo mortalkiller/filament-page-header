@@ -22,7 +22,7 @@
         "post-autoload-dump": "@php vendor/bin/testbench package:discover --ansi",
         "test": "pest",
         "format": "pint",
-        "format:check": "pint --test -v"
+        "format:check": "pint --test"
     },
     "minimum-stability": "stable",
     "prefer-stable": true
