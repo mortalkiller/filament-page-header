@@ -8,12 +8,17 @@ use Filament\Support\Assets\AlpineComponent;
 use Filament\Support\Assets\Css;
 use Filament\Support\Facades\FilamentAsset;
 use Illuminate\Support\ServiceProvider;
+use MortalKiller\FilamentPageHeader\Commands\MakePageHeaderCommand;
 
 final class PageHeaderServiceProvider extends ServiceProvider
 {
     public function boot(): void
     {
         $this->loadViewsFrom(__DIR__.'/../resources/views', 'filament-page-header');
+
+        if ($this->app->runningInConsole()) {
+            $this->commands([MakePageHeaderCommand::class]);
+        }
 
         FilamentAsset::register([
             // The plugin emits this stylesheet in the initial head, after the panel theme.

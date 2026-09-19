@@ -1,6 +1,6 @@
 # Header configuration
 
-[Back to the README](../README.md) · [Installation and first header](../README.md#installation)
+[Back to the README](../README.md) · [Generator](generator.md) · [Installation and first header](../README.md#installation)
 
 Configure content with native Filament schema components. Examples below assume the imports shown in each example and an existing page using `HasPageHeader`.
 
