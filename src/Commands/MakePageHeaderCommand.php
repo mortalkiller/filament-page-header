@@ -46,7 +46,7 @@ final class MakePageHeaderCommand extends Command
 
             [$schemaFqn, $schemaPath, $schemaContents] = $this->getSchemaDefinition($resource);
 
-            if ($filesystem->exists($schemaPath) && (! $this->option('force'))) {
+            if ($filesystem->exists($schemaPath) && ! $this->option('force')) {
                 $this->components->warn("Page header schema [{$schemaFqn}] already exists; leaving it unchanged.");
             } else {
                 $filesystem->ensureDirectoryExists(dirname($schemaPath));
@@ -91,13 +91,13 @@ final class MakePageHeaderCommand extends Command
             throw new RuntimeException("Filament panel [{$panelOption}] was not found.");
         }
 
-        if ((! $this->input->isInteractive()) && blank($panelOption) && (count($panels) > 1)) {
+        if (! $this->input->isInteractive() && blank($panelOption) && (count($panels) > 1)) {
             throw new RuntimeException('Multiple Filament panels are registered. Pass --panel to choose one.');
         }
 
         $this->configurePanel(question: 'Which panel contains the resource?');
 
-        if (! $this->panel instanceof Panel) {
+        if (! ($this->panel instanceof Panel)) {
             throw new RuntimeException('A Filament panel could not be resolved.');
         }
     }
@@ -238,7 +238,7 @@ final class MakePageHeaderCommand extends Command
         $requestedPages = array_values(array_filter((array) $this->option('page'), 'filled'));
         $noPages = (bool) $this->option('no-pages');
 
-        if ($noPages && ($requestedPages !== [])) {
+        if ($noPages && $requestedPages !== []) {
             throw new RuntimeException('The --no-pages option cannot be combined with --page.');
         }
 
