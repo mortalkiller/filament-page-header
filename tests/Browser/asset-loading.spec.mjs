@@ -1,8 +1,8 @@
 import { test, expect } from '@playwright/test';
 
 const stylesheet = 'head link[rel="stylesheet"][href*="/filament-page-header/page-header.css"]';
-const cssPattern = '**/css/mortalkiller/filament-page-header/page-header.css*';
-const jsPattern = '**/js/mortalkiller/filament-page-header/components/page-header.js*';
+const cssPattern = /\/css\/mortalkiller\/filament-page-header\/page-header\.css(?:\?.*)?$/;
+const jsPattern = /\/js\/mortalkiller\/filament-page-header\/components\/page-header\.js(?:\?.*)?$/;
 
 function deferred() {
     let resolve;
@@ -38,7 +38,7 @@ for (const mode of ['normal', 'sticky', 'compact']) {
         const release = deferred();
         const requested = deferred();
         // An equal-specificity theme rule catches accidental stylesheet reordering.
-        await page.route('**/css/filament/filament/app.css*', async route => {
+        await page.route(/\/css\/filament\/filament\/app\.css(?:\?.*)?$/, async route => {
             const response = await route.fetch();
             await route.fulfill({ response, body: `${await response.text()}\n.fph-root .fph-header { padding: 80px; }` });
         });
