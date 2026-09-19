@@ -30,6 +30,7 @@ Enable headers only on the panels and pages you choose. No custom theme build, a
 - [Troubleshooting](#troubleshooting)
 - [Testing and contributing](#testing-and-contributing)
 - [Changelog](#changelog)
+- [Roadmap](#roadmap)
 - [Security](#security)
 - [Support this project](#support-this-project)
 - [Credits and license](#credits-and-license)
@@ -236,6 +237,10 @@ See [demo and testing setup](docs/testing.md) before running browser tests, and 
 ## Changelog
 
 See [GitHub Releases](https://github.com/mortalkiller/filament-page-header/releases) for published versions and release notes.
+
+## Roadmap
+
+See the [project roadmap](docs/roadmap.md) for planned developer-experience, navigation, and action-control improvements, along with the package's scope and design principles.
 
 ## Security
 
