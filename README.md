@@ -133,7 +133,7 @@ class EditCustomer extends EditRecord
 }
 ```
 
-The trait also works with Create, View, List and custom pages. Use nullable record closures where no record exists. `Header::make()` inherits the page heading and subheading by default and does not change the browser tab title.
+The trait also works with Create, View, List and custom pages. Use nullable record closures where no record exists. `Header::make()` inherits the page heading and subheading by default and does not change the browser tab title. By default, the header schema uses the page's current Resource record; override [`getPageHeaderRecord()`](docs/configuration.md#record-and-context-resolution) for tenant, parent, singleton, custom-model or array-backed contexts.
 
 ## Configuration
 
@@ -146,6 +146,7 @@ Use native Filament entries for content and keep business logic in your applicat
 | Field icons | `fieldIcon()`, `fieldIconPosition()`, `fieldIconSize()` | [Metadata fields](docs/configuration.md#metadata-separators-and-field-icons) |
 | Product identity | `image()` and `descriptionSchema()` | [Product example](docs/configuration.md#product-header-example) |
 | Reusable resource headers | Convention discovery or `schemaFor()` | [Shared configuration](docs/configuration.md#share-configuration-across-a-resource) |
+| Record/context | `getPageHeaderRecord()` | [Custom record contexts](docs/configuration.md#record-and-context-resolution) |
 | Custom composition | `headingSchema()`, `leading()`, `schema()` | [Layout slots](docs/configuration.md#layout-slots) |
 
 Native `getHeaderActions()` continues to define the page actions. They render once, right-aligned on desktop and after the details on mobile. Native button groups, modals, form targets and authorization remain in place. Breadcrumbs sit outside the card and scroll with the page.
