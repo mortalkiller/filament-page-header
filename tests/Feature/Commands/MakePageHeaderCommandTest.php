@@ -5,9 +5,6 @@ declare(strict_types=1);
 use Filament\Panel;
 use Filament\PanelRegistry;
 use Illuminate\Filesystem\Filesystem;
-use MortalKiller\FilamentPageHeader\Tests\TestCase;
-
-uses(TestCase::class);
 
 function makeGeneratorFixture(array $pageTypes = ['list', 'create', 'view', 'edit'], bool $withTrait = false): array
 {
