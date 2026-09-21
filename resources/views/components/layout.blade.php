@@ -16,7 +16,7 @@
     $hasMetadata = $hasContent($slots['metadata']);
     $hasSummary = $hasContent($slots['summary']);
 @endphp
-<div {{ (new \Illuminate\View\ComponentAttributeBag($getExtraAttributes()))->class(['fph-layout']) }}>
+<div {{ (new \Illuminate\View\ComponentAttributeBag($getExtraAttributes()))->class(['fph-layout']) }} data-fph-actions-position="{{ $getActionsPosition()->value }}">
     <div class="fph-top">
         <div class="fph-content">
             @if ($hasContent($slots['leading']))
