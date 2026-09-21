@@ -3,67 +3,21 @@ title: Roadmap
 description: Current development direction and design principles for Filament Page Header.
 ---
 
-This roadmap describes the current direction for Filament Page Header. It is intentionally focused on practical Filament workflows rather than turning the package into a general-purpose UI framework.
+This roadmap describes future functionality being considered for Filament Page Header. It is intentionally focused on practical Filament workflows rather than turning the package into a general-purpose UI framework.
 
-Planned versions and scope are directional and may change based on implementation findings, Filament changes, and community feedback.
+Items are directional and may change based on implementation findings, Filament changes, and community feedback.
 
-## 2.2 — Developer experience
-
-Reduce the setup needed to introduce page headers into an existing Filament resource.
-
-Planned:
-
-- Add a `make:filament-page-header` Artisan command.
-- Accept a resource as the primary target.
-- Support interactive page selection for List, Create, View, Edit, and custom resource pages where practical.
-- Support non-interactive options for automation.
-- Generate the conventional resource header schema.
-- Add `HasPageHeader` safely to selected pages.
-- Support panel selection when the application contains multiple panels.
-- Make repeated execution safe and predictable.
-- Provide `--force` and generation-only workflows where appropriate.
-
-The generator should produce the same structure a developer would reasonably write by hand. It must not introduce a second configuration system.
-
-## 2.3 — Header navigation
-
-Make native Filament navigation concepts easier to compose with the page header.
-
-Planned:
-
-- Configurable native breadcrumb placement.
-- Support breadcrumbs outside the header, inside the header, or hidden.
-- Integrate native Filament record sub-navigation where available.
-- Allow breadcrumb and sub-navigation visibility to participate in compact-mode configuration.
-- Preserve Filament routing, authorization, active-state handling, and generated URLs.
-
-The package should render existing Filament navigation rather than implement its own router or navigation state.
-
-## 2.4 — Action control
+## Action control
 
 Give applications more control over how native page actions behave inside responsive and compact headers.
 
 Planned:
 
 - Configurable desktop action positioning.
-- Keep the existing mobile-friendly full-width behavior as a supported default.
-- Allow selected native actions to remain visible in compact mode.
-- Allow selected native actions to be hidden in compact mode.
-- Preserve native Filament actions, modals, authorization, forms, button groups, and hooks.
+- Allow selected native page actions to remain visible in compact mode.
+- Allow selected native page actions to be hidden in compact mode.
 
-The package must not duplicate or replace Filament's action system.
-
-## Documentation and context improvements
-
-Before adding more API, improve discoverability for capabilities the package already has.
-
-Planned:
-
-- Document `getPageHeaderRecord()` for tenant-backed pages.
-- Document parent-record headers.
-- Document settings/singleton pages.
-- Document custom pages that use a model or array as header context.
-- Add complete examples for applications with multiple panels.
+Any implementation must continue to use Filament's native action system and preserve authorization, modals, forms, button groups, hooks, and action state. The package must not duplicate or replace Filament actions.
 
 ## Design principles
 
