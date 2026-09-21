@@ -298,7 +298,7 @@ Follow the [migration guide](docs/migration.md), including the deprecated compac
 ## Testing and contributing
 
 ```bash
-composer test
+composer check
 node --test tests/JavaScript/*.test.mjs
 npm run test:browser
 ```
