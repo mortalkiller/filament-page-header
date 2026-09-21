@@ -16,6 +16,7 @@ use Filament\Support\Colors\Color;
 use Filament\Support\Facades\FilamentColor;
 use InvalidArgumentException;
 use MortalKiller\FilamentPageHeader\CompactHeader;
+use MortalKiller\FilamentPageHeader\Concerns\HasHeaderActions;
 use MortalKiller\FilamentPageHeader\Enums\BreadcrumbPosition;
 use MortalKiller\FilamentPageHeader\Enums\HeaderMode;
 use MortalKiller\FilamentPageHeader\Enums\HeaderPart;
@@ -23,6 +24,8 @@ use MortalKiller\FilamentPageHeader\HeaderOptions;
 
 class Header extends Component
 {
+    use HasHeaderActions;
+
     protected ?CompactHeader $compactContent = null;
 
     /** @var array<string, bool> */
