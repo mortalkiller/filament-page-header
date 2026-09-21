@@ -17,8 +17,19 @@ Build informative, responsive page headers with native **Filament 4 and 5** sche
 
 Enable headers only on the panels and pages you choose. No custom theme build, application-specific models or required icon library.
 
+## Documentation
+
+Full documentation, guides and API reference:
+
+**https://docs.pedromonteiro.dev/filament-page-header/**
+
+- [Getting started](https://docs.pedromonteiro.dev/filament-page-header/getting-started/installation/)
+- [Configuration guide](https://docs.pedromonteiro.dev/filament-page-header/guides/configuration/)
+- [API reference](https://docs.pedromonteiro.dev/filament-page-header/api/)
+
 ## Contents
 
+- [Documentation](#documentation)
 - [Features](#features)
 - [Screenshots](#screenshots)
 - [Version compatibility](#version-compatibility)
