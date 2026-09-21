@@ -31,6 +31,7 @@ export class HeaderController {
     constructor(root, options = {}) {
         this.root = root;
         this.header = root.querySelector('[data-fph-header]');
+        this.surface = root.querySelector('[data-fph-surface]') ?? this.header;
         this.document = root.ownerDocument;
         this.window = this.document.defaultView;
         this.options = options;
@@ -67,12 +68,12 @@ export class HeaderController {
 
         if (this.window.ResizeObserver) {
             this.resizeObserver = new this.window.ResizeObserver(() => this.schedule(true));
-            this.resizeObserver.observe(this.header);
+            this.resizeObserver.observe(this.surface);
             this.resizeObserver.observe(this.root.parentElement);
             for (const topbar of this.topbars()) this.resizeObserver.observe(topbar);
         }
         this.mutationObserver = new this.window.MutationObserver(() => this.schedule(true));
-        this.mutationObserver.observe(this.header, {
+        this.mutationObserver.observe(this.surface, {
             childList: true, characterData: true, subtree: true, attributes: true,
             attributeFilter: ['data-fph-exclude-compact', 'data-fph-hide-compact'],
         });
@@ -127,10 +128,10 @@ export class HeaderController {
         this.root.dataset.fphMeasuring = 'true';
         this.root.dataset.fphCompact = 'false';
         this.updateMetadataDividers();
-        this.expandedHeight = Math.ceil(this.header.getBoundingClientRect().height);
+        this.expandedHeight = Math.ceil(this.surface.getBoundingClientRect().height);
         this.root.dataset.fphCompact = 'true';
         this.updateMetadataDividers(true);
-        this.compactHeight = Math.ceil(this.header.getBoundingClientRect().height);
+        this.compactHeight = Math.ceil(this.surface.getBoundingClientRect().height);
         this.root.dataset.fphCompact = compact ?? 'false';
         // Commit the restored layout while transitions are still disabled.
         this.header.getBoundingClientRect();

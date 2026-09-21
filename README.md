@@ -26,6 +26,7 @@ Enable headers only on the panels and pages you choose. No custom theme build, a
 - [Generator](#generator)
 - [Your first header](#your-first-header)
 - [Configuration](#configuration)
+- [Header navigation](#header-navigation)
 - [Sticky and compact modes](#sticky-and-compact-modes)
 - [Migration from v1](#migration-from-v1)
 - [Troubleshooting](#troubleshooting)
@@ -42,6 +43,7 @@ Enable headers only on the panels and pages you choose. No custom theme build, a
 - Native schema fields for metadata and summary metrics, with responsive separators.
 - Field icons before or after the complete label/value, with configurable size.
 - Native page actions aligned right on desktop and stacked at full width on mobile.
+- Breadcrumb positioning and optional native page/record sub-navigation inside the header.
 - Normal, sticky and compact layouts, with configurable responsive thresholds.
 - Typed compact configuration: keep entire blocks or select individual fields.
 - Native light/dark colors, keyboard focus handling and reduced-motion support.
@@ -173,7 +175,7 @@ Use native Filament entries for content and keep business logic in your applicat
 | Record/context | `getPageHeaderRecord()` | [Custom record contexts](docs/configuration.md#record-and-context-resolution) |
 | Custom composition | `headingSchema()`, `leading()`, `schema()` | [Layout slots](docs/configuration.md#layout-slots) |
 
-Native `getHeaderActions()` continues to define the page actions. They render once, right-aligned on desktop and after the details on mobile. Native button groups, modals, form targets and authorization remain in place. Breadcrumbs sit outside the card and scroll with the page.
+Native `getHeaderActions()` continues to define the page actions. They render once, right-aligned on desktop and after the details on mobile. Native button groups, modals, form targets and authorization remain in place. Breadcrumbs sit outside the card and scroll with the page by default. [Configure their position and native sub-navigation](#header-navigation) when needed.
 
 Color an initials fallback with a panel color alias or a native Filament palette. The text color is chosen for contrast unless you override it:
 
@@ -199,6 +201,39 @@ Header::make()
 See [Images and icons](docs/configuration.md#images-and-icons) for imports, closures and fallback behavior.
 
 For a resilient identity, configure image, initials and an icon together. The header renders one visual in this order: custom `leading()` content, a resolved avatar/image, initials, then `icon()`.
+
+## Header navigation
+
+Keep Filament's breadcrumbs outside the card (the default), place them inside, or hide them:
+
+```php
+use MortalKiller\FilamentPageHeader\Components\Header;
+use MortalKiller\FilamentPageHeader\Enums\BreadcrumbPosition;
+
+Header::make()->breadcrumbs(BreadcrumbPosition::Outside);
+Header::make()->breadcrumbs(BreadcrumbPosition::Inside);
+Header::make()->breadcrumbs(BreadcrumbPosition::Hidden);
+```
+
+Move existing native Page/Resource sub-navigation into the header with `subNavigation()`. Desktop uses Filament's horizontal tabs; mobile uses its dropdown. URLs, authorization, active state and SPA navigation stay native. No navigation is created if the page has none.
+
+```php
+use MortalKiller\FilamentPageHeader\CompactHeader;
+use MortalKiller\FilamentPageHeader\Enums\HeaderPart;
+
+Header::make()
+    ->breadcrumbs(BreadcrumbPosition::Inside)
+    ->subNavigation()
+    ->compact()
+    ->whenCompact(fn (CompactHeader $compact) => $compact
+        ->show(HeaderPart::Breadcrumbs, HeaderPart::SubNavigation));
+```
+
+Inside breadcrumbs and sub-navigation hide when compact unless explicitly retained. Retained outside breadcrumbs remain outside the card but join the pinned header; otherwise they scroll with the page as before. Navigation supports `show()`, not `only()` field selection. `Hidden` and panel-level breadcrumb disabling remain authoritative.
+
+`subNavigation()` integrates route navigation such as `getRecordSubNavigation()` and `ManageRelatedRecords` pages. **Relation Manager tabs remain in the page content**, including combined content tabs and their Before/After ordering. Without `subNavigation()`, Filament keeps its original Start/End/Top layout.
+
+See [Navigation configuration](docs/configuration.md#breadcrumbs-and-sub-navigation) for details.
 
 ## Sticky and compact modes
 

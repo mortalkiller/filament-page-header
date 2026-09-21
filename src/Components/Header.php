@@ -16,6 +16,7 @@ use Filament\Support\Colors\Color;
 use Filament\Support\Facades\FilamentColor;
 use InvalidArgumentException;
 use MortalKiller\FilamentPageHeader\CompactHeader;
+use MortalKiller\FilamentPageHeader\Enums\BreadcrumbPosition;
 use MortalKiller\FilamentPageHeader\Enums\HeaderMode;
 use MortalKiller\FilamentPageHeader\Enums\HeaderPart;
 use MortalKiller\FilamentPageHeader\HeaderOptions;
@@ -53,10 +54,14 @@ class Header extends Component
 
     protected ?int $compactBreakpoint = null;
 
+    protected BreadcrumbPosition|Closure $breadcrumbPosition = BreadcrumbPosition::Outside;
+
+    protected bool|Closure $hasSubNavigation = false;
+
     protected string $view = 'filament-page-header::components.layout';
 
     /** @var list<string> */
-    protected array $compactHiddenSlots = ['description', 'metadata', 'summary', 'default'];
+    protected array $compactHiddenSlots = ['description', 'metadata', 'summary', 'default', 'breadcrumbs', 'subNavigation'];
 
     public static function make(array|Closure $schema = []): static
     {
@@ -86,6 +91,30 @@ class Header extends Component
     public function getPage(): ?Page
     {
         return $this->page;
+    }
+
+    public function breadcrumbs(BreadcrumbPosition|Closure $position): static
+    {
+        $this->breadcrumbPosition = $position;
+
+        return $this;
+    }
+
+    public function getBreadcrumbPosition(): BreadcrumbPosition
+    {
+        return $this->evaluate($this->breadcrumbPosition);
+    }
+
+    public function subNavigation(bool|Closure $condition = true): static
+    {
+        $this->hasSubNavigation = $condition;
+
+        return $this;
+    }
+
+    public function hasSubNavigation(): bool
+    {
+        return (bool) $this->evaluate($this->hasSubNavigation);
     }
 
     public function avatar(mixed $url): static
@@ -391,7 +420,8 @@ class Header extends Component
         }
 
         $this->compactContent = null;
-        $this->compactHiddenSlots = array_values(array_unique($slots));
+        // Legacy selections predate navigation and must not opt it into pinning.
+        $this->compactHiddenSlots = array_values(array_unique([...$slots, 'breadcrumbs', 'subNavigation']));
 
         return $this;
     }

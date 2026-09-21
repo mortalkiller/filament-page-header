@@ -9,6 +9,7 @@ use Filament\PanelProvider;
 use MortalKiller\FilamentPageHeader\PageHeaderPlugin;
 use MortalKiller\FilamentPageHeader\Tests\Fixtures\Pages\ExamplePage;
 use MortalKiller\FilamentPageHeader\Tests\Fixtures\Pages\NativePage;
+use MortalKiller\FilamentPageHeader\Tests\Fixtures\Resources\NavigationOrderResource;
 use MortalKiller\FilamentPageHeader\Tests\Fixtures\Resources\OrderResource;
 
 class TestPanelProvider extends PanelProvider
@@ -18,6 +19,6 @@ class TestPanelProvider extends PanelProvider
         return $panel->default()->id('test')->path('test')
             ->plugin(PageHeaderPlugin::make())
             ->pages([ExamplePage::class, NativePage::class])
-            ->resources([OrderResource::class]);
+            ->resources([OrderResource::class, NavigationOrderResource::class]);
     }
 }

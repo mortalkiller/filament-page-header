@@ -20,6 +20,8 @@ use MortalKiller\FilamentPageHeader\PageHeaderPlugin;
 use Workbench\App\Http\Middleware\LocalDemoUser;
 use Workbench\App\Pages\HeaderGallery;
 use Workbench\App\Pages\NativePage;
+use Workbench\App\Pages\NavigationDetails;
+use Workbench\App\Pages\NavigationOverview;
 
 final class DemoPanelProvider extends PanelProvider
 {
@@ -29,7 +31,7 @@ final class DemoPanelProvider extends PanelProvider
             ->spa()->sidebarCollapsibleOnDesktop()->userMenu(false)->font('sans-serif', provider: LocalFontProvider::class)
             ->colors(['primary' => Color::Indigo])
             ->plugin(PageHeaderPlugin::make())
-            ->pages([HeaderGallery::class, NativePage::class])
+            ->pages([HeaderGallery::class, NativePage::class, NavigationOverview::class, NavigationDetails::class])
             ->middleware([
                 EncryptCookies::class,
                 AddQueuedCookiesToResponse::class,

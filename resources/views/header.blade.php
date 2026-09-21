@@ -3,8 +3,12 @@
     use Filament\Support\Facades\FilamentView;
     use Filament\View\PanelsRenderHook;
     use MortalKiller\FilamentPageHeader\PageHeaderPlugin;
+    use MortalKiller\FilamentPageHeader\Enums\BreadcrumbPosition;
+    $breadcrumbPosition = $headerComponent?->getBreadcrumbPosition() ?? BreadcrumbPosition::Outside;
+    $hideBreadcrumbsWhenCompact = $headerComponent?->isSlotHiddenWhenCompact('breadcrumbs') ?? true;
+    $keepOutsideBreadcrumbs = $breadcrumbs && $breadcrumbPosition === BreadcrumbPosition::Outside && ! $hideBreadcrumbsWhenCompact;
 @endphp
-@if ($breadcrumbs)
+@if ($breadcrumbs && $breadcrumbPosition === BreadcrumbPosition::Outside && ! $keepOutsideBreadcrumbs)
     <div class="fph-breadcrumbs">
         <x-filament::breadcrumbs :breadcrumbs="$breadcrumbs" />
     </div>
@@ -18,16 +22,31 @@
     x-load-src="{{ FilamentAsset::getAlpineComponentSrc('page-header', package: PageHeaderPlugin::PACKAGE) }}"
     x-data="pageHeader(@js($options))"
 >
-    <header class="fph-header fi-section" data-fph-header>
-        <div class="fph-schema">
-            @if (! $headerComponent)
-                {{ FilamentView::renderHook(PanelsRenderHook::PAGE_HEADER_HEADING_BEFORE, scopes: $page->getRenderHookScopes()) }}
+    <div class="fph-surface" data-fph-surface>
+        @if ($keepOutsideBreadcrumbs)
+            <div class="fph-breadcrumbs">
+                <x-filament::breadcrumbs :breadcrumbs="$breadcrumbs" />
+            </div>
+        @endif
+        <header class="fph-header fi-section" data-fph-header>
+            @if ($breadcrumbs && $breadcrumbPosition === BreadcrumbPosition::Inside)
+                <div class="fph-breadcrumbs" data-fph-hide-compact="{{ $hideBreadcrumbsWhenCompact ? 'true' : 'false' }}">
+                    <x-filament::breadcrumbs :breadcrumbs="$breadcrumbs" />
+                </div>
             @endif
-            {{ $schema }}
-            @if (! $headerComponent)
-                {{ FilamentView::renderHook(PanelsRenderHook::PAGE_HEADER_HEADING_AFTER, scopes: $page->getRenderHookScopes()) }}
-                @include('filament-page-header::actions', ['page' => $page])
+            <div class="fph-schema">
+                @if (! $headerComponent)
+                    {{ FilamentView::renderHook(PanelsRenderHook::PAGE_HEADER_HEADING_BEFORE, scopes: $page->getRenderHookScopes()) }}
+                @endif
+                {{ $schema }}
+                @if (! $headerComponent)
+                    {{ FilamentView::renderHook(PanelsRenderHook::PAGE_HEADER_HEADING_AFTER, scopes: $page->getRenderHookScopes()) }}
+                    @include('filament-page-header::actions', ['page' => $page])
+                @endif
+            </div>
+            @if ($subNavigation)
+                @include('filament-page-header::sub-navigation')
             @endif
-        </div>
-    </header>
+        </header>
+    </div>
 </div>

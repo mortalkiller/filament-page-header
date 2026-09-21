@@ -12,4 +12,6 @@ enum HeaderPart: string
     case Metadata = 'metadata';
     case Summary = 'summary';
     case Content = 'default';
+    case Breadcrumbs = 'breadcrumbs';
+    case SubNavigation = 'subNavigation';
 }

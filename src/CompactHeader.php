@@ -31,6 +31,10 @@ final class CompactHeader
             throw new InvalidArgumentException('The image block does not support field selection. Use show(HeaderPart::Image).');
         }
 
+        if (in_array($part, [HeaderPart::Breadcrumbs, HeaderPart::SubNavigation], true)) {
+            throw new InvalidArgumentException('Native navigation does not support field selection. Use show() instead.');
+        }
+
         foreach ($fields as $field) {
             if (! is_string($field) || trim($field) === '') {
                 throw new InvalidArgumentException('Compact field names must be non-empty strings.');

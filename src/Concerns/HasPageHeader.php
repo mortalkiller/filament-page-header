@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace MortalKiller\FilamentPageHeader\Concerns;
 
 use Filament\Facades\Filament;
+use Filament\Navigation\NavigationGroup;
 use Filament\Resources\Pages\CreateRecord;
 use Filament\Resources\Pages\EditRecord;
 use Filament\Resources\Pages\ViewRecord;
@@ -17,6 +18,20 @@ use MortalKiller\FilamentPageHeader\PageHeaderPlugin;
 
 trait HasPageHeader
 {
+    protected bool $isRenderingPageHeader = false;
+
+    protected bool $isResolvingPageHeader = false;
+
+    public function renderingHasPageHeader(): void
+    {
+        $this->isRenderingPageHeader = true;
+    }
+
+    public function renderedHasPageHeader(): void
+    {
+        $this->isRenderingPageHeader = false;
+    }
+
     public function headerSchema(Schema $schema): Schema
     {
         $class = $this->getPageHeaderSchemaClass();
@@ -105,28 +120,61 @@ trait HasPageHeader
         return Filament::getCurrentPanel()?->hasPlugin(PageHeaderPlugin::ID) === true;
     }
 
+    /** @return array<NavigationGroup> */
+    public function getCachedSubNavigation(): array
+    {
+        // Filament reads this before rendering the header. Only suppress its
+        // original location when our actual header view takes ownership.
+        if ($this->isRenderingPageHeader && ! $this->isResolvingPageHeader && $this->pageHeaderIsEnabled()) {
+            $header = $this->getHeader();
+
+            if ($header?->name() === 'filament-page-header::header' && ($header->getData()['subNavigation'] ?? []) !== []) {
+                return [];
+            }
+        }
+
+        return parent::getCachedSubNavigation();
+    }
+
+    /** @internal Keep Filament's filtering, grouping and active state intact.
+     * @return array<NavigationGroup>
+     */
+    public function getPageHeaderSubNavigation(): array
+    {
+        return parent::getCachedSubNavigation();
+    }
+
     public function getHeader(): ?View
     {
-        if (! $this->pageHeaderIsEnabled()) {
-            return parent::getHeader();
+        // Custom headings and breadcrumbs may consult native navigation while
+        // the header is being resolved. Keep that data available without reentry.
+        $this->isResolvingPageHeader = true;
+
+        try {
+            if (! $this->pageHeaderIsEnabled()) {
+                return parent::getHeader();
+            }
+
+            $schema = $this->getSchema('headerSchema');
+
+            if ($schema === null || $schema->getComponents() === []) {
+                return parent::getHeader();
+            }
+
+            $headerComponent = $this->getPageHeaderComponent()?->page($this);
+
+            return view('filament-page-header::header', [
+                'headerComponent' => $headerComponent,
+                'page' => $this,
+                'schema' => $schema,
+                'options' => $this->getPageHeaderOptions()->toArray(),
+                'actions' => $this->getCachedHeaderActions(),
+                'actionsAlignment' => $this->getHeaderActionsAlignment(),
+                'breadcrumbs' => Filament::hasBreadcrumbs() ? $this->getBreadcrumbs() : [],
+                'subNavigation' => $headerComponent?->hasSubNavigation() ? $this->getPageHeaderSubNavigation() : [],
+            ]);
+        } finally {
+            $this->isResolvingPageHeader = false;
         }
-
-        $schema = $this->getSchema('headerSchema');
-
-        if ($schema === null || $schema->getComponents() === []) {
-            return parent::getHeader();
-        }
-
-        $headerComponent = $this->getPageHeaderComponent()?->page($this);
-
-        return view('filament-page-header::header', [
-            'headerComponent' => $headerComponent,
-            'page' => $this,
-            'schema' => $schema,
-            'options' => $this->getPageHeaderOptions()->toArray(),
-            'actions' => $this->getCachedHeaderActions(),
-            'actionsAlignment' => $this->getHeaderActionsAlignment(),
-            'breadcrumbs' => Filament::hasBreadcrumbs() ? $this->getBreadcrumbs() : [],
-        ]);
     }
 }

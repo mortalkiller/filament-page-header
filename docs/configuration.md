@@ -10,6 +10,34 @@ The plugin includes its stylesheet in the initial document head, after the panel
 
 Keep publishing assets with `php artisan filament:assets` after package updates. No custom theme import is required. Theme overrides still follow normal CSS cascade rules; for equally specific rules in the same cascade layer, the package stylesheet comes after the panel theme.
 
+## Breadcrumbs and sub-navigation
+
+```php
+use MortalKiller\FilamentPageHeader\Components\Header;
+use MortalKiller\FilamentPageHeader\CompactHeader;
+use MortalKiller\FilamentPageHeader\Enums\BreadcrumbPosition;
+use MortalKiller\FilamentPageHeader\Enums\HeaderPart;
+
+Header::make()
+    ->breadcrumbs(BreadcrumbPosition::Inside)
+    ->subNavigation()
+    ->compact()
+    ->whenCompact(fn (CompactHeader $compact) => $compact
+        ->show(HeaderPart::Breadcrumbs, HeaderPart::SubNavigation));
+```
+
+`BreadcrumbPosition::Outside` is the default and preserves the original breadcrumb location above the card. `Inside` places them above the identity content in the card. `Hidden` omits them entirely. The native page provides labels and URLs; disabling breadcrumbs on the panel still hides them. The position accepts a closure with the usual Filament schema utilities.
+
+Inside breadcrumbs and sub-navigation are hidden in compact mode by default. Select their `HeaderPart` values with `show()` to keep them. These are whole native navigation blocks: `only()` rejects field selection for either part. Selecting `Breadcrumbs` never overrides `Hidden` or panel settings, and selecting `SubNavigation` never enables a disabled `subNavigation()`.
+
+Outside breadcrumbs normally scroll away with the page. Explicitly retaining them puts them in the same sticky surface as the card while keeping them visually outside it. The full surface is measured and its expanded height reserved, so compacting does not move the page content. In normal mode the entire surface scrolls normally. As with other header content, pinning is disabled when the surface would take too much of a short viewport.
+
+`subNavigation()` accepts a boolean or closure and is disabled by default. It uses the native Page/Resource navigation, including record pages returned by `getRecordSubNavigation()` and `ManageRelatedRecords`. Desktop renders Filament's sub-navigation tabs; mobile renders its sub-navigation dropdown. The package reuses cached native navigation groups/items and their filtering, URLs, labels, icons, badges, active state and SPA links.
+
+The native location is suppressed only while rendering a page whose actual package header has opted in. Empty schemas, custom header overrides, panels without the plugin and `subNavigation(false)` keep native rendering, including Start/End/Top positions. The header invokes the native Top and mobile-menu render hooks around the relocated components. Start/End sidebar hooks apply only when Filament renders those sidebars. Empty navigation produces no strip or border. Navigation configuration belongs to the first `Header` in the schema, like native header actions.
+
+Relation Manager tabs use a separate Filament system. They remain in the page content and keep their Livewire state. Combining them with the main content tab, or changing `ContentTabPosition::Before` / `After`, does not affect header navigation. No Relation Manager settings are required to use `subNavigation()`.
+
 ## Layout slots
 
 | Method | Purpose |
@@ -31,6 +59,8 @@ Keep publishing assets with `php artisan filament:assets` after package updates.
 | `metadata([...])` | References, dates, links and other secondary information. |
 | `summary([...])` | Optional summary or total, separate from the page's native actions. |
 | `schema([...])` | Additional components or native actions below the title. |
+| `breadcrumbs(BreadcrumbPosition::Inside)` | Position the page’s native breadcrumbs; also accepts a closure. |
+| `subNavigation($condition = true)` | Move native Page/Resource sub-navigation into the header; accepts a boolean or closure. |
 | `whenCompact(fn (CompactHeader $compact) => ...)` | Select compact blocks and fields using HeaderPart enums. |
 
 Slot methods accept arrays or closures. Badge entry labels are hidden automatically. Metadata and summary arrange native components without requiring a Grid; use explicit native layouts only for custom compositions. Use normal Filament visibility, colors, icons and authorization APIs. Do not put persistence, API requests or expensive calculations inside rendering closures.
@@ -381,7 +411,7 @@ PageHeaderPlugin::make()->topbarSelector('.my-topbar, .my-announcement-bar');
 
 Passing `offset(null)` restores automatic detection; `topbarSelector(null)` disables topbar detection. Sticky positioning is bounded by the real scroll container and its ancestors. Avoid short wrappers or unintended `overflow: hidden` ancestors that prevent CSS sticky from reaching the page content.
 
-Without `whenCompact()`, the existing defaults remain: image/avatar, heading, badges and native page actions stay visible; description, metadata, summary and extra content collapse.
+Without `whenCompact()`, the existing defaults remain: image/avatar, heading, badges and native page actions stay visible; description, metadata, summary, extra content, inside breadcrumbs and sub-navigation collapse.
 
 Configure compact content with a typed callback:
 
@@ -405,15 +435,17 @@ Header::make()
 | `Metadata` | Information fields. |
 | `Summary` | Summary metrics. |
 | `Content` | Extra components declared through `schema()`. |
+| `Breadcrumbs` | Native page breadcrumbs in their configured position. |
+| `SubNavigation` | Native page/record navigation, when `subNavigation()` is enabled. |
 
 - `show(HeaderPart ...$parts)` adds complete blocks to the compact selection.
 - `only(HeaderPart $part, array $fields)` enables that block with only the listed direct fields. It takes precedence over `show()` for that block regardless of call order. Repeating `only()` replaces that block's field list; `only(..., [])` hides it.
-- Field identifiers are the names passed to native entries' `make()`, including relationship names such as `supplier.name`. Other schema components use their local `key()` / state path. For a nested layout, select its explicit key to retain the whole layout; this API does not search its descendants. Named schema actions can also be selected. Image/leading content supports `show()` only.
+- Field identifiers are the names passed to native entries' `make()`, including relationship names such as `supplier.name`. Other schema components use their local `key()` / state path. For a nested layout, select its explicit key to retain the whole layout; this API does not search its descendants. Named schema actions can also be selected. Image/leading content and native navigation support `show()` only.
 - Missing or currently unavailable fields do not become visible. If none of the selected fields are available, the block collapses without leaving an empty details strip. Empty/invalid field identifiers are rejected.
 - Native `visible()` / `hidden()` conditions and permissions remain authoritative. Compaction only changes presentation of already-rendered content; it is not an authorization boundary. Components and actions are not duplicated, and scrolling sends no Livewire requests.
 - Separators follow the visible rows in both expanded and compact layouts. Focused content stays accessible until focus leaves it. Images and initials remain centered with the compact identity block and continue to shrink responsively. A compact header gains a subtle lower shadow only after it reaches the sticky edge; that shadow and the reduced spacing animate over 150ms.
 
-Breadcrumbs render above and outside the header card and scroll with the page. For deprecated compact methods, see [Migration from v1](migration.md).
+Breadcrumbs default to the outside location; see [breadcrumbs and sub-navigation](#breadcrumbs-and-sub-navigation) for placement and compact visibility. For deprecated compact methods, see [Migration from v1](migration.md).
 
 The browser handles scrolling and compaction without Livewire requests or duplicated action instances. Its sticky state remains browser-owned across unrelated Livewire updates, so changing a relation-manager tab does not reset an already compact header. A stable expanded footprint prevents layout jumps. On very short viewports or unusually tall headers, pinning is temporarily disabled so the page remains usable. Reduced-motion preferences are respected.
 
