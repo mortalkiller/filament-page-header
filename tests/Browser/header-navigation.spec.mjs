@@ -106,6 +106,138 @@ test('SPA switches between native and integrated sub-navigation without duplicat
     await expect(page.locator('.fi-page-sub-navigation-sidebar-ctn')).toHaveCount(1);
 });
 
+for (const colorScheme of ['light', 'dark']) {
+    for (const width of [390, 767, 768, 940, 1440]) {
+        test(`hidden navigation restores compact header spacing at ${width}px in ${colorScheme}`, async ({ page }) => {
+            await page.setViewportSize({ width, height: 1000 });
+            await page.addInitScript(scheme => localStorage.setItem('theme', scheme), colorScheme);
+
+            for (const navigation of [1, 0]) {
+                await openNavigation(page, `retain=0&navigation=${navigation}`);
+                const header = page.locator('[data-fph-header]');
+                if (!navigation) await expect(header).toHaveCSS('padding-bottom', width < 768 ? '16px' : '20px');
+
+                await page.evaluate(() => window.scrollTo(0, 700));
+                await expect(page.locator('[data-fph-root]')).toHaveAttribute('data-fph-compact', 'true');
+                await expect(page.locator('[data-fph-sub-navigation]')).toBeHidden();
+                await expect(header).toHaveCSS('padding-bottom', '12px');
+                await expect.poll(() => header.evaluate(element => {
+                    const layout = element.querySelector('.fph-layout');
+                    return element.getBoundingClientRect().bottom - layout.getBoundingClientRect().bottom;
+                })).toBeCloseTo(12, 0);
+            }
+        });
+    }
+
+    test(`mobile navigation preserves its original separation across resizing in ${colorScheme}`, async ({ page }) => {
+        await page.setViewportSize({ width: 1440, height: 1000 });
+        await page.addInitScript(scheme => localStorage.setItem('theme', scheme), colorScheme);
+        await openNavigation(page, 'retain=1');
+
+        for (const compact of [false, true]) {
+            await page.evaluate(y => window.scrollTo(0, y), compact ? 700 : 0);
+            await expect(page.locator('[data-fph-root]')).toHaveAttribute('data-fph-compact', String(compact));
+            for (const width of [390, 767, 768, 1440]) {
+                await page.setViewportSize({ width, height: 1000 });
+                const nav = page.locator('[data-fph-sub-navigation]');
+                await expect(nav).toBeVisible();
+                await expect(nav).toHaveCSS('margin-top', '16px');
+                await expect(nav).toHaveCSS('padding-top', width < 768 ? '16px' : '0px');
+                await expect(nav).toHaveCSS('border-top-width', width < 768 ? '1px' : '0px');
+                await expect(page.locator('[data-fph-header]')).toHaveCSS('padding-bottom', width < 768 ? (compact ? '12px' : '16px') : '0px');
+            }
+        }
+    });
+
+    test(`keyboard focus keeps navigation on the border until it hides in ${colorScheme}`, async ({ page }) => {
+        await page.setViewportSize({ width: 940, height: 1000 });
+        await page.addInitScript(scheme => localStorage.setItem('theme', scheme), colorScheme);
+        await openNavigation(page, 'retain=0');
+        const nav = page.locator('[data-fph-sub-navigation]');
+        const header = page.locator('[data-fph-header]');
+        await nav.locator('.fph-sub-navigation-desktop a').first().focus();
+        const content = page.locator('[data-navigation-content]');
+        const contentTop = await content.evaluate(element => element.getBoundingClientRect().top + scrollY);
+        await page.evaluate(() => window.scrollTo(0, 700));
+        await expect(page.locator('[data-fph-root]')).toHaveAttribute('data-fph-compact', 'true');
+        await expect(nav).toBeVisible();
+        await expect(header).toHaveCSS('padding-bottom', '0px');
+        await page.getByRole('textbox', { name: 'Unsaved navigation note' }).evaluate(element => element.focus({ preventScroll: true }));
+        await expect(nav).toBeHidden();
+        await expect(header).toHaveCSS('padding-bottom', '12px');
+        expect(await content.evaluate(element => element.getBoundingClientRect().top + scrollY)).toBeCloseTo(contentTop, 0);
+        await page.evaluate(() => window.scrollTo(0, 0));
+        await expect(nav).toBeVisible();
+        await expect(header).toHaveCSS('padding-bottom', '0px');
+    });
+}
+
+test('desktop navigation follows the header content with its active line on the header border', async ({ page }) => {
+    await page.setViewportSize({ width: 1440, height: 1000 });
+    await openNavigation(page, 'breadcrumbs=inside&retain=1');
+    const geometry = await page.locator('[data-fph-header]').evaluate(header => {
+        const layout = header.querySelector('.fph-layout');
+        const navigation = header.querySelector('[data-fph-sub-navigation]');
+        const tabs = navigation?.querySelector('.fi-page-sub-navigation-tabs');
+        const activeTab = tabs?.querySelector('.fi-tabs-item.fi-active');
+        const activeTabLabel = activeTab?.querySelector('.fi-tabs-item-label');
+        if (!layout || !navigation || !tabs || !activeTab || !activeTabLabel) throw new Error('The header requires an integrated desktop navigation.');
+
+        const headerBox = header.getBoundingClientRect();
+        const layoutBox = layout.getBoundingClientRect();
+        const tabsBox = tabs.getBoundingClientRect();
+        const activeTabLabelBox = activeTabLabel.getBoundingClientRect();
+        const navigationStyle = getComputedStyle(navigation);
+        const tabsStyle = getComputedStyle(tabs);
+        const activeTabStyle = getComputedStyle(activeTab);
+        const activeIndicatorStyle = getComputedStyle(activeTab, '::after');
+
+        return {
+            borderTop: navigationStyle.borderTopWidth,
+            paddingTop: navigationStyle.paddingTop,
+            tabsAfterLayout: tabsBox.top - layoutBox.bottom,
+            headerBottomSpace: headerBox.bottom - tabsBox.bottom,
+            activeLabelBottomSpace: tabsBox.bottom - activeTabLabelBox.bottom,
+            tabsBackground: tabsStyle.backgroundColor,
+            tabsBorderRadius: tabsStyle.borderRadius,
+            tabsBoxShadow: tabsStyle.boxShadow,
+            tabsPadding: tabsStyle.padding,
+            activeTabBackground: activeTabStyle.backgroundColor,
+            activeTabBorderRadius: activeTabStyle.borderRadius,
+            activeIndicatorContent: activeIndicatorStyle.content,
+            activeIndicatorHeight: activeIndicatorStyle.height,
+            activeIndicatorBackground: activeIndicatorStyle.backgroundColor,
+        };
+    });
+
+    expect(geometry.borderTop).toBe('0px');
+    expect(geometry.paddingTop).toBe('0px');
+    expect(geometry.tabsAfterLayout).toBeGreaterThanOrEqual(12);
+    expect(geometry.tabsAfterLayout).toBeLessThanOrEqual(16);
+    expect(Math.abs(geometry.headerBottomSpace)).toBeLessThanOrEqual(1);
+    expect(geometry.activeLabelBottomSpace).toBeGreaterThanOrEqual(15);
+    expect(geometry.activeLabelBottomSpace).toBeLessThanOrEqual(17);
+    expect(geometry.tabsBackground).toBe('rgba(0, 0, 0, 0)');
+    expect(geometry.tabsBorderRadius).toBe('0px');
+    expect(geometry.tabsBoxShadow).toBe('none');
+    expect(geometry.tabsPadding).toBe('0px');
+    expect(geometry.activeTabBackground).toBe('rgba(0, 0, 0, 0)');
+    expect(geometry.activeTabBorderRadius).toBe('0px');
+    expect(geometry.activeIndicatorContent).toBe('""');
+    expect(geometry.activeIndicatorHeight).toBe('2px');
+    expect(geometry.activeIndicatorBackground).not.toBe('rgba(0, 0, 0, 0)');
+
+    await page.evaluate(() => window.scrollTo(0, 700));
+    await expect(page.locator('[data-fph-root]')).toHaveAttribute('data-fph-compact', 'true');
+    const compactHeaderBottomSpace = await page.locator('[data-fph-header]').evaluate(header => {
+        const tabs = header.querySelector('.fi-page-sub-navigation-tabs');
+        if (!tabs) throw new Error('The compact header requires integrated desktop navigation.');
+
+        return header.getBoundingClientRect().bottom - tabs.getBoundingClientRect().bottom;
+    });
+    expect(Math.abs(compactHeaderBottomSpace)).toBeLessThanOrEqual(1);
+});
+
 for (const width of [390, 1440]) {
     test(`Livewire updates remeasure retained outside breadcrumbs at ${width}px`, async ({ page }) => {
         await page.setViewportSize({ width, height: 1000 });

@@ -34,6 +34,10 @@ Outside breadcrumbs normally scroll away with the page. Explicitly retaining the
 
 `subNavigation()` accepts a boolean or closure and is disabled by default. It uses the native Page/Resource navigation, including record pages returned by `getRecordSubNavigation()` and `ManageRelatedRecords`. Desktop renders Filament's sub-navigation tabs; mobile renders its sub-navigation dropdown. The package reuses cached native navigation groups/items and their filtering, URLs, labels, icons, badges, active state and SPA links.
 
+On desktop, the tabs are part of the header itself: they follow the header content with the standard `1rem` gap and use an active underline in the panel's primary color. They do not receive a second rounded container, background or dividing border. The active underline sits directly on the header's lower edge, with `1rem` of bottom padding below the labels.
+
+This edge alignment applies only while desktop navigation is visible, including when keyboard focus keeps it open in compact mode. When navigation hides, the header keeps its original compact bottom padding (`0.75rem`). Headers without sub-navigation retain their normal spacing. Mobile keeps the original dropdown layout, including the separator and `1rem` of padding above it.
+
 The native location is suppressed only while rendering a page whose actual package header has opted in. Empty schemas, custom header overrides, panels without the plugin and `subNavigation(false)` keep native rendering, including Start/End/Top positions. The header invokes the native Top and mobile-menu render hooks around the relocated components. Start/End sidebar hooks apply only when Filament renders those sidebars. Empty navigation produces no strip or border. Navigation configuration belongs to the first `Header` in the schema, like native header actions.
 
 Relation Manager tabs use a separate Filament system. They remain in the page content and keep their Livewire state. Combining them with the main content tab, or changing `ContentTabPosition::Before` / `After`, does not affect header navigation. No Relation Manager settings are required to use `subNavigation()`.
