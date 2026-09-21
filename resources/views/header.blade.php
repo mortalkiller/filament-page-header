@@ -28,7 +28,11 @@
                 <x-filament::breadcrumbs :breadcrumbs="$breadcrumbs" />
             </div>
         @endif
-        <header class="fph-header fi-section" data-fph-header>
+        <header
+            class="fph-header fi-section"
+            data-fph-header
+            @if ($subNavigation) data-fph-has-sub-navigation @endif
+        >
             @if ($breadcrumbs && $breadcrumbPosition === BreadcrumbPosition::Inside)
                 <div class="fph-breadcrumbs" data-fph-hide-compact="{{ $hideBreadcrumbsWhenCompact ? 'true' : 'false' }}">
                     <x-filament::breadcrumbs :breadcrumbs="$breadcrumbs" />

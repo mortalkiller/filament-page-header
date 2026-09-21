@@ -14,7 +14,7 @@ The PHP suite is run in CI against both supported Filament lines and Laravel com
 | `5.8.1` | 12 / Testbench 10 | Minimum supported Filament 5 release |
 | `^5.8.1` | 13 / Testbench 11 | Latest Filament 5 release Composer resolves |
 
-The Chromium CI suite runs against Filament `4.12.6` and the latest version Composer resolves for `^5.8.1`. It covers the rendered header, sticky/compact behavior, native actions, themes and responsive layouts. The matrix is part of [GitHub Actions](../.github/workflows/tests.yml), so every pull request tests the package without changing a consuming application.
+The Chromium CI suite runs against Filament `4.12.6` and the latest version Composer resolves for `^5.8.1`. It covers the rendered header, sticky/compact behavior, native actions, themes and responsive layouts. The matrix is part of [GitHub Actions](https://github.com/mortalkiller/filament-page-header/blob/2.x/.github/workflows/tests.yml), so every pull request tests the package without changing a consuming application.
 
 Do not alter the package's root requirement to test another combination locally. Use a temporary clean copy, constrain Filament and Testbench there, then run the normal suite. This keeps your working tree and lockfile untouched.
 
@@ -28,7 +28,7 @@ php workbench/artisan filament:assets
 php workbench/artisan serve --host=127.0.0.1 --port=8000
 ```
 
-Open `http://127.0.0.1:8000/demo/headers`. The workbench demonstrates twelve compositions and all three scroll modes. It is a **local testing application**, not a production application; do not expose it publicly. It does not need Pressiu's database or theme.
+Open `http://127.0.0.1:8000/demo/headers`. The workbench demonstrates twelve compositions and all three scroll modes. It is a **local testing application**, not a production application; do not expose it publicly. It is self-contained and does not require a consuming application's database, theme, or application-specific configuration.
 
 Run checks from the repository root:
 
@@ -56,7 +56,7 @@ To regenerate the matching desktop/mobile and light/dark captures:
 npm run test:browser -- tests/Browser/product-showcase.spec.mjs
 ```
 
-Inspect the output under `test-results/` before copying the selected `product-{theme}-{width}.png` and desktop `-compact.png` header images to `docs/screenshots/`. Keep generated reports, traces and other test output out of Git. See the [verification record](verification.md) for previous executed checks and their limits.
+Inspect the output under `test-results/` before copying the selected `product-{theme}-{width}.png` and desktop `-compact.png` header images to `docs/screenshots/`. Keep generated reports, traces and other test output out of Git. See the [verification record](https://github.com/mortalkiller/filament-page-header/blob/2.x/docs/verification.md) for package-level validation scope and limits.
 
 [Local development](local-development.md) · [Back to the README](https://github.com/mortalkiller/filament-page-header/blob/2.x/README.md)
 

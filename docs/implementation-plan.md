@@ -1,40 +1,67 @@
 # Header API and presentation implementation plan
 
-## Approved design
+## Design goals
 
-Replace HeaderLayout with Header. Identity uses heading(), description(), avatar() and initials(); badges, metadata and summary accept native components. The package owns the entire card, responsive layout, external breadcrumbs, square pinned top corners, right-aligned desktop actions, full-width mobile action columns, light/dark styling and compact behavior. Pressiu only declares content and plugin options. Existing labels, permissions, business closures, forms and action ordering remain authoritative. The changes are prepared as a local package commit; no release is part of this work.
+Version 2 replaces the previous `HeaderLayout` API with `Header` and keeps the package focused on presentation and Filament integration.
 
-## Execution
+A consuming application supplies content, records, native schema components, actions, and authorization. The package owns the page-header composition, responsive behavior, sticky/compact presentation, navigation placement, and package assets.
 
-- [x] Add behavioral regression coverage for the new identity API, escaping, hidden labels, responsive options and per-header overrides. Run the new tests before implementation.
-- [x] Implement Header and migrate package fixtures. Integrate native actions once in the upper row; metadata and summary share the lower strip. Retain advanced native schema composition and native/custom fallback.
-- [x] Add sticky(), compact(), normal() and compactBelow(int) defaults and per-header overrides. Compact hides description, metadata, summary and extra content by default; retainSummaryWhenCompact() opts metrics back in. Preserve focus safety, cleanup and short-viewport fallback.
-- [x] Implement responsive card CSS using Filament gray tokens in both themes. Verify right-aligned wrapping, long text, images, empty slots and one principal heading.
-- [x] Migrate only CustomerHeader and TenantPanelProvider API use in Pressiu. Publish package assets locally.
-- [x] Run isolated package PHP/JS/browser checks and focused customer integration checks. Inspect real light/dark desktop/mobile screenshots and final diff.
-- [x] Update README, current specification, local workflow and verification record. Assess existing end-user articles without adding implementation details.
+No application-specific models, database queries, service providers, infrastructure conventions, or business rules belong in the package API or documentation.
+
+## Core execution
+
+- [x] Add regression coverage for the identity API, escaping, hidden labels, responsive options, and per-header overrides.
+- [x] Implement `Header` and migrate package fixtures to the new API.
+- [x] Keep native page actions rendered once and preserve native action ordering, modals, forms, authorization, and groups.
+- [x] Add `normal()`, `sticky()`, `compact()`, and `compactBelow()` at panel and header level.
+- [x] Implement responsive light/dark presentation using Filament tokens.
+- [x] Validate desktop/mobile behavior, long content, empty slots, images, actions, and one principal heading.
+- [x] Update package README, migration guidance, specification, local-development workflow, and verification notes.
 
 ## Metadata follow-up
 
-- [x] Add optional MetadataEntry field icons with per-field Before/After positions while preserving native TextEntry rendering and behavior.
-- [x] Separate visible metadata fields on the same wrapped row without drawing leading lines or clipping native content.
-- [x] Configure customer icons through the package API and document both positions.
+- [x] Add `MetadataEntry` field icons while retaining native `TextEntry` behavior.
+- [x] Support before/after icon positions.
+- [x] Add responsive metadata separators that follow actual wrapped rows.
+- [x] Keep native visibility, formatting, links, copyable values, and actions authoritative.
 
-## Product and icon-size follow-up
+## Product-style identity follow-up
 
-- [x] Add fieldIconSize(int|Closure), validate positive pixel sizes, default to 24 px and increase icon-to-field spacing to 16 px.
-- [x] Add square image() presentation without cropping and descriptionSchema() for native copyable product codes.
-- [x] Add the shared ProductHeader to Pressiu View/Edit pages, using the main image, supplier code, status/stock badges and approved catalogue fields; preserve native actions and keep the code visible while compact.
-- [x] Update README examples, current specification and product help in all four locales.
-- [x] Verify PHP behavior, browser layout in both themes, focused product/support regressions and final screenshots.
+- [x] Add `fieldIconSize(int|Closure)` with positive pixel validation and a 24 px default.
+- [x] Add square `image()` presentation with contain fitting.
+- [x] Add `descriptionSchema()` for richer supporting content such as copyable references.
+- [x] Add fictional product fixtures to the workbench and screenshot suite.
+- [x] Validate product-style headers in light/dark and desktop/mobile layouts.
 
 ## Typed compact content
 
-- [x] Add HeaderPart and CompactHeader with whenCompact(), show() and only().
-- [x] Preserve native field visibility, action instances and focus safety; calculate dividers for expanded and compact selections.
-- [x] Migrate ProductHeader and the workbench to the typed API; document direct-field selection, defaults and legacy compatibility.
-- [x] Cover selection, hidden fields, invalid identifiers and browser expansion/compaction with unsaved input.
+- [x] Add `HeaderPart` and `CompactHeader`.
+- [x] Add `whenCompact()`, `show()`, and `only()`.
+- [x] Preserve native visibility, authorization, action instances, unsaved state, and focus behavior.
+- [x] Support field-level compact selection without duplicating components.
+- [x] Keep legacy compact methods available only for compatibility and document their replacements.
+
+## Header navigation
+
+- [x] Add configurable breadcrumb placement.
+- [x] Integrate existing native Filament page/record sub-navigation.
+- [x] Keep routing, active state, authorization, URLs, and SPA behavior native to Filament.
+- [x] Allow breadcrumbs and sub-navigation to participate in typed compact selection.
+- [x] Keep Relation Manager content tabs in their native page-content location.
 
 ## Verification contract
 
-PHP tests cover photo/initials selection, escaped names, native child component defaults, panel/header configuration isolation, recordless pages and native action behavior. JavaScript tests cover breakpoint boundaries. Browser tests exercise 360/390/768/1024/1440 widths, light/dark, expanded/compact, native actions, no horizontal overflow, no scroll-triggered requests and unchanged unsaved form state. Install only already-declared development dependencies.
+Package validation covers:
+
+- PHP behavior and public API contracts.
+- JavaScript breakpoint and measurement logic.
+- Browser rendering in supported Filament versions.
+- Desktop/mobile and light/dark layouts.
+- Sticky and compact transitions.
+- Native actions and navigation.
+- Accessibility-sensitive focus and reduced-motion behavior.
+- No horizontal overflow in supported demo compositions.
+- No scroll-triggered Livewire requests.
+- Preservation of unsaved form state across visual compaction.
+
+Consumer applications should still run their own integration suites because their models, policies, themes, actions, and business rules remain outside this package.
