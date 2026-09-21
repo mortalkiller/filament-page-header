@@ -1,11 +1,11 @@
 ---
 title: CompactHeader
-description: Select blocks and individual fields that remain visible in compact mode.
+description: Select blocks, fields and native actions that remain visible in compact mode.
 ---
 
 `CompactHeader` is configured inside `Header::whenCompact()`.
 
-Each callback starts with no optional parts selected. Add the parts you want to preserve with `show()` or select specific named fields with `only()`.
+Each callback starts with no optional parts selected. Add the parts you want to preserve with `show()` or select specific named fields with `only()`. Native actions are independent: they all remain available by default until you configure `actions()` or `hideActions()`.
 
 ## Example
 
@@ -34,8 +34,25 @@ Header::make()
 | --- | --- |
 | `show(HeaderPart ...$parts): self` | Keep one or more complete header parts visible in compact mode. |
 | `only(HeaderPart $part, array $fields): self` | Keep only the listed direct named fields from a part, and mark that part visible. |
+| `actions(array $names): self` | Keep only the named native page actions, including matching actions inside groups. |
+| `hideActions(array $names): self` | Keep all native page actions except the named actions. |
 | `isVisible(HeaderPart $part): bool` | Inspect whether a part is selected. Usually only needed by package internals or advanced extensions. |
 | `getFields(HeaderPart $part): ?array` | Read the selected fields for a part. Usually only needed by package internals or advanced extensions. |
+
+## Native action selection
+
+```php
+$compact->actions(['save', 'approve']);
+$compact->hideActions(['delete']);
+```
+
+The second call replaces the first action policy: this example keeps every action except `delete`. Names are native action identifiers, not labels. Original order, group hierarchy, visibility, authorization and disabled state are preserved.
+
+`actions([])` hides all native actions in compact mode; `hideActions([])` keeps all. Unknown names are ignored, duplicate names are normalized, and empty or non-string names throw `InvalidArgumentException`. Invalid input leaves the previous policy unchanged.
+
+Calling `show()` or `only()` does not reset action selection. A new `whenCompact()` callback replaces the entire compact configuration, including its action policy. Compact selection does not affect normal, sticky or expanded presentation.
+
+See [Native header actions](../../guides/native-actions/) for positioning, empty groups, teleported dropdowns, focus and modal behavior. This is presentation filtering, not a substitute for server-side authorization.
 
 ## Available parts
 
