@@ -4,7 +4,7 @@
 
 [![Latest version](https://img.shields.io/packagist/v/mortalkiller/filament-page-header.svg)](https://packagist.org/packages/mortalkiller/filament-page-header)
 [![Total downloads](https://img.shields.io/packagist/dt/mortalkiller/filament-page-header.svg)](https://packagist.org/packages/mortalkiller/filament-page-header)
-[![Package tests](https://github.com/mortalkiller/filament-page-header/actions/workflows/tests.yml/badge.svg?branch=2.x)](https://github.com/mortalkiller/filament-page-header/actions/workflows/tests.yml)
+[![Package tests](https://github.com/mortalkiller/filament-page-header/actions/workflows/tests.yml/badge.svg?branch=main)](https://github.com/mortalkiller/filament-page-header/actions/workflows/tests.yml)
 [![License](https://img.shields.io/packagist/l/mortalkiller/filament-page-header.svg)](LICENSE.md)
 
 [![Scanned by Plumb](https://plumbphp.dev/badges/mortalkiller/filament-page-header/scanned.svg)](https://plumbphp.dev/mortalkiller/filament-page-header)
@@ -82,7 +82,7 @@ This README documents **2.x**. Package major versions identify this package's AP
 | `^2.0` | `^4.12.6 \|\| ^5.8.1` | `^8.3` | 12 or 13 | `Header`, `MetadataEntry`, typed compact configuration |
 | `^1.0` | `^5.8.1` | `^8.3` | 12 or 13 | Previous `HeaderLayout` API |
 
-Version 2 runs its PHP suite against the minimum secure Filament 4 release (`4.12.6`), the latest release resolved by `^4.12.6`, the minimum Filament 5 release (`5.8.1`) and the latest release resolved by `^5.8.1`, across Laravel 12 and 13. The Chromium suite runs on the minimum supported release of each Filament major. Versions before `4.12.6` are outside the declared requirement; Composer specifically blocks `4.0.0` and `4.12.0`–`4.12.5` because of known security advisories. Filament `5.0`–`5.8.0` is also outside the declared requirement and has not been validated. Other Filament majors are outside these releases' requirements. PHP must also satisfy your selected Laravel version's requirements.
+Version 2 runs its PHP suite against the minimum secure Filament 4 release (`4.12.6`), the latest release resolved by `^4.12.6`, the minimum Filament 5 release (`5.8.1`) and the latest release resolved by `^5.8.1`, across Laravel 12 and 13, including PHP 8.5 on the latest dependency boundaries. The Chromium suite runs on the minimum supported Filament 4 release and the latest release resolved by `^5.8.1`. Versions before `4.12.6` are outside the declared requirement; Composer specifically blocks `4.0.0` and `4.12.0`–`4.12.5` because of known security advisories. Filament `5.0`–`5.8.0` is also outside the declared requirement and has not been validated. Other Filament majors are outside these releases' requirements. PHP must also satisfy your selected Laravel version's requirements.
 
 See the [1.x README](https://github.com/mortalkiller/filament-page-header/blob/1.x/README.md) for the previous API and the [verification record](docs/verification.md) for executed checks. Security maintenance is documented separately in the [security policy](SECURITY.md).
 
