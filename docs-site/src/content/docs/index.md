@@ -12,8 +12,8 @@ hero:
     - text: API reference
       link: /filament-page-header/api/
       variant: minimal
-    - text: View on GitHub
-      link: https://github.com/mortalkiller/filament-page-header
+    - text: Pedro Monteiro
+      link: https://pedromonteiro.dev
       icon: external
       variant: minimal
 ---

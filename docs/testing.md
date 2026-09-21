@@ -25,7 +25,7 @@ php workbench/artisan filament:assets
 php workbench/artisan serve --host=127.0.0.1 --port=8000
 ```
 
-Open `http://127.0.0.1:8000/demo/headers`. The workbench demonstrates twelve compositions and all three scroll modes. It is a **local testing application**, not a production application; do not expose it publicly. It does not need Pressiu's database or theme.
+Open `http://127.0.0.1:8000/demo/headers`. The workbench demonstrates twelve compositions and all three scroll modes. It is a **local testing application**, not a production application; do not expose it publicly. It is self-contained and does not require a consuming application's database, theme, or application-specific configuration.
 
 Run checks from the repository root:
 

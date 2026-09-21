@@ -2,30 +2,166 @@
 
 ## Boundary
 
-Independent package for Filament `^4.12.6 || ^5.8.1`, Laravel 12/13 and PHP 8.3+ (subject to framework constraints). No consumer models, tenant identifiers, queries, provider calls, fiscal logic or required icon package. All rendering, CSS, JavaScript and behavior belong here. A consuming application only configures the plugin and native schemas. Version 2 replaces HeaderLayout with Header. See migration.md for upgrading consumers from the 1.x API.
+Filament Page Header is an independent presentation package for supported Filament 4/5, Laravel 12/13, and compatible PHP versions.
 
-## Approved composition
+The package must not depend on a consuming application's models, tenant implementation, database schema, provider integrations, deployment topology, or business rules. A consuming application configures the plugin and supplies native Filament schema components, records, actions, and authorization.
 
-Breadcrumbs are a separate element above the card and outside the sticky region; they scroll with the page. The card starts with the primary row. A readable avatar, heading, description and badges form the identity on the left. Native page actions appear on the right. Actions retain their order and move to right-aligned rows if necessary. They are neither duplicated nor automatically consolidated into a new menu. A divided lower strip contains metadata and a grouped summary. Mobile wraps content without horizontal scrolling and places native actions after details in a single full-width column. Button groups retain their horizontal segments, while standalone icon-only menu triggers are centered on their own row. Forms and their tabs remain outside the header.
+Version 2 replaces the previous `HeaderLayout` API with `Header`. See [migration.md](migration.md) for the upgrade path.
 
-Header::make() inherits the page heading and description. heading(), description(), avatar(), initials() and icon() cover common identity needs. The visual fallback order is custom leading content, a resolved avatar/image, generated initials, then an icon; only one appears. initialsBgColor(), initialsTextColor(), iconBgColor() and iconColor() each accept a registered panel color alias, native palette, CSS color string where applicable, or closure. Background colors use shade 600 and the highest-contrast palette extreme for the foreground in both themes. Explicit foreground palettes and aliases use shade 600. These methods do not alter rendered avatars or images. badges(), metadata() and summary() accept native components and closures with automatic layout. leading(), headingSchema() and schema() preserve advanced composition. image() provides a square, softly rounded frame with contain fitting, sized at 96 px on desktop, 80 px below 768 px and 32 px when compact. The image/avatar and complete identity block are vertically centered; avatar() retains the circular identity presentation. descriptionSchema() accepts native copyable reference fields, which consumers may retain during compaction with whenCompact(). Native ImageEntry handles stored images and private URLs; URL avatars are escaped and restricted to web/relative schemes. Full names generate the first two initials. Direct metadata fields have a 32 px horizontal gap with a centered vertical separator, reserving 16 px on either side independently of field icons; the first field of each row has no leading separator. The browser recalculates row positions during the existing expanded-layout measurement, including resize and content changes, without clipping native menus or making requests. MetadataEntry extends native TextEntry with optional fieldIcon() and fieldIconPosition(Before/After), including closure injection. The decorative icon sits beside the full native label/value/action wrapper; null icons add no wrapper or space. fieldIconSize() accepts positive pixel integers or closures, defaults to 24 pixels and rejects invalid values. The icon/content gap is 16 pixels, with native text width preserved while wrapping. Native value icons and all formatting, links and actions remain independent. Empty regions do not leave separators. Heading/subheading HTML requires explicit opt-in.
+## Composition
+
+The header may contain:
+
+- Breadcrumbs.
+- A leading identity visual.
+- Heading and description.
+- Badges.
+- Native page actions.
+- Metadata.
+- Summary information.
+- Additional schema content.
+- Native page/record sub-navigation.
+
+Native page actions render once. The package must not duplicate, replace, or re-authorize them.
+
+On mobile, content must wrap without page-level horizontal scrolling and standalone actions must remain usable at narrow widths.
+
+## Identity
+
+`Header::make()` inherits the page heading and subheading until the consuming page overrides them.
+
+Common identity methods include:
+
+- `heading()`
+- `description()`
+- `avatar()`
+- `image()`
+- `initials()`
+- `icon()`
+- `leading()`
+- `headingSchema()`
+- `descriptionSchema()`
+
+The visual fallback order is:
+
+1. Custom `leading()` content.
+2. A resolved avatar or image.
+3. Generated initials.
+4. An icon.
+
+Only one automatic identity visual is rendered.
+
+Color methods accept supported Filament color aliases/palettes or closures. Explicit foreground configuration remains optional.
+
+`image()` is intended for product/entity imagery that should use a square contained frame rather than circular avatar cropping.
+
+## Content slots
+
+`badges()`, `metadata()`, `summary()`, and the default schema accept native Filament schema components and closures.
+
+Native component visibility, formatting, links, copyable state, authorization, and actions remain authoritative.
+
+Empty slots must not create empty visual separators.
+
+## MetadataEntry
+
+`MetadataEntry` extends native `TextEntry`.
+
+Package-specific methods:
+
+- `fieldIcon()`
+- `fieldIconPosition()`
+- `fieldIconSize()`
+
+The field icon sits beside the complete label/value wrapper. Native `TextEntry::icon()` remains independent and continues to apply to the native value rendering.
+
+Direct metadata fields may be separated visually. Separators must follow actual wrapped rows and hidden fields must not leave orphan separators.
 
 ## Configuration and lifecycle
 
-Panel and page opt-in remain required. Shared resource schema discovery, explicit mappings and inline schema precedence remain available. Missing or empty schemas fall back to native headers; a page getHeader override wins. Create/List/custom pages accept null records. Browser tab title, native actions/action groups, authorization, form targets, confirmations, hooks and unsaved state remain independent.
+Panel registration is opt-in through `PageHeaderPlugin`. Page integration is opt-in through `HasPageHeader`.
 
-normal(), sticky(), compact() select a mode; compactBelow(int) adds an exclusive viewport threshold. A component inherits panel options unless explicitly overridden. Selecting a mode clears inherited responsive overrides and compact thresholds. Component changes cannot mutate panel defaults. The first top-level Header owns the native action placement and mode override.
+Supported schema sources include:
 
-Pinned cards have square top corners and rounded bottom corners; normal flow restores the full rounding. A compact pinned card gains a subtle lower shadow that animates with the reduced spacing over 150ms to separate it from scrolling content, after its first measurement only. The root uses `wire:ignore.self`, preserving browser-owned sticky attributes and height through unrelated Livewire morphs while keeping the header's descendants live. Compact mode reduces the avatar and heading, retains badges and native actions, and hides description, metadata, summary and extra schema content. When Description is selected through whenCompact(), it renders below the heading as smaller supporting text; the responsive avatar/image and identity block remain vertically centered with the native actions. whenCompact(Closure) receives an isolated CompactHeader configuration. show(HeaderPart ...$parts) retains entire optional blocks; only(HeaderPart, list<string>) retains selected direct fields and takes precedence over show regardless of order. New callbacks replace the prior selection and start empty. HeaderPart covers Image, Description, Badges, Metadata, Summary and Content. Heading and page actions remain visible. Native field visibility remains authoritative; empty selections collapse their block. Existing hideWhenCompact/retainSummaryWhenCompact calls remain deprecated compatibility paths. Focused regions remain accessible. Automatic/manual topbar offsets, short-viewport fallback, native CSS sticky boundaries, stable expanded footprint and observer disposal remain required. No network calls or Livewire requests are generated by scrolling or resizing.
+- Inline `headerSchema()`.
+- Convention-based Resource schema discovery.
+- Explicit `schemaFor()` mappings.
 
-Measurement temporarily disables transitions while reading expanded and compact heights. After restoring the original compact state, the controller forces a layout read before removing the measurement flag. This prevents the browser from animating the temporary compact measurement back to the displayed state during initialization, content resizing and Livewire updates. Resize notifications from the card's own active CSS transitions defer measurement until those transitions settle, using their completion promises rather than a fixed timeout. Requests share one pending wait; cancelled transitions are handled, replacements are checked again, and disposed controllers schedule no further work. Scroll state remains responsive during the wait. Descendant animations do not delay measurement.
+A missing or empty package schema falls back to Filament's native header.
 
-## Themes and verification
+The header schema receives the page's current Resource record by default. `getPageHeaderRecord()` may return another model, an array, or `null` for custom contexts.
 
-The card uses the native fi-section class for its light/dark background, ring and shadow. Internal dividers use the panel gray-200 in light mode and white at 10% opacity in dark mode, matching native sections. Text and avatar colors use Filament runtime --gray-* variables, avoiding independent fallback palettes. Native semantic action/badge colors are preserved. Package assets are plain CSS/JS published with filament:assets; consumer CSS or builds are unnecessary.
+Changing the header context must not change the Resource record, persistence behavior, or authorization.
 
-PHP tests cover configuration, identity, escaping, image handling, defaults, recordless pages, native actions and hooks. JavaScript tests cover breakpoints. Browser tests cover 360/390/768/1024+ viewports, light/dark, long content, right-aligned action wrapping, compact summaries, keyboard focus, modal stacking, SPA navigation, no scroll requests and preservation of form inputs. The standalone workbench is the primary visual test application. See verification.md for actual executed results and limits.
+## Modes and responsive behavior
 
-Pressiu selects compact() at all widths so reaching the sticky edge also compacts desktop headers. This is consumer API configuration; sticky() remains the reusable full-content mode. The legacy hideBreadcrumbsWhenCompact option is retained for custom-view compatibility and does not affect the external breadcrumbs in the package view.
+The public modes are:
 
-The Pressiu product view and edit pages share ProductHeader through schema discovery. They display the catalogue primary image, name, copyable supplier code, active/stock badges, supplier, brand, family and variant count. A distinct external identifier appears only when it differs from the supplier code, and last synchronization only for imported products. The supplier code remains visible when compact. Existing action definitions, stock semantics and editing permissions remain authoritative.
+- `HeaderMode::Normal`
+- `HeaderMode::Sticky`
+- `HeaderMode::Compact`
+
+They can be selected through `normal()`, `sticky()`, `compact()`, or `mode()`.
+
+`compactBelow(int)` adds a viewport threshold. `responsive()` supports explicit minimum-width mode mappings at plugin level.
+
+A header-level mode override must not mutate panel defaults or another header instance.
+
+Sticky positioning uses the resolved page scroll context and an automatic or explicit top offset. Very short viewports or layouts where the header cannot safely remain pinned must fall back to usable scrolling behavior.
+
+## Compact content
+
+Without explicit typed selection, compact mode retains the core identity and native actions while collapsing optional supporting content.
+
+`whenCompact()` configures typed compact content using `CompactHeader` and `HeaderPart`.
+
+`show()` retains complete blocks. `only()` retains specific direct named fields where field selection is supported.
+
+Compact selection must not:
+
+- Override native visibility or authorization.
+- Duplicate actions or schema components.
+- Trigger Livewire requests while scrolling.
+- Lose unsaved input state.
+- Break keyboard focus.
+
+Legacy compact methods remain compatibility APIs and are documented as deprecated.
+
+## Breadcrumbs and sub-navigation
+
+Breadcrumb placement is configured with `BreadcrumbPosition::Outside`, `Inside`, or `Hidden`.
+
+`subNavigation()` integrates existing native Filament Page/Resource sub-navigation into the header. It does not create routes or navigation state.
+
+Filament remains responsible for URLs, authorization, active state, generated navigation items, and SPA transitions.
+
+Relation Manager content tabs remain in the page content and are not moved by `subNavigation()`.
+
+## Assets and themes
+
+The package owns its CSS and browser behavior and does not require a consuming application to rebuild a Tailwind theme.
+
+Published Filament assets must be refreshed after package asset changes.
+
+The package follows Filament light/dark tokens and preserves semantic colors from native entries and actions.
+
+Reduced-motion preferences must be respected.
+
+## Generator
+
+The Artisan generator may:
+
+- Create the conventional reusable Resource header schema.
+- Add `HasPageHeader` to selected standard Resource pages.
+- Support explicit panel selection.
+- Support non-interactive page selection.
+- Avoid duplicate imports/traits on repeated runs.
+- Leave existing application methods and actions intact.
+
+The generator must not guess application-specific fields or business rules.
+
+## Compatibility
+
+Package major versions describe this package's API and do not map directly to Filament major versions.
+
+The declared Composer constraints and CI matrix define supported framework combinations. Compatibility claims should be based on package tests and CI rather than on one external application.

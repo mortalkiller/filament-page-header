@@ -96,6 +96,11 @@ export default defineConfig({
           label: 'GitHub',
           href: repositoryUrl,
         },
+        {
+          icon: 'external',
+          label: 'Pedro Monteiro',
+          href: 'https://pedromonteiro.dev',
+        },
       ],
       editLink: {
         baseUrl: `${repositoryUrl}/edit/2.x/docs-site/src/content/docs/`,
