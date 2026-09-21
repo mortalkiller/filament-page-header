@@ -11,7 +11,11 @@ export default defineConfig({
     starlight({
       title: 'Filament Page Header',
       description: 'Responsive, native-first page headers for Filament 4 and 5.',
-      favicon: '/filament-page-header/favicon.svg',
+      favicon: '/filament-page-header/favicon.png',
+      logo: {
+        src: './src/assets/PM-02.png',
+        alt: 'Pedro Monteiro',
+      },
       social: [
         {
           icon: 'github',
@@ -37,6 +41,20 @@ export default defineConfig({
             'guides/configuration',
             'guides/generator',
             'guides/migration',
+          ],
+        },
+        {
+          label: 'API Reference',
+          items: [
+            'api',
+            'api/page-header-plugin',
+            'api/header',
+            'api/metadata-entry',
+            'api/heading-subheading',
+            'api/compact-header',
+            'api/has-page-header',
+            'api/header-options',
+            'api/enums',
           ],
         },
         {
