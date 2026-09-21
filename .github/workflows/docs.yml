@@ -83,12 +83,14 @@ jobs:
         env:
           DOCS_HOST: ${{ secrets.DOCS_HOST }}
           DOCS_USER: ${{ secrets.DOCS_USER }}
+          DOCS_PORT: ${{ vars.DOCS_PORT || '22' }}
           DOCS_REMOTE_PATH: ${{ vars.DOCS_REMOTE_PATH }}
         run: |
           test -n "$DOCS_HOST"
           test -n "$DOCS_USER"
+          test -n "$DOCS_PORT"
           test -n "$DOCS_REMOTE_PATH"
           rsync -az --delete \
-            -e "ssh -i ~/.ssh/id_ed25519" \
+            -e "ssh -p $DOCS_PORT -i ~/.ssh/id_ed25519" \
             docs-site/dist/ \
             "$DOCS_USER@$DOCS_HOST:$DOCS_REMOTE_PATH/"
