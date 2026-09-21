@@ -15,6 +15,50 @@ final class CompactHeader
     /** @var array<string, list<string>> */
     private array $fields = [];
 
+    /** @var list<string>|null */
+    private ?array $actionNames = null;
+
+    private bool $excludesActions = false;
+
+    /** @param list<string> $names */
+    public function actions(array $names): self
+    {
+        return $this->selectActions($names, exclude: false);
+    }
+
+    /** @param list<string> $names */
+    public function hideActions(array $names): self
+    {
+        return $this->selectActions($names, exclude: true);
+    }
+
+    /** @internal This is an additional presentation filter, never an authorization decision. */
+    public function isActionVisible(string $name): bool
+    {
+        if ($this->actionNames === null) {
+            return true;
+        }
+
+        $isSelected = in_array($name, $this->actionNames, true);
+
+        return $this->excludesActions ? ! $isSelected : $isSelected;
+    }
+
+    /** @param list<string> $names */
+    private function selectActions(array $names, bool $exclude): self
+    {
+        foreach ($names as $name) {
+            if (! is_string($name) || trim($name) === '') {
+                throw new InvalidArgumentException('Compact action names must be non-empty strings. Use native action names, not labels.');
+            }
+        }
+
+        $this->actionNames = array_values(array_unique($names));
+        $this->excludesActions = $exclude;
+
+        return $this;
+    }
+
     public function show(HeaderPart ...$parts): self
     {
         foreach ($parts as $part) {
