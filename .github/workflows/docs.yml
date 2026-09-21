@@ -29,7 +29,7 @@ concurrency:
 
 jobs:
   docs:
-    uses: mortalkiller/filament-package-template/.github/workflows/reusable-docs.yml@1.x
+    uses: mortalkiller/filament-package-template/.github/workflows/reusable-docs.yml@90c3c6765c2fd918755497803dfc9b8a0302e7df
     with:
       artifact-name: filament-page-header-docs
       deploy: ${{ (github.event_name == 'push' || github.event_name == 'workflow_dispatch') && github.ref == 'refs/heads/main' && vars.DOCS_DEPLOY_ENABLED == 'true' }}
