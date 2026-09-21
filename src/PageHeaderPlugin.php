@@ -59,6 +59,13 @@ final class PageHeaderPlugin implements Plugin
 
     public function register(Panel $panel): void
     {
+        if ($panel->hasPlugin(self::ID)) {
+            // Panel::plugin() runs register() before adding the plugin to its
+            // map, so reaching this branch means another instance is already
+            // registered for this panel and the render hook is already in place.
+            return;
+        }
+
         $panel->renderHook(
             PanelsRenderHook::STYLES_AFTER,
             fn (): View|string => Filament::getCurrentPanel() === $panel

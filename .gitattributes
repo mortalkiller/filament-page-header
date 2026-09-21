@@ -4,8 +4,13 @@
 /tests export-ignore
 /workbench export-ignore
 /bin export-ignore
+/docs-site export-ignore
+/docs/superpowers export-ignore
+/docs/verification.md export-ignore
 /phpunit.xml.dist export-ignore
 /playwright.config.mjs export-ignore
 /testbench.yaml export-ignore
 /package.json export-ignore
+/pint.json export-ignore
+/composer.lock export-ignore
 /CONTRIBUTING.md export-ignore
