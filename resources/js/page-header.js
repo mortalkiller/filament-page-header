@@ -1,3 +1,6 @@
+// Keep the helper on the same package version as the entry asset.
+const { HeaderActionsController } = await import(`./header-actions.js${new URL(import.meta.url).search}`);
+
 const modes = new Set(['normal', 'sticky', 'compact']);
 const controllers = new WeakMap();
 
@@ -50,6 +53,7 @@ export class HeaderController {
         if (!this.header || this.destroyed) return;
         controllers.get(this.root)?.destroy();
         controllers.set(this.root, this);
+        this.actions = new HeaderActionsController(this.root, () => this.schedule(true));
         this.scrollParent = scrollContainer(this.root, this.window);
         this.listen(this.scrollParent, 'scroll', () => this.schedule(), { passive: true });
         if (this.scrollParent !== this.window) this.listen(this.window, 'scroll', () => this.schedule(), { passive: true });
@@ -125,14 +129,18 @@ export class HeaderController {
 
     measure() {
         const compact = this.root.dataset.fphCompact;
+        this.actions?.refresh();
         this.root.dataset.fphMeasuring = 'true';
         this.root.dataset.fphCompact = 'false';
+        this.actions?.apply(false);
         this.updateMetadataDividers();
         this.expandedHeight = Math.ceil(this.surface.getBoundingClientRect().height);
         this.root.dataset.fphCompact = 'true';
+        this.actions?.apply(true);
         this.updateMetadataDividers(true);
         this.compactHeight = Math.ceil(this.surface.getBoundingClientRect().height);
         this.root.dataset.fphCompact = compact ?? 'false';
+        this.actions?.apply(compact === 'true');
         // Commit the restored layout while transitions are still disabled.
         this.header.getBoundingClientRect();
         delete this.root.dataset.fphMeasuring;
@@ -177,6 +185,7 @@ export class HeaderController {
         const stuck = shouldStick(this.root.getBoundingClientRect().top, boundaryTop + offset, scrollTop, mode);
         this.root.dataset.fphStuck = String(stuck);
         this.root.dataset.fphCompact = String(stuck && mode === 'compact');
+        this.actions?.apply(stuck && mode === 'compact', true);
         this.root.dataset.fphReady = 'true';
     }
 
@@ -197,6 +206,7 @@ export class HeaderController {
         if (this.destroyed) return;
         this.destroyed = true;
         if (this.frame !== null) this.window.cancelAnimationFrame(this.frame);
+        this.actions?.destroy();
         this.resizeObserver?.disconnect();
         this.mutationObserver?.disconnect();
         this.optionsObserver?.disconnect();
