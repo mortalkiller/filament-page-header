@@ -25,6 +25,7 @@ Full documentation, guides and API reference:
 
 - [Getting started](https://docs.pedromonteiro.dev/filament-page-header/getting-started/installation/)
 - [Configuration guide](https://docs.pedromonteiro.dev/filament-page-header/guides/configuration/)
+- [Native action control](docs/native-actions.md)
 - [API reference](https://docs.pedromonteiro.dev/filament-page-header/api/)
 
 ## Contents
@@ -37,6 +38,7 @@ Full documentation, guides and API reference:
 - [Generator](#generator)
 - [Your first header](#your-first-header)
 - [Configuration](#configuration)
+- [Native page actions](#native-page-actions)
 - [Header navigation](#header-navigation)
 - [Sticky and compact modes](#sticky-and-compact-modes)
 - [Migration from v1](#migration-from-v1)
@@ -53,10 +55,10 @@ Full documentation, guides and API reference:
 - Headings, descriptions, badges, avatars, initials and product images.
 - Native schema fields for metadata and summary metrics, with responsive separators.
 - Field icons before or after the complete label/value, with configurable size.
-- Native page actions aligned right on desktop and after the details on mobile.
+- Native page actions with Start, End and Below positions and a full-width mobile layout.
 - Breadcrumb positioning and optional native page/record sub-navigation inside the header.
 - Normal, sticky and compact layouts, with configurable responsive thresholds.
-- Typed compact configuration: keep entire blocks or select individual fields.
+- Typed compact configuration: keep entire blocks, select fields, or include/exclude native actions by name.
 - Native light/dark colors, keyboard focus handling and reduced-motion support.
 - Shared resource schemas, with individual page overrides.
 - Artisan generator for conventional header schemas and Resource page setup.
@@ -180,13 +182,14 @@ Use native Filament entries for content and keep business logic in your applicat
 | --- | --- | --- |
 | Identity | `heading()`, `description()`, `avatar()`, `image()`, `initials()`, `icon()`, `initialsBgColor()`, `initialsTextColor()`, `iconBgColor()`, `iconColor()` | [Images and icons](docs/configuration.md#images-and-icons) |
 | Badges and details | `badges()`, `metadata()`, `summary()` | [Layout slots](docs/configuration.md#layout-slots) |
+| Native actions | `actionsPosition()`, compact `actions()` / `hideActions()` | [Native action control](docs/native-actions.md) |
 | Field icons | `fieldIcon()`, `fieldIconPosition()`, `fieldIconSize()` | [Metadata fields](docs/configuration.md#metadata-separators-and-field-icons) |
 | Product identity | `image()` and `descriptionSchema()` | [Product example](docs/configuration.md#product-header-example) |
 | Reusable resource headers | Convention discovery or `schemaFor()` | [Shared configuration](docs/configuration.md#share-configuration-across-a-resource) |
 | Record/context | `getPageHeaderRecord()` | [Custom record contexts](docs/configuration.md#record-and-context-resolution) |
 | Custom composition | `headingSchema()`, `leading()`, `schema()` | [Layout slots](docs/configuration.md#layout-slots) |
 
-Native `getHeaderActions()` continues to define the page actions. They render once, right-aligned on desktop and after the details on mobile. Native button groups, modals, form targets and authorization remain in place. Breadcrumbs sit outside the card and scroll with the page by default. [Configure their position and native sub-navigation](#header-navigation) when needed.
+Native `getHeaderActions()` continues to define the page actions. They render once, at the logical end on desktop by default and after the details on mobile. Native button groups, modals, form targets and authorization remain in place. Breadcrumbs sit outside the card and scroll with the page by default. [Configure their position and native sub-navigation](#header-navigation) when needed.
 
 Color an initials fallback with a panel color alias or a native Filament palette. The text color is chosen for contrast unless you override it:
 
@@ -212,6 +215,28 @@ Header::make()
 See [Images and icons](docs/configuration.md#images-and-icons) for imports, closures and fallback behavior.
 
 For a resilient identity, configure image, initials and an icon together. The header renders one visual in this order: custom `leading()` content, a resolved avatar/image, initials, then `icon()`.
+
+## Native page actions
+
+Position the action block and choose which native action names remain in compact mode:
+
+```php
+use MortalKiller\FilamentPageHeader\CompactHeader;
+use MortalKiller\FilamentPageHeader\Components\Header;
+use MortalKiller\FilamentPageHeader\Enums\HeaderActionsPosition;
+
+Header::make()
+    ->actionsPosition(HeaderActionsPosition::Below)
+    ->compact()
+    ->whenCompact(fn (CompactHeader $compact) => $compact
+        ->actions(['save', 'approve']));
+```
+
+The example assumes those actions already exist in the page's `getHeaderActions()`. Positions are `Start`, `End` (default), and `Below`. Mobile keeps the existing full-width action area.
+
+Use `hideActions(['delete', 'duplicate'])` instead for exclusion. The last selection call wins. `actions([])` hides all native actions in compact mode, while `hideActions([])` keeps all. Without action configuration, existing headers retain every action allowed by Filament.
+
+Selection preserves native order and nested groups, removes empty compact groups, and keeps render hooks and active interactions intact. It does not replace server-side authorization or filter normal/sticky presentation. [Read the complete action guide](docs/native-actions.md), including teleported dropdowns, forms and focus handling.
 
 ## Header navigation
 
@@ -273,7 +298,7 @@ Header::make()
         ->only(HeaderPart::Metadata, ['reference']));
 ```
 
-Use this on a header whose metadata includes `reference`. Each `whenCompact()` callback starts with no optional blocks selected. The heading and native page actions always remain; field visibility and authorization still apply. Scrolling does not duplicate actions or send Livewire requests.
+Use this on a header whose metadata includes `reference`. Each `whenCompact()` callback starts with no optional blocks selected. The heading always remains; native page actions remain unless you configure `actions()` or `hideActions()`. Native visibility and authorization still apply. Scrolling does not duplicate actions or send Livewire requests.
 
 [Full compact configuration, offsets and responsive rules](docs/configuration.md#sticky-and-compact-modes).
 
@@ -292,6 +317,7 @@ Follow the [migration guide](docs/migration.md), including the deprecated compac
 | The header does not stick | Enable `sticky()` or `compact()`. Check the real scroll container, short parent wrappers and ancestor overflow. Pinning is temporarily disabled when the header cannot fit the viewport. |
 | `whenCompact()` has no visible effect | Enable `compact()` on the header or plugin, then scroll to the sticky edge. The callback selects content; it does not activate compaction. |
 | A selected compact field disappears | Match its entry name or layout key, and check native visibility conditions. Selection covers direct fields, not nested descendants. |
+| A selected compact action is missing | Use its native action name, not its label. Check native visibility and authorization; selection never overrides them. |
 
 [Advanced layout and offset configuration](docs/configuration.md#offset-and-compact-content).
 
@@ -311,7 +337,7 @@ See [GitHub Releases](https://github.com/mortalkiller/filament-page-header/relea
 
 ## Roadmap
 
-See the [project roadmap](docs/roadmap.md) for planned action-control improvements, along with the package's scope and design principles.
+See the [project roadmap](docs/roadmap.md) for planned improvements, along with the package's scope and design principles.
 
 ## Security
 
