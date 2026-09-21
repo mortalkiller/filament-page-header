@@ -75,8 +75,10 @@ class ActionControlPage extends HeaderGallery
             ...$actions,
             ActionGroup::make([
                 Action::make('approve')->label('Approve')->visible(fn () => $this->status !== 'Approved')
-                    ->requiresConfirmation()->action(fn () => $this->status = 'Approved'),
-                Action::make('duplicate')->label('Duplicate')->action(fn () => $this->status = 'Duplicated'),
+                    ->requiresConfirmation()->modalSubmitActionLabel('Approve order')->action(fn () => $this->status = 'Approved'),
+                ActionGroup::make([
+                    Action::make('duplicate')->label('Duplicate')->action(fn () => $this->status = 'Duplicated'),
+                ])->dropdown(false),
                 ActionGroup::make([
                     Action::make('archive')->label('Archive')->action(fn () => $this->status = 'Archived'),
                 ])->label('Nested')->dropdownTeleport($this->teleport),
@@ -91,7 +93,7 @@ class ActionControlPage extends HeaderGallery
                 Action::make('ungrouped')->label('Ungrouped')->action(fn () => $this->status = 'Ungrouped'),
             ])->dropdown(false),
             Action::make('form')->label('Edit reason')->schema([TextInput::make('reason')->required()])
-                ->action(fn (array $data) => $this->status = $data['reason']),
+                ->modalSubmitActionLabel('Apply reason')->action(fn (array $data) => $this->status = $data['reason']),
             Action::make('disabled')->label('Disabled')->disabled(),
             Action::make('hidden')->label('Hidden action')->hidden(),
             Action::make('denied')->label('Denied action')->authorize(false),
