@@ -311,7 +311,7 @@ See [GitHub Releases](https://github.com/mortalkiller/filament-page-header/relea
 
 ## Roadmap
 
-See the [project roadmap](docs/roadmap.md) for planned developer-experience, navigation, and action-control improvements, along with the package's scope and design principles.
+See the [project roadmap](docs/roadmap.md) for planned action-control improvements, along with the package's scope and design principles.
 
 ## Security
 
