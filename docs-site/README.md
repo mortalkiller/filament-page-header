@@ -64,14 +64,14 @@ For the current OVH server:
 ```text
 DOCS_HOST=51.210.254.250
 DOCS_USER=github-docs
-DOCS_PORT=1096
+DOCS_PORT=1906
 DOCS_REMOTE_PATH=/opt/webserver/docs.pedromonteiro.dev/filament-page-header
 ```
 
 The `DOCS_SSH_KNOWN_HOSTS` value must be generated for the configured SSH port, for example:
 
 ```bash
-ssh-keyscan -p 1096 -t ed25519 51.210.254.250
+ssh-keyscan -p 1906 -t ed25519 51.210.254.250
 ```
 
 After a successful build on `2.x`, the deploy job downloads the exact build artifact and syncs it to the host directory using rsync over SSH.
