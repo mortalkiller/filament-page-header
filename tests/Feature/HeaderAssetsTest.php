@@ -60,3 +60,20 @@ it('keeps Alpine behavior without deferring the header stylesheet to Alpine', fu
         ->and($root->getAttribute('x-load-src'))->toContain('/components/page-header.js')
         ->and($root->getAttribute('x-data'))->toStartWith('pageHeader(');
 });
+
+it('registers the styles hook once when the plugin is registered twice on a panel', function (): void {
+    $panel = Panel::make()
+        ->id('duplicate')
+        ->path('duplicate')
+        ->plugin(PageHeaderPlugin::make())
+        ->plugin(PageHeaderPlugin::make()->sticky());
+
+    Filament::setCurrentPanel($panel);
+    $panel->boot();
+
+    $plugin = $panel->getPlugin(PageHeaderPlugin::ID);
+
+    expect(headerAssetDocument()->query('//head/link[contains(@href, "page-header.css")]')->length)->toBe(1)
+        ->and($plugin)->toBeInstanceOf(PageHeaderPlugin::class)
+        ->and($plugin->getOptions()->toArray()['mode'])->toBe('sticky');
+});
