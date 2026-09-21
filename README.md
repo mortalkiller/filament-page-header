@@ -4,7 +4,7 @@
 
 [![Latest version](https://img.shields.io/packagist/v/mortalkiller/filament-page-header.svg)](https://packagist.org/packages/mortalkiller/filament-page-header)
 [![Total downloads](https://img.shields.io/packagist/dt/mortalkiller/filament-page-header.svg)](https://packagist.org/packages/mortalkiller/filament-page-header)
-[![Package tests](https://github.com/mortalkiller/filament-page-header/actions/workflows/tests.yml/badge.svg?branch=main)](https://github.com/mortalkiller/filament-page-header/actions/workflows/tests.yml)
+[![Package tests](https://github.com/mortalkiller/filament-page-header/actions/workflows/tests.yml/badge.svg?branch=2.x)](https://github.com/mortalkiller/filament-page-header/actions/workflows/tests.yml)
 [![License](https://img.shields.io/packagist/l/mortalkiller/filament-page-header.svg)](LICENSE.md)
 
 [![Scanned by Plumb](https://plumbphp.dev/badges/mortalkiller/filament-page-header/scanned.svg)](https://plumbphp.dev/mortalkiller/filament-page-header)
@@ -53,7 +53,7 @@ Full documentation, guides and API reference:
 - Headings, descriptions, badges, avatars, initials and product images.
 - Native schema fields for metadata and summary metrics, with responsive separators.
 - Field icons before or after the complete label/value, with configurable size.
-- Native page actions aligned right on desktop and stacked at full width on mobile.
+- Native page actions aligned right on desktop and after the details on mobile.
 - Breadcrumb positioning and optional native page/record sub-navigation inside the header.
 - Normal, sticky and compact layouts, with configurable responsive thresholds.
 - Typed compact configuration: keep entire blocks or select individual fields.
