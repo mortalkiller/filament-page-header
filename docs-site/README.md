@@ -40,7 +40,9 @@ Automatic deployment is disabled until the repository variable below is set:
 DOCS_DEPLOY_ENABLED=true
 ```
 
-Configure these repository secrets:
+The deploy job uses the `docs-production` GitHub environment. Prefer environment-scoped secrets for production credentials, although repository secrets with the same names also work.
+
+Configure these secrets:
 
 ```text
 DOCS_HOST
@@ -49,18 +51,33 @@ DOCS_SSH_PRIVATE_KEY
 DOCS_SSH_KNOWN_HOSTS
 ```
 
-Configure this repository variable:
+Configure these variables:
 
 ```text
+DOCS_DEPLOY_ENABLED
+DOCS_PORT
 DOCS_REMOTE_PATH
 ```
 
-For the intended server layout, use:
+For the current OVH server:
+
+```text
+DOCS_HOST=51.210.254.250
+DOCS_USER=github-docs
+DOCS_PORT=1096
+DOCS_REMOTE_PATH=/opt/webserver/docs.pedromonteiro.dev/filament-page-header
+```
+
+The `DOCS_SSH_KNOWN_HOSTS` value must be generated for the configured SSH port, for example:
+
+```bash
+ssh-keyscan -p 1096 -t ed25519 51.210.254.250
+```
+
+After a successful build on `2.x`, the deploy job downloads the exact build artifact and syncs it to the host directory using rsync over SSH.
+
+The Nginx container mounts `/opt/webserver` from the host at `/var/www`, so the host deployment directory is visible inside Nginx as:
 
 ```text
 /var/www/docs.pedromonteiro.dev/filament-page-header
 ```
-
-After a successful build on `2.x`, the deploy job downloads the exact build artifact and syncs it to the configured directory using rsync over SSH.
-
-The Nginx virtual host should serve `/var/www/docs.pedromonteiro.dev` as its root and route `/filament-page-header/` to the corresponding static directory.
