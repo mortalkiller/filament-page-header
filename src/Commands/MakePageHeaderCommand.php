@@ -86,7 +86,7 @@ final class MakePageHeaderCommand extends Command
 
         $panelOption = $this->option('panel');
 
-        if (filled($panelOption) && (Filament::getPanel((string) $panelOption, isStrict: false) === null)) {
+        if (filled($panelOption) && ! array_key_exists((string) $panelOption, $panels)) {
             throw new RuntimeException("Filament panel [{$panelOption}] was not found.");
         }
 

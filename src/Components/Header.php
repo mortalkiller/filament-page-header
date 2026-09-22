@@ -7,6 +7,7 @@ namespace MortalKiller\FilamentPageHeader\Components;
 use BackedEnum;
 use Closure;
 use Filament\Actions\Action;
+use Filament\Actions\ActionGroup;
 use Filament\Infolists\Components\Entry;
 use Filament\Infolists\Components\ImageEntry;
 use Filament\Pages\Page;
@@ -66,6 +67,7 @@ class Header extends Component
     /** @var list<string> */
     protected array $compactHiddenSlots = ['description', 'metadata', 'summary', 'default', 'breadcrumbs', 'subNavigation'];
 
+    /** @param array<Component|Action|ActionGroup|string|Htmlable>|Closure $schema */
     public static function make(array|Closure $schema = []): static
     {
         $component = app(static::class);
@@ -379,31 +381,37 @@ class Header extends Component
         return $this->childComponents([Subheading::make('page_subheading')->state($state)->html($html)], 'description');
     }
 
+    /** @param array<Component|Action|ActionGroup|string|Htmlable>|Closure $components */
     public function descriptionSchema(array|Closure $components): static
     {
         return $this->childComponents($components, 'description');
     }
 
+    /** @param array<Component|Action|ActionGroup|string|Htmlable>|Closure $components */
     public function headingSchema(array|Closure $components): static
     {
         return $this->childComponents($components, 'heading');
     }
 
+    /** @param array<Component|Action|ActionGroup|string|Htmlable>|Closure $components */
     public function badges(array|Closure $components): static
     {
         return $this->childComponents($components, 'badges');
     }
 
+    /** @param array<Component|Action|ActionGroup|string|Htmlable>|Closure $components */
     public function leading(array|Closure $components): static
     {
         return $this->childComponents($components, 'leading');
     }
 
+    /** @param array<Component|Action|ActionGroup|string|Htmlable>|Closure $components */
     public function metadata(array|Closure $components): static
     {
         return $this->childComponents($components, 'metadata');
     }
 
+    /** @param array<Component|Action|ActionGroup|string|Htmlable>|Closure $components */
     public function summary(array|Closure $components): static
     {
         return $this->childComponents($components, 'summary');
