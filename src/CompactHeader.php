@@ -47,7 +47,10 @@ final class CompactHeader
     /** @param list<string> $names */
     private function selectActions(array $names, bool $exclude): self
     {
-        foreach ($names as $name) {
+        /** @var list<mixed> $namesToValidate */
+        $namesToValidate = $names;
+
+        foreach ($namesToValidate as $name) {
             if (! is_string($name) || trim($name) === '') {
                 throw new InvalidArgumentException('Compact action names must be non-empty strings. Use native action names, not labels.');
             }
@@ -79,7 +82,10 @@ final class CompactHeader
             throw new InvalidArgumentException('Native navigation does not support field selection. Use show() instead.');
         }
 
-        foreach ($fields as $field) {
+        /** @var list<mixed> $fieldsToValidate */
+        $fieldsToValidate = $fields;
+
+        foreach ($fieldsToValidate as $field) {
             if (! is_string($field) || trim($field) === '') {
                 throw new InvalidArgumentException('Compact field names must be non-empty strings.');
             }

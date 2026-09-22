@@ -26,7 +26,10 @@ final readonly class HeaderOptions
             throw new InvalidArgumentException('The compact breakpoint must be positive.');
         }
 
-        foreach ($breakpoints as $width => $mode) {
+        /** @var array<array-key, mixed> $breakpointsToValidate */
+        $breakpointsToValidate = $breakpoints;
+
+        foreach ($breakpointsToValidate as $width => $mode) {
             if (! is_int($width) || $width < 0 || ! $mode instanceof HeaderMode) {
                 throw new InvalidArgumentException('Responsive modes must map non-negative integer widths to HeaderMode cases.');
             }

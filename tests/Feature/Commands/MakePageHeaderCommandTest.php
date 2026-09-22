@@ -200,6 +200,19 @@ it('generates a conventional header schema and enables selected resource pages',
     }
 });
 
+it('accepts normalized panel identifiers consistently with Filament', function (): void {
+    $fixture = makeGeneratorFixture(['list']);
+    $normalizedPanel = strtoupper(str_replace('-', '_', $fixture['panel']));
+
+    $this->artisan('make:filament-page-header', [
+        'resource' => 'OrderResource',
+        '--panel' => $normalizedPanel,
+        '--no-pages' => true,
+    ])->assertSuccessful();
+
+    expect($fixture['resourceDirectory'].'/Schemas/OrderHeader.php')->toBeFile();
+});
+
 it('protects an existing schema unless force is explicitly requested', function (): void {
     $fixture = makeGeneratorFixture();
 
