@@ -15,6 +15,7 @@ use Filament\Schemas\Components\Component;
 use Filament\Schemas\Schema;
 use Filament\Support\Colors\Color;
 use Filament\Support\Facades\FilamentColor;
+use Illuminate\Contracts\Support\Htmlable;
 use InvalidArgumentException;
 use MortalKiller\FilamentPageHeader\CompactHeader;
 use MortalKiller\FilamentPageHeader\Concerns\HasHeaderActions;

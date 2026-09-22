@@ -5,7 +5,6 @@ parameters:
     level: 6
     paths:
         - src
-    scanFiles:
         - tests/Fixtures/Pages/ExamplePage.php
     tmpDir: build/phpstan
     checkOctaneCompatibility: true
