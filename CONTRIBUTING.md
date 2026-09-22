@@ -20,6 +20,16 @@ Read [Development and release flow](docs/development-flow.md). Permanent branche
 
 Use English for code, comments and test descriptions. Keep public API changes explicit and include migration guidance for breaking changes. Avoid unrelated formatting and refactoring.
 
+## Agent skill
+
+The repository includes `laravel/boost` and `mortalkiller/filament-package-standard` as development dependencies. After `composer install` or after updating either package, synchronize the canonical maintainer skill with:
+
+```bash
+vendor/bin/testbench boost:update
+```
+
+Laravel Boost discovers `developing-filament-packages` from the direct `mortalkiller/filament-package-standard` dependency.
+
 ## Checks
 
 ```bash
