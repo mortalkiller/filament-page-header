@@ -10,6 +10,7 @@ use Filament\Http\Middleware\DispatchServingFilamentEvent;
 use Filament\Panel;
 use Filament\PanelProvider;
 use Filament\Support\Colors\Color;
+use Filament\View\PanelsRenderHook;
 use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
 use Illuminate\Cookie\Middleware\EncryptCookies;
 use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
@@ -18,6 +19,7 @@ use Illuminate\Session\Middleware\StartSession;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
 use MortalKiller\FilamentPageHeader\PageHeaderPlugin;
 use Workbench\App\Http\Middleware\LocalDemoUser;
+use Workbench\App\Pages\ActionControlPage;
 use Workbench\App\Pages\HeaderGallery;
 use Workbench\App\Pages\NativePage;
 use Workbench\App\Pages\NavigationDetails;
@@ -31,7 +33,12 @@ final class DemoPanelProvider extends PanelProvider
             ->spa()->sidebarCollapsibleOnDesktop()->userMenu(false)->font('sans-serif', provider: LocalFontProvider::class)
             ->colors(['primary' => Color::Indigo])
             ->plugin(PageHeaderPlugin::make())
-            ->pages([HeaderGallery::class, NativePage::class, NavigationOverview::class, NavigationDetails::class])
+            ->pages([HeaderGallery::class, NativePage::class, NavigationOverview::class, NavigationDetails::class, ActionControlPage::class])
+            ->renderHook(
+                PanelsRenderHook::PAGE_HEADER_ACTIONS_BEFORE,
+                static fn (): string => request()->boolean('action_hooks') ? '<span data-action-test-hook>Action hook</span>' : '',
+                ActionControlPage::class,
+            )
             ->middleware([
                 EncryptCookies::class,
                 AddQueuedCookiesToResponse::class,

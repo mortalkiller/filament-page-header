@@ -16,6 +16,7 @@ use MortalKiller\FilamentPageHeader\CompactHeader;
 use MortalKiller\FilamentPageHeader\Components\Header;
 use MortalKiller\FilamentPageHeader\Components\MetadataEntry;
 use MortalKiller\FilamentPageHeader\Enums\BreadcrumbPosition;
+use MortalKiller\FilamentPageHeader\Enums\HeaderActionsPosition;
 use MortalKiller\FilamentPageHeader\Enums\HeaderPart;
 
 Header::make()
@@ -33,6 +34,7 @@ Header::make()
         MetadataEntry::make('created_at')
             ->dateTime(),
     ])
+    ->actionsPosition(HeaderActionsPosition::End)
     ->breadcrumbs(BreadcrumbPosition::Inside)
     ->subNavigation()
     ->compact()
@@ -115,6 +117,24 @@ Using `ImageEntry` preserves Filament's storage, disk, visibility, and temporary
 
 All slots accept native Filament components. Keep persistence and expensive application work outside rendering closures.
 
+## Native page actions
+
+| Method | Default | Description |
+| --- | --- | --- |
+| `actionsPosition(HeaderActionsPosition\|Closure $position): static` | `End` | Position the native action block before the main row (`Start`), after it (`End`), or below the header content (`Below`). |
+
+Declare actions in the page's native `getHeaderActions()`. Logical positions respect RTL; mobile keeps the existing full-width area after the details. Positioning never changes the order of actions within the block.
+
+```php
+Header::make()
+    ->actionsPosition(HeaderActionsPosition::Below)
+    ->compact()
+    ->whenCompact(fn (CompactHeader $compact) => $compact
+        ->actions(['save', 'approve']));
+```
+
+The example assumes the page already declares native actions named `save` and `approve`. Use `hideActions()` for exclusion instead of inclusion. See [Native header actions](../../guides/native-actions/) and [CompactHeader](../compact-header/) for group handling, selection precedence and interaction guarantees.
+
 ## Breadcrumbs
 
 ```php
@@ -172,7 +192,7 @@ Header::make()
 
 `whenCompact(Closure $configure)` configures exactly which optional blocks remain visible. See [CompactHeader](../compact-header/) for the complete selection rules.
 
-The heading and native page actions remain available in compact mode.
+The heading always remains available. Native page actions remain available by default unless an action selection is configured. Native authorization, visibility and disabled state still apply.
 
 ## Deprecated compatibility methods
 

@@ -21,9 +21,11 @@ final class PageHeaderServiceProvider extends ServiceProvider
         }
 
         FilamentAsset::register([
-            // The plugin emits this stylesheet in the initial head, after the panel theme.
+            // The plugin emits these stylesheets in the initial head, after the panel theme.
             Css::make('page-header', __DIR__.'/../resources/css/page-header.css')->loadedOnRequest(),
+            Css::make('header-actions', __DIR__.'/../resources/css/header-actions.css')->loadedOnRequest(),
             AlpineComponent::make('page-header', __DIR__.'/../resources/js/page-header.js'),
+            AlpineComponent::make('header-actions', __DIR__.'/../resources/js/header-actions.js'),
         ], package: PageHeaderPlugin::PACKAGE);
     }
 }

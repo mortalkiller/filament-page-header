@@ -1,6 +1,6 @@
 ---
 title: Enums
-description: HeaderMode, HeaderPart, and BreadcrumbPosition enum cases.
+description: HeaderMode, HeaderActionsPosition, HeaderPart, and BreadcrumbPosition enum cases.
 ---
 
 The package uses enums for configuration where a fixed set of values is meaningful.
@@ -26,6 +26,29 @@ PageHeaderPlugin::make()
     ->mode(HeaderMode::Sticky);
 ```
 
+## HeaderActionsPosition
+
+Namespace:
+
+```php
+MortalKiller\FilamentPageHeader\Enums\HeaderActionsPosition
+```
+
+| Case | Value | Desktop behavior |
+| --- | --- | --- |
+| `HeaderActionsPosition::Start` | `start` | Action block before the main content, at the logical inline start. |
+| `HeaderActionsPosition::End` | `end` | Action block after the main content; the default. |
+| `HeaderActionsPosition::Below` | `below` | Action block on its own row after the header content, before sub-navigation. |
+
+Start and End respect RTL. Mobile retains the full-width action area after the details for every position. These values position the block, not the order of its actions.
+
+```php
+Header::make()
+    ->actionsPosition(HeaderActionsPosition::Below);
+```
+
+See [Native header actions](../../guides/native-actions/) for compact selection and interaction behavior.
+
 ## HeaderPart
 
 Namespace:
@@ -34,7 +57,7 @@ Namespace:
 MortalKiller\FilamentPageHeader\Enums\HeaderPart
 ```
 
-Used by [`CompactHeader`](../compact-header/).
+Used by [`CompactHeader`](../compact-header/). Native actions use their separate `actions()` / `hideActions()` policy, not a `HeaderPart` case.
 
 | Case | Internal value | Represents |
 | --- | --- | --- |

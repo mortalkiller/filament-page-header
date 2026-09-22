@@ -36,7 +36,7 @@ export default defineConfig({
       customCss: ['./src/styles/custom.css'],
       sidebar: [
         { label: 'Getting Started', items: ['getting-started/installation', 'getting-started/compatibility'] },
-        { label: 'Guides', items: ['guides/configuration', 'guides/generator', 'guides/migration'] },
+        { label: 'Guides', items: ['guides/configuration', 'guides/native-actions', 'guides/generator', 'guides/migration'] },
         { label: 'API Reference', items: ['api', 'api/page-header-plugin', 'api/header', 'api/metadata-entry', 'api/heading-subheading', 'api/compact-header', 'api/has-page-header', 'api/header-options', 'api/enums'] },
         { label: 'Development', items: ['development/local-development', 'development/testing', 'development/releases'] },
         { label: 'Project', items: ['project/roadmap', 'project/security'] },
