@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace MortalKiller\FilamentPageHeader\Commands;
 
 use Filament\Facades\Filament;
+use Filament\FilamentManager;
 use Filament\Panel;
 use Filament\Resources\Pages\CreateRecord;
 use Filament\Resources\Pages\EditRecord;
@@ -86,7 +87,7 @@ final class MakePageHeaderCommand extends Command
 
         $panelOption = $this->option('panel');
 
-        if (filled($panelOption) && ! array_key_exists((string) $panelOption, $panels)) {
+        if (filled($panelOption) && app(FilamentManager::class)->getPanel((string) $panelOption, isStrict: false) === null) {
             throw new RuntimeException("Filament panel [{$panelOption}] was not found.");
         }
 
