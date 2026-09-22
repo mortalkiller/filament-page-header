@@ -81,13 +81,21 @@ test('Playwright actionability does not move a compact header before opening a n
     expect(await page.evaluate(() => window.scrollY)).toBeCloseTo(before, 0);
 });
 
-test('native dropdown opening preserves compact state without Playwright actionability scrolling', async ({ page }) => {
+test('native pointer opening preserves compact state without locator auto-scroll', async ({ page }) => {
     await page.setViewportSize({ width: 1440, height: 1000 });
     await openHeader(page, { teleport: '0', selection: 'exclude' });
     await compact(page);
 
     const before = await page.evaluate(() => window.scrollY);
-    await page.getByRole('button', { name: 'More', exact: true }).evaluate(element => element.click());
+    const trigger = page.getByRole('button', { name: 'More', exact: true });
+    const bounds = await trigger.boundingBox();
+
+    expect(bounds).not.toBeNull();
+
+    await page.mouse.click(
+        bounds.x + bounds.width / 2,
+        bounds.y + bounds.height / 2,
+    );
 
     await expect(action(page, 'approve')).toBeVisible();
     await expect(page.locator('[data-fph-root]')).toHaveAttribute('data-fph-compact', 'true');
