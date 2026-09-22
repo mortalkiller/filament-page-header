@@ -69,6 +69,32 @@ for (const mode of ['normal', 'sticky']) {
     });
 }
 
+test('Playwright actionability does not move a compact header before opening a native dropdown', async ({ page }) => {
+    await page.setViewportSize({ width: 1440, height: 1000 });
+    await openHeader(page, { teleport: '0', selection: 'exclude' });
+    await compact(page);
+
+    const before = await page.evaluate(() => window.scrollY);
+    await page.getByRole('button', { name: 'More', exact: true }).click({ trial: true });
+
+    await expect(page.locator('[data-fph-root]')).toHaveAttribute('data-fph-compact', 'true');
+    expect(await page.evaluate(() => window.scrollY)).toBeCloseTo(before, 0);
+});
+
+test('native dropdown opening preserves compact state without Playwright actionability scrolling', async ({ page }) => {
+    await page.setViewportSize({ width: 1440, height: 1000 });
+    await openHeader(page, { teleport: '0', selection: 'exclude' });
+    await compact(page);
+
+    const before = await page.evaluate(() => window.scrollY);
+    await page.getByRole('button', { name: 'More', exact: true }).evaluate(element => element.click());
+
+    await expect(action(page, 'approve')).toBeVisible();
+    await expect(page.locator('[data-fph-root]')).toHaveAttribute('data-fph-compact', 'true');
+    await expect(action(page, 'duplicate')).toBeHidden();
+    expect(await page.evaluate(() => window.scrollY)).toBeCloseTo(before, 0);
+});
+
 for (const teleport of ['0', '1']) {
     for (const selection of ['include', 'exclude']) {
         test(`${selection} keeps native groups intact with teleport=${teleport}`, async ({ page }) => {
