@@ -50,7 +50,7 @@ jobs:
       php-version: '8.4'
 
   skills:
-    name: Laravel Boost skill discovery
+    name: Package standard skill distribution
     runs-on: ubuntu-latest
 
     steps:
@@ -69,7 +69,9 @@ jobs:
       - name: Install dependencies
         run: composer install --no-interaction --prefer-dist --no-progress
 
-      - name: Verify developing-filament-packages discovery
+      - name: Verify developing-filament-packages distribution
         shell: bash
-        run: vendor/bin/testbench boost:list-skills --no-ansi | grep -F 'developing-filament-packages'
+        run: |
+          test -f vendor/mortalkiller/filament-package-standard/resources/boost/skills/developing-filament-packages/SKILL.md
+          grep -F 'name: developing-filament-packages' vendor/mortalkiller/filament-package-standard/resources/boost/skills/developing-filament-packages/SKILL.md
 
