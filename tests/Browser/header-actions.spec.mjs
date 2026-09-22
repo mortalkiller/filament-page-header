@@ -20,6 +20,19 @@ async function noOverflow(page) {
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth + 1)).toBe(true);
 }
 
+async function clickAtCurrentPosition(page, locator) {
+    const bounds = await locator.boundingBox();
+
+    if (!bounds) {
+        throw new Error('Expected the control to be visible before the pointer click.');
+    }
+
+    await page.mouse.click(
+        bounds.x + bounds.width / 2,
+        bounds.y + bounds.height / 2,
+    );
+}
+
 for (const position of ['start', 'end', 'below']) {
     for (const direction of ['ltr', 'rtl']) {
         test(`${position} uses logical desktop positioning in ${direction}`, async ({ page }) => {
@@ -87,7 +100,10 @@ for (const teleport of ['0', '1']) {
             await expect(action(page, 'ungrouped')).toBeHidden();
             await expect(page.locator('.fph-actions > .fi-ac > .fi-btn-group')).toBeHidden();
             await expect(action(page, 'disabled')).toBeDisabled();
-            await page.getByRole('button', { name: 'More', exact: true }).click();
+            const compactScrollTop = await page.evaluate(() => window.scrollY);
+            await clickAtCurrentPosition(page, page.getByRole('button', { name: 'More', exact: true }));
+            await expect(page.locator('[data-fph-root]')).toHaveAttribute('data-fph-compact', 'true');
+            expect(await page.evaluate(() => window.scrollY)).toBeCloseTo(compactScrollTop, 0);
             await expect(action(page, 'approve')).toBeVisible();
             await expect(action(page, 'duplicate')).toBeHidden();
             await expect(action(page, 'duplicate').locator('..')).toHaveAttribute('data-fph-action-hidden', 'true');
@@ -145,7 +161,7 @@ test('a teleported menu already open at the transition remains usable until clos
     await compact(page);
     await expect(action(page, 'duplicate')).toBeVisible();
     await page.keyboard.press('Escape');
-    await page.getByRole('button', { name: 'More', exact: true }).click();
+    await clickAtCurrentPosition(page, page.getByRole('button', { name: 'More', exact: true }));
     await expect(action(page, 'approve')).toBeVisible();
     await expect(action(page, 'duplicate')).toBeHidden();
 });
@@ -179,7 +195,7 @@ test('Livewire visibility changes remove newly empty native dropdowns', async ({
     await page.setViewportSize({ width: 1440, height: 1000 });
     await openHeader(page, { selection: 'approve', teleport: '1' });
     await compact(page);
-    await page.getByRole('button', { name: 'More', exact: true }).click();
+    await clickAtCurrentPosition(page, page.getByRole('button', { name: 'More', exact: true }));
     await action(page, 'approve').click();
     const dialog = page.getByRole('alertdialog', { name: 'Approve', exact: true });
     await expect(dialog.locator('.fi-modal-window')).toBeVisible();
@@ -195,7 +211,7 @@ test('SPA navigation cleans up action presentation and initializes exactly one n
     await page.setViewportSize({ width: 1440, height: 1000 });
     const errors = await openHeader(page, { teleport: '1' });
     await compact(page);
-    await page.getByRole('button', { name: 'More', exact: true }).click();
+    await clickAtCurrentPosition(page, page.getByRole('button', { name: 'More', exact: true }));
     await page.locator('[data-demo-content]').getByRole('link', { name: 'Native page', exact: true }).evaluate(el => el.click());
     await expect(page).toHaveURL(/\/demo\/native$/);
     await expect(page.locator('[data-fph-root]')).toHaveCount(0);
