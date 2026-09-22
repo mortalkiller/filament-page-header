@@ -17,6 +17,12 @@ Build informative, responsive page headers with native **Filament 4 and 5** sche
 
 Enable headers only on the panels and pages you choose. No custom theme build, application-specific models or required icon library.
 
+## Why
+
+Filament's native page headers are intentionally simple, which is often exactly what an application needs. The friction starts when several pages need richer identity, status, metadata, responsive actions, sticky behavior or compact-on-scroll presentation. Reimplementing that per Resource usually means repeated Blade overrides, layout CSS and interaction code that can drift away from Filament's native actions and navigation.
+
+Filament Page Header exists to keep that richer presentation inside Filament's schema system. It provides one reusable, opt-in composition layer while leaving records, authorization, actions, breadcrumbs and sub-navigation under Filament's control. Pages that do not need a richer header can keep the native header unchanged.
+
 ## Documentation
 
 Full documentation, guides and API reference:
@@ -30,6 +36,7 @@ Full documentation, guides and API reference:
 
 ## Contents
 
+- [Why](#why)
 - [Documentation](#documentation)
 - [Features](#features)
 - [Screenshots](#screenshots)
