@@ -91,7 +91,9 @@ for (const teleport of ['0', '1']) {
             await expect(action(page, 'approve')).toBeVisible();
             await expect(action(page, 'duplicate')).toBeHidden();
             await expect(action(page, 'duplicate').locator('..')).toHaveAttribute('data-fph-action-hidden', 'true');
-            expect(await action(page, 'approve').evaluate(el => !!el.closest('[data-fph-root]'))).toBe(teleport === '0');
+            // Native dropdownTeleport() uses fixed positioning, not DOM reparenting.
+            const panel = action(page, 'approve').locator('xpath=ancestor::*[contains(concat(" ", normalize-space(@class), " "), " fi-dropdown-panel ")][1]');
+            await expect(panel).toHaveCSS('position', teleport === '1' ? 'fixed' : 'absolute');
             await page.getByRole('button', { name: 'Nested', exact: true }).click();
             await expect(action(page, 'archive')).toBeVisible();
             await expect(action(page, 'archive')).toHaveCount(1);
@@ -154,16 +156,18 @@ test('native action forms and page form submissions retain their state and handl
     const note = page.getByRole('textbox', { name: 'Unsaved note', exact: true });
     await note.fill('Unsaved form draft');
     await action(page, 'form').click();
-    const dialog = page.getByRole('dialog');
-    await expect(dialog).toBeVisible();
+    const dialog = page.getByRole('dialog', { name: 'Edit reason', exact: true });
+    const modalWindow = dialog.locator('.fi-modal-window');
+    await expect(modalWindow).toBeVisible();
+    await expect(dialog).toHaveAttribute('aria-modal', 'true');
     const reason = dialog.getByRole('textbox', { name: /Reason/ });
     await reason.fill('Reviewed');
     await compact(page);
-    await expect(dialog).toBeVisible();
+    await expect(modalWindow).toBeVisible();
     await expect(reason).toHaveValue('Reviewed');
     await expect(action(page, 'form')).toBeHidden();
     await dialog.getByRole('button', { name: 'Apply reason', exact: true }).click();
-    await expect(dialog).toBeHidden();
+    await expect(modalWindow).toBeHidden();
     await expect(page.locator('.fph-badges')).toContainText('Reviewed');
     await expect(note).toHaveValue('Unsaved form draft');
     await action(page, 'save').click();
@@ -177,8 +181,10 @@ test('Livewire visibility changes remove newly empty native dropdowns', async ({
     await compact(page);
     await page.getByRole('button', { name: 'More', exact: true }).click();
     await action(page, 'approve').click();
-    await page.getByRole('dialog').getByRole('button', { name: 'Approve order', exact: true }).click();
-    await expect(page.getByRole('dialog')).toBeHidden();
+    const dialog = page.getByRole('alertdialog', { name: 'Approve', exact: true });
+    await expect(dialog.locator('.fi-modal-window')).toBeVisible();
+    await dialog.getByRole('button', { name: 'Approve order', exact: true }).click();
+    await expect(dialog.locator('.fi-modal-window')).toBeHidden();
     await expect(action(page, 'approve')).toHaveCount(0);
     await page.evaluate(() => document.activeElement?.blur());
     await compact(page);
