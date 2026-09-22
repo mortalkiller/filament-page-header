@@ -14,16 +14,16 @@ concurrency:
 
 jobs:
   php:
-    uses: mortalkiller/filament-package-template/.github/workflows/reusable-tests.yml@fd1b3f6ef3fd383de952c8a4f210c51b49f63e36
+    uses: mortalkiller/filament-package-template/.github/workflows/reusable-tests.yml@5ed6a6b06b4d8e7c2b2d013eedbe86aeba01d5af
     with:
       matrix-json: >-
         {"include":[
-          {"php":"8.3","testbench":"^10.0","filament":"4.12.6","expected_filament":"4.12.6"},
-          {"php":"8.4","testbench":"^11.0","filament":"^4.12.6"},
-          {"php":"8.5","testbench":"^11.0","filament":"^4.12.6"},
-          {"php":"8.3","testbench":"^10.0","filament":"5.8.1","expected_filament":"5.8.1"},
-          {"php":"8.4","testbench":"^11.0","filament":"^5.8.1"},
-          {"php":"8.5","testbench":"^11.0","filament":"^5.8.1"}
+          {"php":"8.3","laravel":"12.*","testbench":"^10.0","filament":"4.12.6","dependencies":"lowest","expected_filament":"4.12.6"},
+          {"php":"8.4","laravel":"13.*","testbench":"^11.0","filament":"^4.12.6","dependencies":"latest"},
+          {"php":"8.5","laravel":"13.*","testbench":"^11.0","filament":"^4.12.6","dependencies":"latest"},
+          {"php":"8.3","laravel":"12.*","testbench":"^10.0","filament":"5.8.1","dependencies":"lowest","expected_filament":"5.8.1"},
+          {"php":"8.4","laravel":"13.*","testbench":"^11.0","filament":"^5.8.1","dependencies":"latest"},
+          {"php":"8.5","laravel":"13.*","testbench":"^11.0","filament":"^5.8.1","dependencies":"latest"}
         ]}
       test-command: composer test
 
@@ -43,7 +43,7 @@ jobs:
         run: node --test tests/JavaScript/*.test.mjs
 
   browser:
-    uses: mortalkiller/filament-package-template/.github/workflows/reusable-browser-tests.yml@fd1b3f6ef3fd383de952c8a4f210c51b49f63e36
+    uses: mortalkiller/filament-package-template/.github/workflows/reusable-browser-tests.yml@5ed6a6b06b4d8e7c2b2d013eedbe86aeba01d5af
     with:
       filament-matrix-json: >-
         {"include":[{"filament":"4.12.6"},{"filament":"^5.8.1"}]}
@@ -74,4 +74,3 @@ jobs:
         run: |
           test -f vendor/mortalkiller/filament-package-standard/resources/boost/skills/developing-filament-packages/SKILL.md
           grep -F 'name: developing-filament-packages' vendor/mortalkiller/filament-package-standard/resources/boost/skills/developing-filament-packages/SKILL.md
-

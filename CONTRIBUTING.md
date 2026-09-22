@@ -13,42 +13,39 @@ Report vulnerabilities privately using [SECURITY.md](SECURITY.md).
 1. Create a focused feature or fix branch from `2.x`, and target your pull request at `2.x`.
 2. Use the independent [workbench and testing setup](docs/testing.md), or the [local path repository workflow](docs/local-development.md).
 3. Keep reusable behavior inside the package. Consumer applications should configure its public API.
-4. Add meaningful regression coverage for behavior changes and update the relevant documentation. For visual changes, inspect desktop/mobile and light/dark layouts.
-5. Run the checks relevant to the change. Describe what passed and what you could not run in the pull request.
+4. Add meaningful regression coverage for behavior changes and update relevant documentation. For visual changes, inspect desktop/mobile and light/dark layouts.
+5. Run the checks relevant to the change and describe them in the pull request.
 
-Read [Development and release flow](docs/development-flow.md). Permanent branches are package-major lines; there is no separate stable-promotion branch. Keep the historical unsupported `1.x` line frozen. Squash temporary work after review and passing CI.
+Read the [Package Standard v2](https://github.com/mortalkiller/filament-package-standard/blob/2.x/docs/package-standard.md), [Standard v2 migration guide](https://github.com/mortalkiller/filament-package-standard/blob/2.x/docs/migrating-to-v2.md), and [Development and release flow](docs/development-flow.md). Standard/tooling upgrades do not determine package SemVer. Keep the historical unsupported `1.x` line frozen.
 
 Use English for code, comments and test descriptions. Keep public API changes explicit and include migration guidance for breaking changes. Avoid unrelated formatting and refactoring.
 
 ## Agent skill
 
-The repository includes `mortalkiller/filament-package-standard` as a direct development dependency. After `composer install`, read and use:
+The repository includes `mortalkiller/filament-package-standard:^2.0` as a direct development dependency. After `composer install`, read and use:
 
 ```text
 vendor/mortalkiller/filament-package-standard/resources/boost/skills/developing-filament-packages/SKILL.md
 ```
 
-In real Laravel applications that install both the Standard and Laravel Boost directly, Boost can discover and synchronize the same skill.
-
 ## Checks
 
 ```bash
-composer test
-composer format:check
+composer check
 node --test tests/JavaScript/*.test.mjs
 npm run test:browser
 ```
 
-Run `composer format` to format PHP changes. Browser tests require the setup described in the testing guide. CI runs PHP, JavaScript and Chromium checks on pull requests; the PHP matrix covers the supported Filament 4 and 5/Laravel 12 and 13 combinations. Push checks cover major branches. The docs workflow validates both canonical and major-version build paths without deployment.
+`composer check` runs Pint, Larastan and Pest. Browser tests require the setup described in the testing guide. CI runs PHP, JavaScript, Chromium, static-analysis and Zizmor checks. The PHP matrix covers the supported Filament 4 and 5/Laravel 12 and 13 combinations.
 
-Do not commit dependencies, generated environment files, test reports or lockfiles produced by local library development. Selected, reviewed documentation screenshots belong in `docs/screenshots/`.
+Do not commit dependencies, generated environment files, test reports or lockfiles produced by local library development. Selected reviewed documentation screenshots belong in `docs/screenshots/`.
 
 ## Dependency maintenance
 
-Dependabot checks Composer, GitHub Actions and npm weekly. Version updates use an explicit seven-day cooldown and open pull requests for review; there is no automatic merge configured by this package. Review compatibility changes and keep GitHub Actions pinned to full commit SHAs. Pin shared workflow tooling through the matching `standard-ref`. Security updates are separate from ordinary version updates and are not delayed by the cooldown.
+Dependabot checks Composer, GitHub Actions and npm weekly. Version updates use an explicit seven-day cooldown and open pull requests for review; there is no automatic merge configured by this package. Review compatibility changes and keep GitHub Actions pinned to full commit SHAs. Pin shared workflow tooling through the matching `standard-ref`.
 
 ## Pull requests and releases
 
-Explain the problem, resulting behavior and executed checks. Attach before/after screenshots for layout changes. Changes must be published to GitHub before external checks such as Plumb can observe them; do not claim a new score from a local configuration alone.
+Explain the problem, resulting behavior and executed checks. Attach before/after screenshots for layout changes. Changes must be published to GitHub before external checks such as Plumb can observe them.
 
-After successful checks on the exact major commit, create a new immutable `vX.Y.Z` tag and publish its GitHub Release. Stable releases publish exact-tag documentation; branch pushes and prereleases do not replace stable docs. Maintainers publish release notes through [GitHub Releases](https://github.com/mortalkiller/filament-page-header/releases). Contributors do not need to create a release to test a change locally.
+After successful checks on the exact major commit, create a new immutable `vX.Y.Z` tag and publish its GitHub Release. Stable releases publish exact-tag documentation; branch pushes and prereleases do not replace stable docs. Never move existing tags.

@@ -7,6 +7,8 @@
 /docs-site export-ignore
 /docs/superpowers export-ignore
 /docs/verification.md export-ignore
+/.editorconfig export-ignore
+/phpstan.neon.dist export-ignore
 /phpunit.xml.dist export-ignore
 /playwright.config.mjs export-ignore
 /testbench.yaml export-ignore

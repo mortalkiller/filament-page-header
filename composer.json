@@ -14,8 +14,9 @@
         "illuminate/support": "^12.0 || ^13.0"
     },
     "require-dev": {
+        "larastan/larastan": "^3.0",
         "laravel/pint": "^1.0",
-        "mortalkiller/filament-package-standard": "^1.0",
+        "mortalkiller/filament-package-standard": "^2.0",
         "orchestra/testbench": "^10.0 || ^11.0",
         "pestphp/pest": "^4.1",
         "pestphp/pest-plugin-laravel": "^4.0"
@@ -48,8 +49,10 @@
         "post-autoload-dump": "@php vendor/bin/testbench package:discover --ansi",
         "test": "pest",
         "lint": "pint --test",
+        "analyse": "phpstan analyse --memory-limit=1G",
         "check": [
             "@lint",
+            "@analyse",
             "@test"
         ],
         "browser:prepare": [
