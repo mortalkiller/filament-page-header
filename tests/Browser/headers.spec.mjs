@@ -1,4 +1,5 @@
 import { test, expect } from '@playwright/test';
+import { getDropdownAction } from './support/menu-locators.mjs';
 
 async function openHeader(page, query = 'variant=10&mode=compact') {
     const errors = [];
@@ -121,7 +122,7 @@ test('menu and confirmation remain above the sticky header', async ({ page }) =>
     await page.evaluate(() => window.scrollTo(0, 700));
     await expect(page.locator('[data-fph-root]')).toHaveAttribute('data-fph-stuck', 'true');
     await page.getByRole('button', { name: 'More', exact: true }).click();
-    await page.getByRole('button', { name: 'Confirm action', exact: true }).click();
+    await getDropdownAction(page, 'Confirm action').click();
     const dialog = page.getByRole('alertdialog', { name: 'Confirm action', exact: true });
     const modalWindow = dialog.locator('.fi-modal-window');
     await expect(modalWindow).toBeVisible();

@@ -1,4 +1,5 @@
 import { test, expect } from '@playwright/test';
+import { getDropdownNavigationLink } from './support/menu-locators.mjs';
 
 async function openNavigation(page, query = '') {
     await page.goto(`/demo/navigation?${query}`);
@@ -25,8 +26,8 @@ for (const width of [390, 1440]) {
                 await expect(desktop).toBeHidden();
                 await expect(mobile).toBeVisible();
                 await mobile.getByRole('button', { name: 'Navigation overview', exact: true }).click();
-                await expect(mobile.getByRole('link', { name: 'Navigation overview', exact: true })).toHaveAttribute('aria-current', 'page');
-                await mobile.getByRole('link', { name: 'Navigation details', exact: true }).click();
+                await expect(getDropdownNavigationLink(mobile, 'Navigation overview')).toHaveAttribute('aria-current', 'page');
+                await getDropdownNavigationLink(mobile, 'Navigation details').click();
             } else {
                 await expect(desktop).toBeVisible();
                 await expect(mobile).toBeHidden();
