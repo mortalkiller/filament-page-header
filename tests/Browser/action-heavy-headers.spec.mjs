@@ -1,4 +1,5 @@
 import { test, expect } from '@playwright/test';
+import { getDropdownAction } from './support/menu-locators.mjs';
 
 const actionLabels = [
     'Guardar alterações',
@@ -94,7 +95,7 @@ for (const mode of ['sticky', 'compact']) {
             }
 
             await page.getByRole('button', { name: 'Mais', exact: true }).click();
-            await expect(page.getByRole('button', { name: 'Unir cliente', exact: true })).toBeVisible();
+            await expect(getDropdownAction(page, 'Unir cliente')).toBeVisible();
             await page.keyboard.press('Escape');
             await header.screenshot({ path: testInfo.outputPath(`header-${mode}.png`) });
             await page.evaluate(() => window.scrollTo(0, 0));
@@ -204,10 +205,10 @@ for (const theme of ['light', 'dark']) {
             if (width < 768) {
                 await expectMobileActionColumn(page);
                 await page.getByRole('button', { name: 'Outros documentos', exact: true }).click();
-                await expect(page.getByRole('button', { name: 'Criar fatura', exact: true })).toBeVisible();
+                await expect(getDropdownAction(page, 'Criar fatura')).toBeVisible();
                 await page.keyboard.press('Escape');
                 await page.getByRole('button', { name: 'Mais', exact: true }).click();
-                await expect(page.getByRole('button', { name: 'Unir cliente', exact: true })).toBeVisible();
+                await expect(getDropdownAction(page, 'Unir cliente')).toBeVisible();
                 await page.keyboard.press('Escape');
             }
             await header.screenshot({ path: testInfo.outputPath(`customer-${theme}-${width}-compact.png`) });

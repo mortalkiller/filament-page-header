@@ -14,14 +14,14 @@ concurrency:
 
 jobs:
   php:
-    uses: mortalkiller/filament-package-template/.github/workflows/reusable-tests.yml@830e5953c0a1244b4e7a772b6e728492bdd8ef9f
+    uses: mortalkiller/filament-package-template/.github/workflows/reusable-tests.yml@3906572137120a059b197ebabe109b7327ca76b5
     with:
       matrix-json: >-
         {"include":[
-          {"php":"8.3","laravel":"12.*","testbench":"^10.0","filament":"4.12.6","dependencies":"lowest","expected_filament":"4.12.6"},
+          {"php":"8.3","laravel":"12.*","testbench":"^10.0","filament":"4.12.6","dependencies":"lowest","expected_filament":"4.12.6","compatibility_advisory":"PKSA-cnr1-6g7k-bp3d"},
           {"php":"8.4","laravel":"13.*","testbench":"^11.0","filament":"^4.12.6","dependencies":"latest"},
           {"php":"8.5","laravel":"13.*","testbench":"^11.0","filament":"^4.12.6","dependencies":"latest"},
-          {"php":"8.3","laravel":"12.*","testbench":"^10.0","filament":"5.8.1","dependencies":"lowest","expected_filament":"5.8.1"},
+          {"php":"8.3","laravel":"12.*","testbench":"^10.0","filament":"5.8.1","dependencies":"lowest","expected_filament":"5.8.1","compatibility_advisory":"PKSA-cnr1-6g7k-bp3d"},
           {"php":"8.4","laravel":"13.*","testbench":"^11.0","filament":"^5.8.1","dependencies":"latest"},
           {"php":"8.5","laravel":"13.*","testbench":"^11.0","filament":"^5.8.1","dependencies":"latest"}
         ]}
@@ -43,10 +43,10 @@ jobs:
         run: node --test tests/JavaScript/*.test.mjs
 
   browser:
-    uses: mortalkiller/filament-package-template/.github/workflows/reusable-browser-tests.yml@830e5953c0a1244b4e7a772b6e728492bdd8ef9f
+    uses: mortalkiller/filament-package-template/.github/workflows/reusable-browser-tests.yml@3906572137120a059b197ebabe109b7327ca76b5
     with:
       filament-matrix-json: >-
-        {"include":[{"filament":"4.12.6"},{"filament":"^5.8.1"}]}
+        {"include":[{"filament":"4.12.6","compatibility_advisory":"PKSA-cnr1-6g7k-bp3d"},{"filament":"^5.8.1"}]}
       php-version: '8.4'
 
   skills:

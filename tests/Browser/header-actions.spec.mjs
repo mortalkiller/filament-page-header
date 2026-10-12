@@ -1,4 +1,5 @@
 import { test, expect } from '@playwright/test';
+import { getDropdownAction } from './support/menu-locators.mjs';
 
 const action = (page, name) => page.locator(`[data-fph-header-action="${name}"]`);
 
@@ -110,7 +111,7 @@ for (const teleport of ['0', '1']) {
             // Native dropdownTeleport() uses fixed positioning, not DOM reparenting.
             const panel = action(page, 'approve').locator('xpath=ancestor::*[contains(concat(" ", normalize-space(@class), " "), " fi-dropdown-panel ")][1]');
             await expect(panel).toHaveCSS('position', teleport === '1' ? 'fixed' : 'absolute');
-            await page.getByRole('button', { name: 'Nested', exact: true }).click();
+            await getDropdownAction(page, 'Nested').click();
             await expect(action(page, 'archive')).toBeVisible();
             await expect(action(page, 'archive')).toHaveCount(1);
             expect(await page.evaluate(() => window.originalSaveAction === document.querySelector('[data-fph-header-action="save"]'))).toBe(true);
