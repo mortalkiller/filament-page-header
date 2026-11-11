@@ -187,7 +187,8 @@ Use native Filament entries for content and keep business logic in your applicat
 
 | Configure | API | Guide |
 | --- | --- | --- |
-| Identity | `heading()`, `description()`, `avatar()`, `image()`, `initials()`, `icon()`, `initialsBgColor()`, `initialsTextColor()`, `iconBgColor()`, `iconColor()` | [Images and icons](docs/configuration.md#images-and-icons) |
+| Identity | `heading()`, `description()`, `avatar()`, `image()`, `initials()`, `icon()`, `initialsBgColor()`, `initialsTextColor()`, `iconBgColor()`, `iconColor()`, `avatarShape()`, `avatarStyle()` | [Images and icons](docs/configuration.md#images-and-icons) |
+| Card | `contained()` | [Header API](https://docs.pedromonteiro.dev/filament-page-header/api/header/) |
 | Badges and details | `badges()`, `metadata()`, `summary()` | [Layout slots](docs/configuration.md#layout-slots) |
 | Native actions | `actionsPosition()`, compact `actions()` / `hideActions()` | [Native action control](docs/native-actions.md) |
 | Field icons | `fieldIcon()`, `fieldIconPosition()`, `fieldIconSize()` | [Metadata fields](docs/configuration.md#metadata-separators-and-field-icons) |
@@ -217,6 +218,14 @@ Header::make()
     ->icon(Heroicon::OutlinedUser)
     ->iconBgColor('primary')
     ->iconColor(Color::Blue);
+
+// A rounded square with a light tint of the color, on the page instead of in a card.
+Header::make()
+    ->initials(fn (Model $record) => $record->name)
+    ->initialsBgColor('primary')
+    ->avatarShape(AvatarShape::Rounded)
+    ->avatarStyle(AvatarStyle::Soft)
+    ->contained(false);
 ```
 
 See [Images and icons](docs/configuration.md#images-and-icons) for imports, closures and fallback behavior.
