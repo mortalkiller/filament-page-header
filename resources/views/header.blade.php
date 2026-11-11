@@ -6,6 +6,7 @@
     use MortalKiller\FilamentPageHeader\Enums\BreadcrumbPosition;
     $breadcrumbPosition = $headerComponent?->getBreadcrumbPosition() ?? BreadcrumbPosition::Outside;
     $hideBreadcrumbsWhenCompact = $headerComponent?->isSlotHiddenWhenCompact('breadcrumbs') ?? true;
+    $isContained = $headerComponent?->isContained() ?? true;
     $keepOutsideBreadcrumbs = $breadcrumbs && $breadcrumbPosition === BreadcrumbPosition::Outside && ! $hideBreadcrumbsWhenCompact;
 @endphp
 @if ($breadcrumbs && $breadcrumbPosition === BreadcrumbPosition::Outside && ! $keepOutsideBreadcrumbs)
@@ -29,8 +30,9 @@
             </div>
         @endif
         <header
-            class="fph-header fi-section"
+            @class(['fph-header', 'fi-section' => $isContained])
             data-fph-header
+            data-fph-contained="{{ $isContained ? 'true' : 'false' }}"
             @if ($subNavigation) data-fph-has-sub-navigation @endif
         >
             @if ($breadcrumbs && $breadcrumbPosition === BreadcrumbPosition::Inside)

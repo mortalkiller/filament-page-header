@@ -77,6 +77,8 @@ The identity area chooses a single visual using this order: custom `leading()` c
 | `initialsTextColor(...): static` | Override the initials foreground color. |
 | `iconBgColor(...): static` | Set an icon fallback background color. |
 | `iconColor(...): static` | Override the icon foreground color. |
+| `avatarShape(AvatarShape\|Closure $shape): static` | Draw the avatar, initials and icon fallback as a circle (the default) or a rounded square. |
+| `avatarStyle(AvatarStyle\|Closure $style): static` | Color the initials and icon fallbacks solid (the default) or soft: a light tint behind the color itself, with its own dark-theme shades. |
 | `leading(array\|Closure $components): static` | Provide a completely custom leading schema; this takes precedence over avatar/image/initials/icon rendering. |
 
 ### Avatar with fallbacks
@@ -91,6 +93,21 @@ Header::make()
 ```
 
 If the avatar URL is empty or invalid, initials are tried next. If no initials can be rendered, the icon is used.
+
+### Rounded, soft initials
+
+```php
+use MortalKiller\FilamentPageHeader\Enums\AvatarShape;
+use MortalKiller\FilamentPageHeader\Enums\AvatarStyle;
+
+Header::make()
+    ->initials(fn ($record) => $record->name)
+    ->initialsBgColor('primary')
+    ->avatarShape(AvatarShape::Rounded)
+    ->avatarStyle(AvatarStyle::Soft);
+```
+
+A soft avatar uses shade 100 as the background and 700 as the text in the light theme, and 900 and 300 in the dark one. An explicit `initialsTextColor()` or `iconColor()` keeps its color in both themes.
 
 ### Native ImageEntry
 
@@ -164,6 +181,18 @@ Header::make()->subNavigation();
 The package reuses Filament's existing navigation data. It does not create routes, URLs, active-state rules, or authorization logic.
 
 Relation Manager content tabs remain in the page content; `subNavigation()` is for native page/record sub-navigation.
+
+## Card
+
+| Method | Description |
+| --- | --- |
+| `contained(bool\|Closure $condition = true): static` | Draw the header as a card (the default) or, with `false`, directly on the page with no background, border or padding of its own. |
+
+An uncontained header gets the page's background back while it is stuck, so content scrolling under it does not show through. It uses `--fph-page-background` (and `--fph-page-background-dark`) when the panel sets them, and Filament's page colors otherwise.
+
+```php
+Header::make()->contained(false);
+```
 
 ## Header mode
 

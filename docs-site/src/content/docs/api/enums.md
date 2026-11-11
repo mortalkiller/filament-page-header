@@ -49,6 +49,32 @@ Header::make()
 
 See [Native header actions](../../guides/native-actions/) for compact selection and interaction behavior.
 
+## AvatarShape
+
+Namespace:
+
+```php
+MortalKiller\FilamentPageHeader\Enums\AvatarShape
+```
+
+| Case | Value | Shape |
+| --- | --- | --- |
+| `AvatarShape::Circle` | `circle` | A circle; the default. |
+| `AvatarShape::Rounded` | `rounded` | A square with rounded corners. |
+
+## AvatarStyle
+
+Namespace:
+
+```php
+MortalKiller\FilamentPageHeader\Enums\AvatarStyle
+```
+
+| Case | Value | Colors |
+| --- | --- | --- |
+| `AvatarStyle::Solid` | `solid` | The color as the background, with a contrasting text color; the default. |
+| `AvatarStyle::Soft` | `soft` | A light tint as the background and the color as the text, with dark-theme shades. |
+
 ## HeaderPart
 
 Namespace:

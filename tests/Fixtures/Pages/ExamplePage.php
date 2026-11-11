@@ -20,12 +20,15 @@ class ExamplePage extends NativePage
 
     public string $note = '';
 
+    public bool $contained = true;
+
     public int $actionCount = 0;
 
     public function headerSchema(Schema $schema): Schema
     {
         return $schema->components([
             Header::make()->compact()
+                ->contained(fn (self $livewire): bool => $livewire->contained)
                 ->heading(fn (self $livewire): string => $livewire->headerText)
                 ->description('Supporting text')
                 ->badges([

@@ -19,6 +19,8 @@ use Illuminate\Contracts\Support\Htmlable;
 use InvalidArgumentException;
 use MortalKiller\FilamentPageHeader\CompactHeader;
 use MortalKiller\FilamentPageHeader\Concerns\HasHeaderActions;
+use MortalKiller\FilamentPageHeader\Enums\AvatarShape;
+use MortalKiller\FilamentPageHeader\Enums\AvatarStyle;
 use MortalKiller\FilamentPageHeader\Enums\BreadcrumbPosition;
 use MortalKiller\FilamentPageHeader\Enums\HeaderMode;
 use MortalKiller\FilamentPageHeader\Enums\HeaderPart;
@@ -52,6 +54,12 @@ class Header extends Component
 
     /** @var string|array<int, string>|Closure|null */
     protected string|array|Closure|null $iconColor = null;
+
+    protected AvatarShape|Closure $avatarShape = AvatarShape::Circle;
+
+    protected AvatarStyle|Closure $avatarStyle = AvatarStyle::Solid;
+
+    protected bool|Closure $isContained = true;
 
     protected ?Page $page = null;
 
@@ -201,6 +209,63 @@ class Header extends Component
         return $this;
     }
 
+    /** The shape of the avatar, the initials and the icon fallback: a circle, or a square with rounded corners. */
+    public function avatarShape(AvatarShape|Closure $shape): static
+    {
+        $this->avatarShape = $shape;
+
+        return $this;
+    }
+
+    public function getAvatarShape(): AvatarShape
+    {
+        $shape = $this->evaluate($this->avatarShape);
+
+        if (! $shape instanceof AvatarShape) {
+            throw new InvalidArgumentException('The avatar shape must be an AvatarShape case.');
+        }
+
+        return $shape;
+    }
+
+    /**
+     * How the initials and icon fallbacks use their colour: solid (the colour as the background)
+     * or soft (a light tint as the background and the colour as the text, in both themes).
+     */
+    public function avatarStyle(AvatarStyle|Closure $style): static
+    {
+        $this->avatarStyle = $style;
+
+        return $this;
+    }
+
+    public function getAvatarStyle(): AvatarStyle
+    {
+        $style = $this->evaluate($this->avatarStyle);
+
+        if (! $style instanceof AvatarStyle) {
+            throw new InvalidArgumentException('The avatar style must be an AvatarStyle case.');
+        }
+
+        return $style;
+    }
+
+    /**
+     * Whether the header is drawn as a card (a Filament section). Without it the header sits on
+     * the page itself, with no background, border or padding of its own, until it is stuck.
+     */
+    public function contained(bool|Closure $condition = true): static
+    {
+        $this->isContained = $condition;
+
+        return $this;
+    }
+
+    public function isContained(): bool
+    {
+        return (bool) $this->evaluate($this->isContained);
+    }
+
     public function getAvatarUrl(): ?string
     {
         $url = trim((string) $this->evaluate($this->avatar));
@@ -255,6 +320,10 @@ class Header extends Component
             return [];
         }
 
+        if ($this->getAvatarStyle() === AvatarStyle::Soft) {
+            return $this->getSoftIdentityStyles($palette, $this->getForegroundColor($foregroundColor));
+        }
+
         $background = $palette[600] ?? $palette[500] ?? null;
 
         if (! is_string($background)) {
@@ -267,6 +336,25 @@ class Header extends Component
             '--fph-avatar-background' => $background,
             '--fph-avatar-text' => $textColor ?? $this->getInitialsContrastColor($palette, $background),
         ];
+    }
+
+    /**
+     * A light tint of the colour behind the colour itself, and the reverse for the dark theme
+     * (the stylesheet switches to the "-dark" properties there).
+     *
+     * @param  array<int, string>  $palette
+     * @return array<string, string>
+     */
+    private function getSoftIdentityStyles(array $palette, ?string $textColor): array
+    {
+        $shades = [
+            '--fph-avatar-background' => $palette[100] ?? $palette[50] ?? null,
+            '--fph-avatar-text' => $textColor ?? $palette[700] ?? $palette[600] ?? null,
+            '--fph-avatar-background-dark' => $palette[900] ?? $palette[800] ?? null,
+            '--fph-avatar-text-dark' => $textColor ?? $palette[300] ?? $palette[400] ?? null,
+        ];
+
+        return array_filter($shades, is_string(...));
     }
 
     private function getForegroundColor(mixed $color): ?string

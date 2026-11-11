@@ -13,6 +13,8 @@
     $icon = $getIcon();
     $initialsAvatarStyles = $getInitialsAvatarStyles();
     $iconStyles = $getIconStyles();
+    $avatarShape = $getAvatarShape()->value;
+    $avatarStyle = $getAvatarStyle()->value;
     $hasMetadata = $hasContent($slots['metadata']);
     $hasSummary = $hasContent($slots['summary']);
 @endphp
@@ -22,7 +24,7 @@
             @if ($hasContent($slots['leading']))
                 <div class="fph-slot fph-leading{{ $isImage() ? ' fph-image' : '' }}" data-fph-hide-compact="{{ $isSlotHiddenWhenCompact('leading') ? 'true' : 'false' }}">{!! $slots['leading'] !!}</div>
             @elseif ($avatarUrl || $initials !== '')
-                <div class="fph-avatar{{ $isImage() ? ' fph-image' : '' }}" @if (! $avatarUrl && $initialsAvatarStyles !== []) style="@foreach ($initialsAvatarStyles as $property => $value){{ $property }}: {{ $value }}; @endforeach" @endif data-fph-hide-compact="{{ $isSlotHiddenWhenCompact('leading') ? 'true' : 'false' }}">
+                <div class="fph-avatar{{ $isImage() ? ' fph-image' : '' }}" data-fph-avatar-shape="{{ $avatarShape }}" data-fph-avatar-style="{{ $avatarStyle }}" @if (! $avatarUrl && $initialsAvatarStyles !== []) style="@foreach ($initialsAvatarStyles as $property => $value){{ $property }}: {{ $value }}; @endforeach" @endif data-fph-hide-compact="{{ $isSlotHiddenWhenCompact('leading') ? 'true' : 'false' }}">
                     @if ($avatarUrl)
                         <img src="{{ $avatarUrl }}" alt="{{ $avatarName }}" width="56" height="56" />
                     @else
@@ -30,7 +32,7 @@
                     @endif
                 </div>
             @elseif ($icon)
-                <div class="fph-avatar fph-icon" @if ($iconStyles !== []) style="@foreach ($iconStyles as $property => $value){{ $property }}: {{ $value }}; @endforeach" @endif data-fph-hide-compact="{{ $isSlotHiddenWhenCompact('leading') ? 'true' : 'false' }}">
+                <div class="fph-avatar fph-icon" data-fph-avatar-shape="{{ $avatarShape }}" data-fph-avatar-style="{{ $avatarStyle }}" @if ($iconStyles !== []) style="@foreach ($iconStyles as $property => $value){{ $property }}: {{ $value }}; @endforeach" @endif data-fph-hide-compact="{{ $isSlotHiddenWhenCompact('leading') ? 'true' : 'false' }}">
                     <span aria-hidden="true">{{ \Filament\Support\generate_icon_html($icon) }}</span>
                 </div>
             @endif
